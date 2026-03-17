@@ -1,8 +1,11 @@
 export default defineAppConfig({
   ui: {
     colors: {
-      primary: 'green',
-      neutral: 'zinc'
+      primary: 'brass',
+      neutral: 'charcoal'
+    },
+    icons: {
+      loading: 'i-lucide-loader-circle'
     }
   }
 })

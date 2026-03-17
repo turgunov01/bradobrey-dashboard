@@ -2,17 +2,90 @@
 @import "@nuxt/ui";
 
 @theme static {
-  --font-sans: 'Public Sans', sans-serif;
+  --font-sans: 'Public Sans', 'Segoe UI', sans-serif;
 
-  --color-green-50: #EFFDF5;
-  --color-green-100: #D9FBE8;
-  --color-green-200: #B3F5D1;
-  --color-green-300: #75EDAE;
-  --color-green-400: #00DC82;
-  --color-green-500: #00C16A;
-  --color-green-600: #00A155;
-  --color-green-700: #007F45;
-  --color-green-800: #016538;
-  --color-green-900: #0A5331;
-  --color-green-950: #052E16;
+  --color-brass-50: #f8f1e3;
+  --color-brass-100: #f1e1bb;
+  --color-brass-200: #e9d092;
+  --color-brass-300: #d9b165;
+  --color-brass-400: #c89441;
+  --color-brass-500: #b17b2d;
+  --color-brass-600: #8f6224;
+  --color-brass-700: #6f4b1d;
+  --color-brass-800: #533715;
+  --color-brass-900: #39240d;
+  --color-brass-950: #201306;
+
+  --color-charcoal-50: #f6f3ef;
+  --color-charcoal-100: #e6e0d8;
+  --color-charcoal-200: #cfc4b7;
+  --color-charcoal-300: #b19f8b;
+  --color-charcoal-400: #8a7967;
+  --color-charcoal-500: #6b5d50;
+  --color-charcoal-600: #544840;
+  --color-charcoal-700: #403630;
+  --color-charcoal-800: #2a231f;
+  --color-charcoal-900: #1c1714;
+  --color-charcoal-950: #120f0d;
+
+  --color-sand-50: #fbf8f4;
+  --color-sand-100: #f3ebe0;
+  --color-sand-200: #e7d9c5;
+  --color-sand-300: #d8c2a2;
+  --color-sand-400: #c9aa7d;
+  --color-sand-500: #b9945f;
+  --color-sand-600: #9c7748;
+  --color-sand-700: #7c5d38;
+  --color-sand-800: #5b442a;
+  --color-sand-900: #3e2d1c;
+  --color-sand-950: #21170f;
+}
+
+:root {
+  --ui-bg: var(--color-sand-50);
+  --ui-bg-elevated: rgba(255, 255, 255, 0.78);
+  --ui-border: color-mix(in srgb, var(--color-charcoal-200) 72%, white);
+  --ui-text-dimmed: var(--color-charcoal-500);
+  --dashboard-shell: radial-gradient(circle at top left, rgba(177, 123, 45, 0.12), transparent 32%), linear-gradient(180deg, #fbf7f2 0%, #f5efe7 100%);
+}
+
+body {
+  background: var(--dashboard-shell);
+  color: var(--color-charcoal-900);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-brass-300) 52%, white);
+  color: var(--color-charcoal-950);
+}
+
+.page-surface {
+  position: relative;
+}
+
+.page-surface::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(90deg, rgba(32, 19, 6, 0.02) 1px, transparent 1px),
+    linear-gradient(rgba(32, 19, 6, 0.02) 1px, transparent 1px);
+  background-size: 36px 36px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.5), transparent 92%);
+}
+
+.warm-card {
+  backdrop-filter: blur(18px);
+  background: color-mix(in srgb, white 82%, var(--color-sand-100));
+  box-shadow: 0 18px 40px rgba(28, 23, 20, 0.07);
+}
+
+.barbershop-heading {
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+
+.soft-divider {
+  border-color: color-mix(in srgb, var(--color-charcoal-200) 70%, white);
 }
