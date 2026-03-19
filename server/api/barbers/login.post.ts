@@ -24,7 +24,7 @@ export default defineEventHandler(async (event): Promise<{ authenticated: boolea
     if (!hasValidPassword) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'Invalid login or password.'
+        statusMessage: 'Неверный логин или пароль.'
       })
     }
 

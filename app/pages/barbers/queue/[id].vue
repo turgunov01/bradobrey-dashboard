@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { queueEditBeforeCompleteSchema, queueUpdateSchema } from '~~/shared/schemas'
 import { formatDateTime, formatMoney } from '~/utils/format'
-
-definePageMeta({
-  middleware: 'barber-auth'
-})
+import { formatPaymentMethod } from '~/utils/display'
+import { flattenServicesPayload } from '~/utils/services'
 
 const route = useRoute()
 const barbersApi = useBarbersApi()
@@ -38,28 +36,11 @@ const { data, pending, refresh } = await useAsyncData('barber-queue-detail', asy
 const queueItem = computed<Record<string, any> | null>(() => (data.value?.detail as any)?.data || null)
 const queueStatusCode = computed(() => (data.value?.detail as any)?.status || 200)
 
-const flatServices = computed(() => {
-  const payload = data.value?.services as any
-
-  if (Array.isArray(payload?.services)) {
-    return payload.services
-  }
-
-  if (Array.isArray(payload?.categories)) {
-    return payload.categories.flatMap((category: any, index: number) =>
-      (category.services || []).map((service: any) => ({
-        ...service,
-        category_name: category.name || category.title || `Category ${index + 1}`
-      }))
-    )
-  }
-
-  return []
-})
+const flatServices = computed(() => flattenServicesPayload(data.value?.services))
 
 const serviceOptions = computed(() =>
   flatServices.value.map((service: any) => ({
-    label: `${service.name || 'Unnamed service'}${service.category_name ? ` • ${service.category_name}` : ''}`,
+    label: `${service.name || 'Услуга без названия'}${service.category ? ` / ${service.category}` : ''}`,
     value: String(service.id)
   }))
 )
@@ -89,7 +70,7 @@ async function submitUpdate() {
   })
 
   if (!payload.success) {
-    useApiClient().notifyError(new Error(payload.error.issues[0]?.message || 'Invalid queue update'))
+    useApiClient().notifyError(new Error(payload.error.issues[0]?.message || 'Некорректное обновление очереди'))
     return
   }
 
@@ -101,7 +82,7 @@ async function saveOverride() {
   const payload = queueEditBeforeCompleteSchema.safeParse(overrideForm)
 
   if (!payload.success) {
-    useApiClient().notifyError(new Error(payload.error.issues[0]?.message || 'Invalid completion override'))
+    useApiClient().notifyError(new Error(payload.error.issues[0]?.message || 'Некорректная корректировка перед завершением'))
     return
   }
 
@@ -138,17 +119,17 @@ async function markNotInTime() {
 <template>
   <UDashboardPanel id="queue-detail">
     <template #header>
-      <UDashboardNavbar :title="queueItem?.customer_name || `Queue Entry ${queueId}`" :ui="{ right: 'gap-3' }">
+      <UDashboardNavbar :title="queueItem?.customer_name || `Запись очереди ${queueId}`" :ui="{ right: 'gap-3' }">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
 
         <template #right>
           <UButton color="neutral" icon="i-lucide-arrow-left" to="/barbers/workspace" variant="outline">
-            Back
+            Назад
           </UButton>
           <UButton color="neutral" icon="i-lucide-refresh-cw" :loading="pending" variant="outline" @click="refresh()">
-            Refresh
+            Обновить
           </UButton>
         </template>
       </UDashboardNavbar>
@@ -160,8 +141,8 @@ async function markNotInTime() {
           v-if="queueStatusCode === 209"
           color="warning"
           icon="i-lucide-badge-alert"
-          title="Completed queue entry"
-          description="The backend returned HTTP 209 for this record. The detail view remains readable, but the entry is already completed."
+          title="Завершенная запись очереди"
+          description="Бэкенд вернул HTTP 209 для этой записи. Просмотр деталей остается доступным, но запись уже завершена."
           variant="soft"
         />
 
@@ -170,44 +151,44 @@ async function markNotInTime() {
             <template #header>
               <div class="space-y-2">
                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
-                  Queue summary
+                  Сводка по очереди
                 </p>
                 <h2 class="barbershop-heading text-3xl text-charcoal-950">
-                  Track the current visit
+                  Отслеживание текущего визита
                 </h2>
               </div>
             </template>
 
             <div v-if="queueItem" class="grid gap-3 sm:grid-cols-2">
               <div class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 p-4">
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">Status</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">Статус</p>
                 <div class="mt-3">
                   <SharedStatusBadge :label="queueItem.status" />
                 </div>
               </div>
               <div class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 p-4">
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">Payment</p>
-                <p class="mt-3 text-lg font-semibold capitalize text-charcoal-950">{{ queueItem.payment_method || 'pending' }}</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">Оплата</p>
+                <p class="mt-3 text-lg font-semibold text-charcoal-950">{{ formatPaymentMethod(queueItem.payment_method) }}</p>
               </div>
               <div class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 p-4">
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">Created</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">Создано</p>
                 <p class="mt-3 text-lg font-semibold text-charcoal-950">{{ formatDateTime(queueItem.created_at) }}</p>
               </div>
               <div class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 p-4">
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">Amount</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">Сумма</p>
                 <p class="mt-3 text-lg font-semibold text-charcoal-950">{{ formatMoney(queueItem.amount) }}</p>
               </div>
             </div>
 
             <div class="mt-5 flex flex-wrap gap-3">
               <UButton color="neutral" icon="i-lucide-phone-call" variant="outline" @click="callEntry">
-                Call
+                Вызвать
               </UButton>
               <UButton color="primary" icon="i-lucide-play" variant="outline" @click="startEntry">
-                Start
+                Начать
               </UButton>
               <UButton color="primary" icon="i-lucide-check-check" @click="completeEntry">
-                Complete
+                Завершить
               </UButton>
             </div>
           </UCard>
@@ -216,57 +197,57 @@ async function markNotInTime() {
             <template #header>
               <div class="space-y-2">
                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
-                  Update
+                  Обновление
                 </p>
                 <h2 class="barbershop-heading text-3xl text-charcoal-950">
-                  Adjust services and status
+                  Изменение услуг и статуса
                 </h2>
               </div>
             </template>
 
             <div class="space-y-5">
-              <UFormField label="Status">
-                <UInput v-model="updateForm.status" placeholder="waiting, started, completed" />
+              <UFormField label="Статус">
+                <UInput v-model="updateForm.status" placeholder="ожидает, начато, завершено" />
               </UFormField>
 
-              <UFormField label="Payment method">
-                <UInput v-model="updateForm.payment_method" placeholder="cash, card, certificate" />
+              <UFormField label="Способ оплаты">
+                <UInput v-model="updateForm.payment_method" placeholder="наличные, карта, сертификат" />
               </UFormField>
 
-              <UFormField label="Services">
+              <UFormField label="Услуги">
                 <USelectMenu
                   v-model="updateForm.service_ids"
                   class="w-full"
                   :items="serviceOptions"
                   multiple
-                  placeholder="Select one or more services"
+                  placeholder="Выберите одну или несколько услуг"
                   value-key="value"
                 />
               </UFormField>
 
               <div class="flex justify-end">
                 <UButton color="primary" icon="i-lucide-save" @click="submitUpdate">
-                  Save queue changes
+                  Сохранить изменения очереди
                 </UButton>
               </div>
 
               <div class="rounded-[1.5rem] border border-charcoal-200 bg-white/80 p-4">
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-charcoal-500">
-                  Edit before complete
+                  Редактирование перед завершением
                 </p>
 
                 <div class="mt-4 grid gap-4 sm:grid-cols-[0.45fr_0.55fr]">
-                  <UFormField label="Amount override">
+                  <UFormField label="Корректировка суммы">
                     <UInput v-model="overrideForm.amount" type="number" />
                   </UFormField>
-                  <UFormField label="Reason">
-                    <UInput v-model="overrideForm.reason" placeholder="Adjustment reason" />
+                  <UFormField label="Причина">
+                    <UInput v-model="overrideForm.reason" placeholder="Причина корректировки" />
                   </UFormField>
                 </div>
 
                 <div class="mt-4 flex justify-end">
                   <UButton color="neutral" icon="i-lucide-pencil-line" variant="outline" @click="saveOverride">
-                    Save override
+                    Сохранить корректировку
                   </UButton>
                 </div>
               </div>
@@ -279,25 +260,25 @@ async function markNotInTime() {
             <template #header>
               <div class="space-y-2">
                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
-                  Flags
+                  Флаги
                 </p>
                 <h2 class="barbershop-heading text-2xl text-charcoal-950">
-                  Exceptional outcomes
+                  Нестандартные исходы
                 </h2>
               </div>
             </template>
 
             <div class="space-y-3">
               <UButton block color="warning" icon="i-lucide-user-round-x" variant="outline" @click="markNotInTime">
-                Mark not in time
+                Отметить как не вовремя
               </UButton>
               <UButton block color="error" icon="i-lucide-ban" variant="outline" @click="markNoShow">
-                Mark no-show
+                Отметить как неявку
               </UButton>
             </div>
           </UCard>
 
-          <SharedJsonBlock label="Raw queue payload" :value="queueItem || {}" />
+          <SharedJsonBlock label="Сырые данные очереди" :value="queueItem || {}" />
         </div>
       </div>
     </template>

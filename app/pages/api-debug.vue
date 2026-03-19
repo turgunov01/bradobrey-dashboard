@@ -1,6 +1,5 @@
 <script setup lang="ts">
 definePageMeta({
-  middleware: 'barber-auth'
 })
 
 const route = useRoute()
@@ -11,14 +10,14 @@ const branchStore = useBranchStore()
 await branchStore.ensureLoaded()
 
 const presets = computed(() => [
-  { body: '', label: 'Health', method: 'GET', path: '/api/health', value: 'health' },
-  { body: '', label: 'Kiosk config', method: 'GET', path: '/api/kiosk/config', value: 'kiosk-config' },
-  { body: '', label: 'Barber me', method: 'GET', path: '/api/barbers/me', value: 'barber-me' },
-  { body: '', label: 'Live queue', method: 'GET', path: '/api/barbers/queue', value: 'queue' },
-  { body: '', label: 'Services', method: 'GET', path: '/api/services', value: 'services' },
-  { body: '', label: 'Statistics', method: 'GET', path: '/api/statistics', value: 'statistics' },
-  { body: '{"code":"TEST"}', label: 'Promo validate', method: 'POST', path: '/api/promo-code/validate', value: 'promo-validate' },
-  { body: '{"code":"CERT-001"}', label: 'Certificate lookup', method: 'GET', path: '/api/kiosk/certificate/CERT-001', value: 'certificate' }
+  { body: '', label: 'Проверка API', method: 'GET', path: '/api/health', value: 'health' },
+  { body: '', label: 'Конфиг киоска', method: 'GET', path: '/api/kiosk/config', value: 'kiosk-config' },
+  { body: '', label: 'Профиль барбера', method: 'GET', path: '/api/barbers/me', value: 'barber-me' },
+  { body: '', label: 'Активная очередь', method: 'GET', path: '/api/barbers/queue', value: 'queue' },
+  { body: '', label: 'Услуги', method: 'GET', path: '/api/services', value: 'services' },
+  { body: '', label: 'Статистика', method: 'GET', path: '/api/statistics', value: 'statistics' },
+  { body: '{"code":"TEST"}', label: 'Проверка промокода', method: 'POST', path: '/api/promo-code/validate', value: 'promo-validate' },
+  { body: '{"code":"CERT-001"}', label: 'Проверка сертификата', method: 'GET', path: '/api/kiosk/certificate/CERT-001', value: 'certificate' }
 ])
 
 const selectedPreset = ref(String(route.query.preset || presets.value[0]?.value || 'health'))
@@ -53,7 +52,7 @@ async function executeRequest() {
       body = JSON.parse(form.body)
     }
     catch {
-      apiClient.notifyError(new Error('Request body must be valid JSON'))
+      apiClient.notifyError(new Error('Тело запроса должно быть валидным JSON'))
       return
     }
   }
@@ -74,14 +73,14 @@ async function executeRequest() {
 <template>
   <UDashboardPanel id="api-debug">
     <template #header>
-      <UDashboardNavbar title="API Debug" :ui="{ right: 'gap-3' }">
+      <UDashboardNavbar title="Отладка API" :ui="{ right: 'gap-3' }">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
 
         <template #right>
           <UButton color="neutral" icon="i-lucide-trash-2" variant="outline" @click="uiStore.clearDebug()">
-            Clear log
+            Очистить лог
           </UButton>
         </template>
       </UDashboardNavbar>
@@ -94,20 +93,20 @@ async function executeRequest() {
             <template #header>
               <div class="space-y-2">
                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
-                  Request runner
+                  Запуск запросов
                 </p>
                 <h2 class="barbershop-heading text-3xl text-charcoal-950">
-                  Probe the Nuxt BFF
+                  Проверка Nuxt BFF
                 </h2>
               </div>
             </template>
 
             <div class="space-y-4">
-              <UFormField label="Preset">
+              <UFormField label="Пресет">
                 <USelectMenu v-model="selectedPreset" :items="presets" value-key="value" />
               </UFormField>
               <div class="grid gap-4 sm:grid-cols-[0.3fr_0.7fr]">
-                <UFormField label="Method">
+                <UFormField label="Метод">
                   <USelectMenu
                     v-model="form.method"
                     :items="[
@@ -120,30 +119,30 @@ async function executeRequest() {
                     value-key="value"
                   />
                 </UFormField>
-                <UFormField label="Path">
+                <UFormField label="Путь">
                   <UInput v-model="form.path" />
                 </UFormField>
               </div>
-              <UFormField label="JSON body">
+              <UFormField label="Тело JSON">
                 <UTextarea v-model="form.body" :rows="8" />
               </UFormField>
               <UButton color="primary" icon="i-lucide-play" @click="executeRequest">
-                Execute request
+                Выполнить запрос
               </UButton>
             </div>
           </UCard>
 
-          <SharedJsonBlock v-if="result" label="Latest response" :value="result" />
+          <SharedJsonBlock v-if="result" label="Последний ответ" :value="result" />
         </div>
 
         <UCard class="warm-card rounded-[1.9rem] border border-charcoal-200">
           <template #header>
             <div class="space-y-2">
               <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
-                Recent client-side traffic
+                Последние клиентские запросы
               </p>
               <h2 class="barbershop-heading text-3xl text-charcoal-950">
-                Debug stream
+                Поток отладки
               </h2>
             </div>
           </template>
@@ -166,9 +165,9 @@ async function executeRequest() {
           </div>
           <SharedEmptyState
             v-else
-            description="Recent client-side dashboard requests will be recorded here after you use the interface or run a request from this page."
+            description="Здесь будут отображаться последние клиентские запросы панели после использования интерфейса или запуска запроса с этой страницы."
             icon="i-lucide-terminal"
-            title="No debug entries yet"
+            title="Записей отладки пока нет"
           />
         </UCard>
       </div>

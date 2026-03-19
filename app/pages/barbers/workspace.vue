@@ -1,8 +1,4 @@
 <script setup lang="ts">
-definePageMeta({
-  middleware: 'barber-auth'
-})
-
 const sessionStore = useSessionStore()
 const barbersApi = useBarbersApi()
 const breakMinutes = ref(10)
@@ -56,17 +52,17 @@ function openItem(item: any) {
 <template>
   <UDashboardPanel id="workspace">
     <template #header>
-      <UDashboardNavbar title="Barber Workspace" :ui="{ right: 'gap-3' }">
+      <UDashboardNavbar title="Рабочее место барбера" :ui="{ right: 'gap-3' }">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
 
         <template #right>
           <UBadge :color="sessionStore.barber?.is_on_break ? 'warning' : 'primary'" variant="soft">
-            {{ sessionStore.barber?.is_on_break ? 'On break' : 'On shift' }}
+            {{ sessionStore.barber?.is_on_break ? 'На перерыве' : 'На смене' }}
           </UBadge>
           <UButton color="neutral" icon="i-lucide-refresh-cw" :loading="pending" variant="outline" @click="refresh()">
-            Refresh
+            Обновить
           </UButton>
         </template>
       </UDashboardNavbar>
@@ -76,28 +72,28 @@ function openItem(item: any) {
       <div class="space-y-6">
         <div class="grid gap-4 xl:grid-cols-4 md:grid-cols-2">
           <DashboardMetricCard
-            description="Current live items for the authenticated barber."
+            description="Текущие активные записи для авторизованного барбера."
             icon="i-lucide-clock-3"
-            label="Queue items"
+            label="Элементы очереди"
             :value="data?.queue?.count || 0"
           />
           <DashboardMetricCard
-            description="Assigned barber branch context."
+            description="Контекст филиала, назначенный барберу."
             icon="i-lucide-map-pinned"
-            label="Branch"
-            :value="sessionStore.barber?.branch_id || 'Unknown'"
+            label="Филиал"
+            :value="sessionStore.barber?.branch_id || 'Неизвестно'"
           />
           <DashboardMetricCard
-            description="Optional workload signal from kiosk roster."
+            description="Дополнительный индикатор нагрузки из состава киоска."
             icon="i-lucide-users-round"
-            label="Current clients"
+            label="Текущие клиенты"
             :value="sessionStore.barber?.current_clients || 0"
           />
           <DashboardMetricCard
-            description="Estimated waiting time reported by the backend."
+            description="Оценка времени ожидания по данным бэкенда."
             icon="i-lucide-timer"
-            label="Wait estimate"
-            :value="`${sessionStore.barber?.estimated_waiting_time || 0} min`"
+            label="Оценка ожидания"
+            :value="`${sessionStore.barber?.estimated_waiting_time || 0} мин`"
           />
         </div>
 
@@ -106,10 +102,10 @@ function openItem(item: any) {
             <template #header>
               <div class="space-y-2">
                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
-                  Profile
+                  Профиль
                 </p>
                 <h2 class="barbershop-heading text-3xl text-charcoal-950">
-                  {{ sessionStore.user?.name || 'Barber session' }}
+                  {{ sessionStore.user?.name || 'Сессия барбера' }}
                 </h2>
               </div>
             </template>
@@ -117,35 +113,35 @@ function openItem(item: any) {
             <div class="space-y-5">
               <div class="grid gap-3 sm:grid-cols-2">
                 <div class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 p-4">
-                  <p class="text-xs font-semibold uppercase tracking-[0.2em] text-charcoal-500">Login</p>
-                  <p class="mt-2 text-lg font-semibold text-charcoal-950">{{ sessionStore.user?.login || 'Not provided' }}</p>
+                  <p class="text-xs font-semibold uppercase tracking-[0.2em] text-charcoal-500">Логин</p>
+                  <p class="mt-2 text-lg font-semibold text-charcoal-950">{{ sessionStore.user?.login || 'Не указан' }}</p>
                 </div>
                 <div class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 p-4">
-                  <p class="text-xs font-semibold uppercase tracking-[0.2em] text-charcoal-500">Specialization</p>
-                  <p class="mt-2 text-lg font-semibold text-charcoal-950">{{ sessionStore.barber?.specialization || 'General services' }}</p>
+                  <p class="text-xs font-semibold uppercase tracking-[0.2em] text-charcoal-500">Специализация</p>
+                  <p class="mt-2 text-lg font-semibold text-charcoal-950">{{ sessionStore.barber?.specialization || 'Общие услуги' }}</p>
                 </div>
               </div>
 
               <div class="space-y-3 rounded-[1.5rem] border border-charcoal-200 bg-white/80 p-4">
-                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-charcoal-500">Break controls</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-charcoal-500">Управление перерывом</p>
                 <div class="flex flex-wrap items-end gap-3">
-                  <UFormField label="Minutes" name="minutes">
+                  <UFormField label="Минуты" name="minutes">
                     <UInput v-model="breakMinutes" min="1" type="number" />
                   </UFormField>
                   <UButton icon="i-lucide-coffee" @click="startBreak">
-                    Start break
+                    Начать перерыв
                   </UButton>
                   <UButton color="neutral" icon="i-lucide-undo-2" variant="outline" @click="returnFromBreak">
-                    Return
+                    Вернуться
                   </UButton>
                 </div>
               </div>
 
               <UAlert
                 color="neutral"
-                description="Queue updates, call events, and kiosk changes are refreshed again on backend Socket.IO queue:update events."
+                description="Обновления очереди, вызовы клиентов и изменения киоска повторно подтягиваются по событиям Socket.IO queue:update от бэкенда."
                 icon="i-lucide-radio-tower"
-                title="Realtime queue sync"
+                title="Синхронизация очереди в реальном времени"
                 variant="soft"
               />
             </div>
@@ -155,10 +151,10 @@ function openItem(item: any) {
             <template #header>
               <div class="space-y-2">
                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
-                  Live queue
+                  Активная очередь
                 </p>
                 <h2 class="barbershop-heading text-3xl text-charcoal-950">
-                  Action the current queue
+                  Управляйте текущей очередью
                 </h2>
               </div>
             </template>
@@ -175,9 +171,9 @@ function openItem(item: any) {
             </div>
             <SharedEmptyState
               v-else
-              description="No live queue items were returned for the authenticated barber."
+              description="Для авторизованного барбера не найдено активных записей очереди."
               icon="i-lucide-sofa"
-              title="Queue is clear"
+              title="Очередь пуста"
             />
           </UCard>
         </div>

@@ -28,7 +28,7 @@ function getSupabaseAccessConfig(event: H3Event) {
   if (!supabaseUrl || !serviceRoleKey) {
     throw createError({
       statusCode: 500,
-      statusMessage: 'Supabase access control is not configured.'
+      statusMessage: 'Контроль доступа Supabase не настроен.'
     })
   }
 
@@ -72,7 +72,56 @@ async function queryAccessUser(
     throw createError({
       data: error?.data || error?.response?._data,
       statusCode: 502,
-      statusMessage: 'Could not verify dashboard access against Supabase.'
+      statusMessage: 'Не удалось проверить доступ к панели через Supabase.'
+    })
+  }
+}
+
+export async function listSupabaseUsers(
+  event: H3Event,
+  options: {
+    limit?: number
+    role?: string | null
+  } = {}
+) {
+  const { serviceRoleKey, supabaseUrl } = getSupabaseAccessConfig(event)
+
+  try {
+    const rows = await $fetch<unknown[]>('/rest/v1/users', {
+      baseURL: supabaseUrl,
+      headers: {
+        apikey: serviceRoleKey,
+        Authorization: `Bearer ${serviceRoleKey}`
+      },
+      query: {
+        limit: options.limit || 500,
+        order: 'login.asc.nullslast',
+        select: 'id,login,role,branch_id',
+        ...(options.role ? { role: `eq.${options.role}` } : {})
+      }
+    })
+
+    if (!Array.isArray(rows)) {
+      return [] as AccessUser[]
+    }
+
+    const parsedRows: AccessUser[] = []
+
+    for (const row of rows) {
+      const parsed = accessUserSchema.safeParse(row)
+
+      if (parsed.success) {
+        parsedRows.push(parsed.data)
+      }
+    }
+
+    return parsedRows
+  }
+  catch (error: any) {
+    throw createError({
+      data: error?.data || error?.response?._data,
+      statusCode: 502,
+      statusMessage: 'Не удалось получить список пользователей из Supabase.'
     })
   }
 }
@@ -111,7 +160,7 @@ export function assertAdminNetworkRole(accessUser: AccessUser) {
   if (accessUser.role !== 'admin_network') {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Only admin_network users can access this dashboard.'
+      statusMessage: 'Доступ к панели разрешен только пользователям admin_network.'
     })
   }
 
@@ -124,7 +173,7 @@ export function toDashboardUser(accessUser: AccessUser) {
   return {
     id: String(accessUser.id),
     login,
-    name: login || 'Admin',
+    name: login || 'Администратор',
     phone: null,
     role: accessUser.role || null
   }
@@ -134,7 +183,7 @@ function requireAccessUser(accessUser: AccessUser | null) {
   if (!accessUser) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Dashboard access requires a matching user in the Supabase users table.'
+      statusMessage: 'Для доступа к панели требуется соответствующий пользователь в таблице users Supabase.'
     })
   }
 

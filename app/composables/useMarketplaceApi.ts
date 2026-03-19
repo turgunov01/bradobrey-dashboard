@@ -6,7 +6,7 @@ export function useMarketplaceApi() {
       return client.request('/api/marketplace/banners', {
         body,
         method: 'POST',
-        successMessage: 'Banner created'
+        successMessage: 'Баннер создан'
       })
     },
     detail(id: string) {
@@ -19,14 +19,14 @@ export function useMarketplaceApi() {
       return client.request(`/api/marketplace/banners/${id}`, {
         body: { is_active: isActive },
         method: 'DELETE',
-        successMessage: isActive ? 'Banner activated' : 'Banner deactivated'
+        successMessage: isActive ? 'Баннер активирован' : 'Баннер деактивирован'
       })
     },
     update(id: string, body: FormData) {
       return client.request(`/api/marketplace/banners/${id}`, {
         body,
         method: 'PUT',
-        successMessage: 'Banner updated'
+        successMessage: 'Баннер обновлен'
       })
     }
   }

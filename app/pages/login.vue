@@ -48,7 +48,7 @@ async function submit() {
 
   if (!parsed.success) {
     applyFieldErrors(parsed.error.issues)
-    useApiClient().notifyError(new Error(parsed.error.issues[0]?.message || 'Invalid login payload'))
+    useApiClient().notifyError(new Error(parsed.error.issues[0]?.message || 'Некорректные данные для входа'))
     return
   }
 
@@ -66,7 +66,7 @@ async function submit() {
     await navigateTo('/')
 
   } catch (error: any) {
-    fieldErrors.password = error?.statusMessage || error?.message || 'Invalid login or password.'
+    fieldErrors.password = error?.statusMessage || error?.message || 'Неверный логин или пароль.'
   } finally {
     loading.value = false
   }
@@ -79,22 +79,22 @@ async function submit() {
     <form class="space-y-5" @submit.prevent="submit">
       <div class="space-y-1">
         <h1 class="barbershop-heading text-3xl text-charcoal-950">
-          Login
+          Вход
         </h1>
       </div>
 
-      <UFormField label="Login" name="login" :error="fieldErrors.login">
-        <UInput v-model="form.login" autocomplete="username" autofocus class="w-full" placeholder="Login" />
+      <UFormField label="Логин" name="login" :error="fieldErrors.login">
+        <UInput v-model="form.login" autocomplete="username" autofocus class="w-full" placeholder="Введите логин" />
       </UFormField>
 
-      <UFormField label="Password" name="password" :error="fieldErrors.password">
-        <UInput v-model="form.password" autocomplete="current-password" class="w-full" placeholder="Password"
+      <UFormField label="Пароль" name="password" :error="fieldErrors.password">
+        <UInput v-model="form.password" autocomplete="current-password" class="w-full" placeholder="Введите пароль"
           type="password" />
       </UFormField>
 
       <div class="pt-1">
         <UButton block :loading="loading" color="primary" size="lg" type="submit">
-          Sign in
+          Войти
         </UButton>
       </div>
     </form>

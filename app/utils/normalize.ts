@@ -1,3 +1,16 @@
+const keyLabels: Record<string, string> = {
+  amount: 'Сумма',
+  completed: 'Завершено',
+  completed_orders: 'Завершенные заказы',
+  count: 'Количество',
+  orders: 'Заказы',
+  queue_count: 'Элементы очереди',
+  revenue: 'Выручка',
+  total_amount: 'Итоговая сумма',
+  total_clients: 'Всего клиентов',
+  total_revenue: 'Общая выручка'
+}
+
 export function asArray<T>(value: T[] | { items?: T[] } | null | undefined) {
   if (Array.isArray(value)) {
     return value
@@ -28,6 +41,10 @@ export function pickValue(source: Record<string, any> | null | undefined, keys: 
 }
 
 export function toKeyLabel(key: string) {
+  if (keyLabels[key]) {
+    return keyLabels[key]
+  }
+
   return key
     .replace(/_/g, ' ')
     .replace(/\b\w/g, letter => letter.toUpperCase())

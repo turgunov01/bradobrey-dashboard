@@ -15,7 +15,7 @@ defineProps<{
         Bradobrey
       </p>
       <h1 class="barbershop-heading truncate text-xl text-charcoal-950">
-        Operations
+        Панель
       </h1>
     </div>
   </div>

@@ -18,7 +18,7 @@ function getAdminSessionSecret(event: H3Event) {
   if (!secret) {
     throw createError({
       statusCode: 500,
-      statusMessage: 'Admin session secret is not configured.'
+      statusMessage: 'Секрет админ-сессии не настроен.'
     })
   }
 

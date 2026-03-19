@@ -5,7 +5,7 @@ export function useServicesApi() {
 
   return {
     create(payload: ServiceFormPayload) {
-      return client.request('/api/services', { body: payload, method: 'POST', successMessage: 'Service created' })
+      return client.request('/api/services', { body: payload, method: 'POST', successMessage: 'Услуга создана' })
     },
     detail(id: string) {
       return client.request(`/api/services/${id}`)
@@ -14,10 +14,10 @@ export function useServicesApi() {
       return client.request('/api/services')
     },
     remove(id: string) {
-      return client.request(`/api/services/${id}`, { method: 'DELETE', successMessage: 'Service deleted' })
+      return client.request(`/api/services/${id}`, { method: 'DELETE', successMessage: 'Услуга удалена' })
     },
     update(id: string, payload: Partial<ServiceFormPayload>) {
-      return client.request(`/api/services/${id}`, { body: payload, method: 'PATCH', successMessage: 'Service updated' })
+      return client.request(`/api/services/${id}`, { body: payload, method: 'PATCH', successMessage: 'Услуга обновлена' })
     }
   }
 }

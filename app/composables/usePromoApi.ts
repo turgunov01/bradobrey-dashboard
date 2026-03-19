@@ -12,7 +12,7 @@ export function usePromoApi() {
       return client.request('/api/promo-code/dashboard/create', {
         body: payload,
         method: 'POST',
-        successMessage: 'Promo code created'
+        successMessage: 'Промокод создан'
       })
     },
     dashboard() {
@@ -21,18 +21,31 @@ export function usePromoApi() {
     detail(id: string) {
       return client.request(`/api/promo-code/dashboard/${id}`)
     },
+    remove(id: string) {
+      return client.request(`/api/promo-code/dashboard/${id}`, {
+        method: 'DELETE',
+        successMessage: 'Промокод удален'
+      })
+    },
+    update(id: string, payload: PromoCreatePayload) {
+      return client.request(`/api/promo-code/dashboard/${id}`, {
+        body: payload,
+        method: 'PATCH',
+        successMessage: 'Промокод обновлен'
+      })
+    },
     use(payload: PromoUsePayload) {
       return client.request('/api/promo-code/use', {
         body: payload,
         method: 'POST',
-        successMessage: 'Promo code usage recorded'
+        successMessage: 'Использование промокода зафиксировано'
       })
     },
     validate(payload: PromoValidatePayload) {
       return client.request('/api/promo-code/validate', {
         body: payload,
         method: 'POST',
-        successMessage: 'Promo code validated'
+        successMessage: 'Промокод проверен'
       })
     }
   }

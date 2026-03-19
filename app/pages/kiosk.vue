@@ -2,6 +2,7 @@
 import type { TableColumn, TableRow } from '@nuxt/ui'
 
 import { kioskBookingSchema, kioskRegisterSchema } from '~~/shared/schemas'
+import { flattenServicesPayload } from '~/utils/services'
 
 type KioskTab = 'barbers' | 'booking' | 'services'
 type BarberRow = {
@@ -20,10 +21,6 @@ type ServiceRow = {
   serviceId: string
 }
 
-definePageMeta({
-  middleware: 'barber-auth'
-})
-
 const branchStore = useBranchStore()
 const client = useApiClient()
 const kioskApi = useKioskApi()
@@ -39,17 +36,17 @@ const bookingForm = reactive({
   phone_number: '',
   source: 'dashboard-kiosk'
 })
-const deviceName = ref('Front desk iPad')
+const deviceName = ref('Планшет ресепшена')
 const selectedBarberId = ref('')
 const selectedServiceIds = ref<string[]>([])
 const certificateCode = ref('')
 const certificateResult = ref<unknown>(null)
 const bookingPending = ref(false)
 
-const tabs = [
-  { label: 'Barbers', value: 'barbers' as KioskTab },
-  { label: 'Services', value: 'services' as KioskTab },
-  { label: 'Booking', value: 'booking' as KioskTab }
+const baseTabs = [
+  { label: 'Барберы', value: 'barbers' as KioskTab },
+  { label: 'Услуги', value: 'services' as KioskTab },
+  { label: 'Бронирование', value: 'booking' as KioskTab }
 ]
 
 const { data, pending, refresh } = await useAsyncData('kiosk-dashboard', async () => {
@@ -66,58 +63,51 @@ const { data, pending, refresh } = await useAsyncData('kiosk-dashboard', async (
   watch: [() => branchStore.activeBranchId]
 })
 
-const allServices = computed(() => {
-  const payload = data.value?.services as any
-
-  if (Array.isArray(payload?.services) && payload.services.length) {
-    return payload.services
-  }
-
-  if (Array.isArray(payload?.categories)) {
-    return payload.categories.flatMap((category: any, index: number) =>
-      (category.services || []).map((service: any) => ({
-        ...service,
-        category_name: category.name || category.title || `Category ${index + 1}`
-      }))
-    )
-  }
-
-  return []
-})
+const allServices = computed(() => flattenServicesPayload(data.value?.services))
 
 const barberRows = computed<BarberRow[]>(() =>
   (data.value?.barbers || []).map((barber: any, index: number) => ({
     barberId: barber.id !== undefined ? String(barber.id) : '',
     currentClients: barber.current_clients || 0,
     id: String(barber.id ?? barber.user_id ?? barber.name ?? `barber-${index}`),
-    name: barber.name || barber.user?.name || 'Unnamed barber',
+    name: barber.name || barber.user?.name || 'Барбер без имени',
     waitTime: barber.estimated_waiting_time || 0
   }))
 )
 
+const hasBarbers = computed(() => barberRows.value.length > 0)
+
+const tabs = computed(() =>
+  baseTabs.map(tab =>
+    tab.value === 'barbers'
+      ? tab
+      : { ...tab, disabled: !hasBarbers.value }
+  )
+)
+
 const serviceRows = computed<ServiceRow[]>(() =>
   allServices.value.map((service: any, index: number) => ({
-    category: service.category_name || 'Uncategorized',
+    category: service.category || service.category_name || 'Без категории',
     duration: Number(service.duration || 0),
     id: String(service.id ?? `service-${index}`),
-    name: service.name || 'Unnamed service',
+    name: service.name || 'Услуга без названия',
     price: service.price ?? 0,
     serviceId: service.id !== undefined ? String(service.id) : ''
   }))
 )
 
 const barberColumns: TableColumn<BarberRow>[] = [
-  { accessorKey: 'name', header: 'Barber' },
-  { accessorKey: 'currentClients', header: 'Clients' },
-  { accessorKey: 'waitTime', header: 'Wait' },
+  { accessorKey: 'name', header: 'Барбер' },
+  { accessorKey: 'currentClients', header: 'Клиенты' },
+  { accessorKey: 'waitTime', header: 'Ожидание' },
   { id: 'action', header: '' }
 ]
 
 const serviceColumns: TableColumn<ServiceRow>[] = [
-  { accessorKey: 'category', header: 'Category' },
-  { accessorKey: 'name', header: 'Service' },
-  { accessorKey: 'duration', header: 'Duration' },
-  { accessorKey: 'price', header: 'Price' },
+  { accessorKey: 'category', header: 'Категория' },
+  { accessorKey: 'name', header: 'Услуга' },
+  { accessorKey: 'duration', header: 'Длительность' },
+  { accessorKey: 'price', header: 'Цена' },
   { id: 'action', header: '' }
 ]
 
@@ -139,6 +129,16 @@ watch(
 
     if (!rows.some(row => row.barberId === selectedBarberId.value) && rows[0]?.barberId) {
       selectedBarberId.value = rows[0].barberId
+    }
+  },
+  { immediate: true }
+)
+
+watch(
+  hasBarbers,
+  (value) => {
+    if (!value && activeTab.value !== 'barbers') {
+      activeTab.value = 'barbers'
     }
   },
   { immediate: true }
@@ -184,7 +184,7 @@ async function registerDevice() {
   })
 
   if (!payload.success) {
-    client.notifyError(new Error(payload.error.issues[0]?.message || 'Invalid kiosk registration payload'))
+    client.notifyError(new Error(payload.error.issues[0]?.message || 'Некорректные данные регистрации киоска'))
     return
   }
 
@@ -193,7 +193,7 @@ async function registerDevice() {
 
 async function lookupCertificate() {
   if (!certificateCode.value) {
-    client.notifyError(new Error('Certificate code is required'))
+    client.notifyError(new Error('Введите код сертификата'))
     return
   }
 
@@ -213,7 +213,7 @@ async function createBooking() {
   })
 
   if (!payload.success) {
-    client.notifyError(new Error(payload.error.issues[0]?.message || 'Invalid kiosk booking payload'))
+    client.notifyError(new Error(payload.error.issues[0]?.message || 'Некорректные данные записи через киоск'))
     return
   }
 
@@ -237,14 +237,14 @@ async function createBooking() {
 <template>
   <UDashboardPanel id="kiosk">
     <template #header>
-      <UDashboardNavbar title="Kiosk Simulator" :ui="{ right: 'gap-3' }">
+      <UDashboardNavbar title="Симулятор киоска" :ui="{ right: 'gap-3' }">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
 
         <template #right>
           <UButton color="neutral" icon="i-lucide-refresh-cw" :loading="pending" variant="outline" @click="refresh()">
-            Refresh
+            Обновить
           </UButton>
         </template>
       </UDashboardNavbar>
@@ -256,135 +256,112 @@ async function createBooking() {
           <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div class="space-y-2">
               <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
-                Active branch
+                Активный филиал
               </p>
               <h2 class="barbershop-heading text-3xl text-charcoal-950">
-                {{ branchStore.activeBranch?.name || 'Select a branch in the sidebar' }}
+                {{ branchStore.activeBranch?.name || 'Выберите филиал в боковой панели' }}
               </h2>
             </div>
 
             <div class="overflow-x-auto">
-              <UTabs
-                v-model="activeTab"
-                :content="false"
-                :items="tabs"
-                :ui="{
-                  root: 'min-w-max items-start',
-                  list: 'inline-flex w-max rounded-[1.35rem] bg-charcoal-100 p-1.5',
-                  indicator: 'rounded-[0.95rem] bg-primary shadow-none',
-                  trigger: 'h-11 rounded-[0.95rem] px-4 text-sm font-semibold data-[state=active]:text-inverted sm:text-[15px]',
-                  label: 'whitespace-nowrap'
-                }"
-              />
+              <UTabs v-model="activeTab" :content="false" :items="tabs" :ui="{
+                root: 'min-w-max items-start',
+                list: 'inline-flex w-max rounded-[1.35rem] bg-charcoal-100 p-1.5',
+                indicator: 'rounded-[0.95rem] bg-primary shadow-none',
+                trigger: 'h-11 rounded-[0.95rem] px-4 text-sm font-semibold data-[state=active]:text-inverted sm:text-[15px]',
+                label: 'whitespace-nowrap'
+              }" />
             </div>
           </div>
         </UCard>
 
         <section v-if="activeTab === 'barbers'" class="space-y-4">
           <div v-if="barberRows.length" class="overflow-hidden rounded-[1.5rem] border border-charcoal-200 bg-white/90">
-            <UTable
-              :columns="barberColumns"
-              :data="barberRows"
-              :get-row-id="(row) => row.id"
-              :loading="pending"
-              :meta="{
-                class: {
-                  tr: (row) => row.original.barberId === selectedBarberId ? 'bg-primary/10 cursor-pointer' : 'cursor-pointer'
-                }
-              }"
-              :on-select="handleBarberSelect"
-              sticky="header"
-              :ui="{
-                root: 'max-h-[32rem] overflow-auto',
-                base: 'min-w-[44rem]',
-                thead: 'bg-charcoal-50/90',
-                tbody: 'divide-y divide-charcoal-100 [&>tr]:data-[selectable=true]:hover:bg-charcoal-50/80',
-                th: 'px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-charcoal-500',
-                td: 'px-4 py-4 text-sm text-charcoal-700 align-middle'
-              }"
-            >
+            <UTable :columns="barberColumns" :data="barberRows" :get-row-id="(row) => row.id" :loading="pending" :meta="{
+              class: {
+                tr: (row) => row.original.barberId === selectedBarberId ? 'bg-primary/10 cursor-pointer' : 'cursor-pointer'
+              }
+            }" :on-select="handleBarberSelect" sticky="header" :ui="{
+              root: 'max-h-[32rem] overflow-auto',
+              base: 'min-w-[44rem]',
+              thead: 'bg-charcoal-50/90',
+              tbody: 'divide-y divide-charcoal-100 [&>tr]:data-[selectable=true]:hover:bg-charcoal-50/80',
+              th: 'px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-charcoal-500',
+              td: 'px-4 py-4 text-sm text-charcoal-700 align-middle'
+            }">
               <template #name-cell="{ row }">
                 <div>
                   <p class="font-medium text-charcoal-950">{{ row.original.name }}</p>
-                  <p class="text-xs text-charcoal-500">{{ row.original.barberId === selectedBarberId ? 'Selected barber' : 'Tap or choose to assign' }}</p>
+                  <p class="text-xs text-charcoal-500">
+                    {{ row.original.barberId === selectedBarberId ? 'Выбранный барбер' : 'Нажмите, чтобы назначить' }}
+                  </p>
                 </div>
               </template>
 
               <template #waitTime-cell="{ row }">
-                <span class="font-medium">{{ row.original.waitTime }} min</span>
+                <span class="font-medium">{{ row.original.waitTime }} мин</span>
               </template>
 
               <template #action-cell="{ row }">
-                <UButton
-                  :color="row.original.barberId === selectedBarberId ? 'primary' : 'neutral'"
-                  :variant="row.original.barberId === selectedBarberId ? 'solid' : 'outline'"
-                  size="xs"
-                  @click="selectBarber(row.original.barberId)"
-                >
-                  {{ row.original.barberId === selectedBarberId ? 'Selected' : 'Choose' }}
+                <UButton :color="row.original.barberId === selectedBarberId ? 'primary' : 'neutral'"
+                  :variant="row.original.barberId === selectedBarberId ? 'solid' : 'outline'" size="xs"
+                  @click="selectBarber(row.original.barberId)">
+                  {{ row.original.barberId === selectedBarberId ? 'Выбран' : 'Выбрать' }}
                 </UButton>
               </template>
             </UTable>
           </div>
           <SharedEmptyState
             v-else
-            description="No branch barber roster was returned for the current branch context."
+            description="Для текущего контекста филиала не получен список барберов."
             icon="i-lucide-scissors"
-            title="No barbers available"
+            title="Барберы недоступны"
           />
         </section>
 
         <section v-else-if="activeTab === 'services'" class="space-y-4">
-          <div v-if="serviceRows.length" class="overflow-hidden rounded-[1.5rem] border border-charcoal-200 bg-white/90">
-            <UTable
-              :columns="serviceColumns"
-              :data="serviceRows"
-              :get-row-id="(row) => row.id"
-              :loading="pending"
+          <div v-if="serviceRows.length"
+            class="overflow-hidden rounded-[1.5rem] border border-charcoal-200 bg-white/90">
+            <UTable :columns="serviceColumns" :data="serviceRows" :get-row-id="(row) => row.id" :loading="pending"
               :meta="{
                 class: {
                   tr: (row) => selectedServiceIds.includes(row.original.serviceId) ? 'bg-primary/10 cursor-pointer' : 'cursor-pointer'
                 }
-              }"
-              :on-select="handleServiceSelect"
-              sticky="header"
-              :ui="{
+              }" :on-select="handleServiceSelect" sticky="header" :ui="{
                 root: 'max-h-[36rem] overflow-auto',
                 base: 'min-w-[56rem]',
                 thead: 'bg-charcoal-50/90',
                 tbody: 'divide-y divide-charcoal-100 [&>tr]:data-[selectable=true]:hover:bg-charcoal-50/80',
                 th: 'px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-charcoal-500',
                 td: 'px-4 py-4 text-sm text-charcoal-700 align-middle'
-              }"
-            >
+              }">
               <template #name-cell="{ row }">
                 <div>
                   <p class="font-medium text-charcoal-950">{{ row.original.name }}</p>
-                  <p class="text-xs text-charcoal-500">{{ selectedServiceIds.includes(row.original.serviceId) ? 'Added to booking' : 'Available to add' }}</p>
+                  <p class="text-xs text-charcoal-500">
+                    {{ selectedServiceIds.includes(row.original.serviceId) ? 'Добавлено в запись' : 'Доступно для добавления' }}
+                  </p>
                 </div>
               </template>
 
               <template #duration-cell="{ row }">
-                <span class="font-medium">{{ row.original.duration }} min</span>
+                <span class="font-medium">{{ row.original.duration }} мин</span>
               </template>
 
               <template #action-cell="{ row }">
-                <UButton
-                  :color="selectedServiceIds.includes(row.original.serviceId) ? 'primary' : 'neutral'"
-                  :variant="selectedServiceIds.includes(row.original.serviceId) ? 'solid' : 'outline'"
-                  size="xs"
-                  @click="toggleService(row.original.serviceId)"
-                >
-                  {{ selectedServiceIds.includes(row.original.serviceId) ? 'Remove' : 'Add' }}
+                <UButton :color="selectedServiceIds.includes(row.original.serviceId) ? 'primary' : 'neutral'"
+                  :variant="selectedServiceIds.includes(row.original.serviceId) ? 'solid' : 'outline'" size="xs"
+                  @click="toggleService(row.original.serviceId)">
+                  {{ selectedServiceIds.includes(row.original.serviceId) ? 'Убрать' : 'Добавить' }}
                 </UButton>
               </template>
             </UTable>
           </div>
           <SharedEmptyState
             v-else
-            description="No kiosk services were returned from the backend."
+            description="Бэкенд не вернул услуги для киоска."
             icon="i-lucide-badge-dollar-sign"
-            title="No services available"
+            title="Услуги недоступны"
           />
         </section>
 
@@ -393,31 +370,31 @@ async function createBooking() {
             <template #header>
               <div class="space-y-2">
                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
-                  Booking
+                  Бронирование
                 </p>
                 <h2 class="barbershop-heading text-3xl text-charcoal-950">
-                  Complete kiosk booking
+                  Оформление записи через киоск
                 </h2>
               </div>
             </template>
 
             <div class="space-y-4">
-              <UFormField label="Customer name">
+              <UFormField label="Имя клиента">
                 <UInput v-model="bookingForm.customer_name" />
               </UFormField>
-              <UFormField label="Phone number">
+              <UFormField label="Телефон">
                 <UInput v-model="bookingForm.phone_number" />
               </UFormField>
-              <UFormField label="Payment method">
+              <UFormField label="Способ оплаты">
                 <UInput v-model="bookingForm.payment_method" />
               </UFormField>
-              <UFormField label="Certificate code">
+              <UFormField label="Код сертификата">
                 <UInput v-model="bookingForm.certificate_code" />
               </UFormField>
 
               <div class="flex justify-end">
                 <UButton :loading="bookingPending" color="primary" icon="i-lucide-receipt" @click="createBooking">
-                  Create booking
+                  Создать запись
                 </UButton>
               </div>
             </div>
@@ -428,31 +405,28 @@ async function createBooking() {
               <template #header>
                 <div class="space-y-2">
                   <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
-                    Booking summary
+                    Сводка записи
                   </p>
                   <h2 class="barbershop-heading text-2xl text-charcoal-950">
-                    Selected stack
+                    Выбранный набор
                   </h2>
                 </div>
               </template>
 
               <div class="space-y-3">
                 <div class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 p-4">
-                  <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">Barber</p>
-                  <p class="mt-2 text-lg font-semibold text-charcoal-950">{{ selectedBarber?.name || 'Not selected' }}</p>
+                  <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">Барбер</p>
+                  <p class="mt-2 text-lg font-semibold text-charcoal-950">{{ selectedBarber?.name || 'Не выбран' }}</p>
                 </div>
                 <div class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 p-4">
-                  <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">Services</p>
+                  <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">Услуги</p>
                   <div v-if="selectedServices.length" class="mt-3 space-y-2">
-                    <div
-                      v-for="service in selectedServices"
-                      :key="String(service.id)"
-                      class="rounded-[1rem] bg-sand-100 px-3 py-2 text-sm text-charcoal-700"
-                    >
-                      {{ service.name }} • {{ service.duration || 0 }} min • {{ service.price || 0 }}
+                    <div v-for="service in selectedServices" :key="String(service.id)"
+                      class="rounded-[1rem] bg-sand-100 px-3 py-2 text-sm text-charcoal-700">
+                      {{ service.name }} / {{ service.duration || 0 }} мин / {{ service.price || 0 }}
                     </div>
                   </div>
-                  <p v-else class="mt-2 text-sm text-charcoal-500">No services selected yet.</p>
+                  <p v-else class="mt-2 text-sm text-charcoal-500">Услуги пока не выбраны.</p>
                 </div>
               </div>
             </UCard>
@@ -461,34 +435,35 @@ async function createBooking() {
               <template #header>
                 <div class="space-y-2">
                   <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
-                    Tools
+                    Инструменты
                   </p>
                   <h2 class="barbershop-heading text-2xl text-charcoal-950">
-                    Register and lookup
+                    Регистрация и поиск
                   </h2>
                 </div>
               </template>
 
               <div class="space-y-4">
-                <UFormField label="Device name">
+                <UFormField label="Имя устройства">
                   <UInput v-model="deviceName" />
                 </UFormField>
 
                 <UButton color="neutral" icon="i-lucide-tablet-smartphone" variant="outline" @click="registerDevice">
-                  Register kiosk device
+                  Зарегистрировать устройство киоска
                 </UButton>
 
                 <div class="soft-divider border-t pt-4">
-                  <UFormField label="Certificate lookup">
-                    <UInput v-model="certificateCode" placeholder="Certificate code" />
+                  <UFormField label="Поиск сертификата">
+                    <UInput v-model="certificateCode" placeholder="Код сертификата" />
                   </UFormField>
 
-                  <UButton class="mt-3" color="neutral" icon="i-lucide-search" variant="outline" @click="lookupCertificate">
-                    Lookup certificate
+                  <UButton class="mt-3" color="neutral" icon="i-lucide-search" variant="outline"
+                    @click="lookupCertificate">
+                    Найти сертификат
                   </UButton>
                 </div>
 
-                <SharedJsonBlock v-if="certificateResult" label="Certificate response" :value="certificateResult" />
+                <SharedJsonBlock v-if="certificateResult" label="Ответ сертификата" :value="certificateResult" />
               </div>
             </UCard>
           </div>

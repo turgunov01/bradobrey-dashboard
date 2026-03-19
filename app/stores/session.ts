@@ -17,8 +17,8 @@ export const useSessionStore = defineStore("session", {
   },
 
   actions: {
-    async ensureLoaded() {
-      if (this.status === "loaded") {
+    async ensureLoaded(options: { force?: boolean } = {}) {
+      if (this.status === "loaded" && !options.force) {
         return { barber: this.barber, user: this.user };
       }
 
@@ -43,10 +43,8 @@ export const useSessionStore = defineStore("session", {
       const response = await useBarbersApi().login(payload);
 
       if (response?.authenticated) {
-        localStorage.setItem("isAuthenticated", "true");
+        await this.ensureLoaded({ force: true });
       }
-
-      await this.ensureLoaded();
 
       return response;
     },
@@ -58,7 +56,6 @@ export const useSessionStore = defineStore("session", {
         this.barber = null;
         this.user = null;
         this.status = "idle";
-        localStorage.removeItem("isAuthenticated");
       }
     },
 

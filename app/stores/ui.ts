@@ -35,9 +35,6 @@ export const useUiStore = defineStore('ui', {
     pushDebug(entry: DebugEntry) {
       this.apiDebugEntries = [entry, ...this.apiDebugEntries].slice(0, 40)
     },
-    setHistoryFilter(value: 'all' | 'loyal' | 'retention') {
-      this.historyFilter = value
-    },
     setHistoryStatus(value: string) {
       this.barberHistoryStatus = value
     },
@@ -48,7 +45,6 @@ export const useUiStore = defineStore('ui', {
   state: () => ({
     apiDebugEntries: [] as DebugEntry[],
     barberHistoryStatus: '',
-    historyFilter: 'all' as 'all' | 'loyal' | 'retention',
     statisticsRange: getDefaultRange()
   })
 })

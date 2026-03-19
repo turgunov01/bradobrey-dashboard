@@ -26,7 +26,25 @@ function extractErrorMessage(error: any) {
     return error.message;
   }
 
-  return "The request could not be completed.";
+  return "Не удалось выполнить запрос.";
+}
+
+function buildRequestHeaders(headers?: HeadersInit) {
+  const mergedHeaders = new Headers(
+    import.meta.server ? useRequestHeaders(["cookie"]) : undefined,
+  );
+
+  if (!headers) {
+    return mergedHeaders;
+  }
+
+  const normalizedHeaders = new Headers(headers);
+
+  for (const [key, value] of normalizedHeaders.entries()) {
+    mergedHeaders.set(key, value);
+  }
+
+  return mergedHeaders;
 }
 
 export function useApiClient() {
@@ -50,7 +68,7 @@ export function useApiClient() {
       toast.add({
         color: "error",
         description,
-        title: "Request failed",
+        title: "Ошибка запроса",
       });
     }
   }
@@ -62,7 +80,7 @@ export function useApiClient() {
     try {
       const data = await $fetch<TResponse>(url, {
         body: options.body as BodyInit | Record<string, unknown> | undefined,
-        headers: options.headers,
+        headers: buildRequestHeaders(options.headers),
         method: options.method || "GET",
         query: options.query,
       });
@@ -111,7 +129,7 @@ export function useApiClient() {
     try {
       const response = await $fetch.raw<TResponse>(url, {
         body: options.body as BodyInit | Record<string, unknown> | undefined,
-        headers: options.headers,
+        headers: buildRequestHeaders(options.headers),
         method: options.method || "GET",
         query: options.query,
       });

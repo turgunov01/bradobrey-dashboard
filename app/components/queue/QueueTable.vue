@@ -3,6 +3,7 @@ import type { TableColumn } from '@nuxt/ui'
 
 import type { QueueItem } from '~~/shared/schemas'
 import { formatMoney } from '~/utils/format'
+import { formatPaymentMethod } from '~/utils/display'
 
 const props = defineProps<{
   items: QueueItem[]
@@ -17,10 +18,10 @@ const emit = defineEmits<{
 }>()
 
 const columns: TableColumn<QueueItem>[] = [
-  { accessorKey: 'customer_name', header: 'Client' },
-  { accessorKey: 'status', header: 'Status' },
-  { accessorKey: 'payment_method', header: 'Payment' },
-  { accessorKey: 'amount', header: 'Amount' },
+  { accessorKey: 'customer_name', header: 'Клиент' },
+  { accessorKey: 'status', header: 'Статус' },
+  { accessorKey: 'payment_method', header: 'Оплата' },
+  { accessorKey: 'amount', header: 'Сумма' },
   { id: 'actions', header: '' }
 ]
 </script>
@@ -44,10 +45,10 @@ const columns: TableColumn<QueueItem>[] = [
       <template #customer_name-cell="{ row }">
         <div class="space-y-1">
           <p class="font-medium text-charcoal-950">
-            {{ row.original.customer_name || 'Walk-in client' }}
+            {{ row.original.customer_name || 'Клиент без записи' }}
           </p>
           <p class="text-xs text-charcoal-500">
-            {{ row.original.phone_number || 'No phone number' }}
+            {{ row.original.phone_number || 'Телефон не указан' }}
           </p>
         </div>
       </template>
@@ -57,7 +58,7 @@ const columns: TableColumn<QueueItem>[] = [
       </template>
 
       <template #payment_method-cell="{ row }">
-        <span class="capitalize">{{ row.original.payment_method || 'pending' }}</span>
+        <span>{{ formatPaymentMethod(row.original.payment_method) }}</span>
       </template>
 
       <template #amount-cell="{ row }">
@@ -67,16 +68,16 @@ const columns: TableColumn<QueueItem>[] = [
       <template #actions-cell="{ row }">
         <div class="flex flex-wrap justify-end gap-2">
           <UButton color="neutral" size="xs" variant="outline" @click="emit('open', row.original)">
-            Open
+            Открыть
           </UButton>
           <UButton color="neutral" size="xs" variant="outline" @click="emit('call', row.original)">
-            Call
+            Вызвать
           </UButton>
           <UButton color="primary" size="xs" variant="outline" @click="emit('start', row.original)">
-            Start
+            Начать
           </UButton>
           <UButton color="primary" size="xs" @click="emit('complete', row.original)">
-            Complete
+            Завершить
           </UButton>
         </div>
       </template>

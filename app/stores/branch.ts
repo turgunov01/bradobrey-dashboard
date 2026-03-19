@@ -3,6 +3,55 @@ import { defineStore } from 'pinia'
 import type { Branch } from '~~/shared/schemas'
 import { branchSchema } from '~~/shared/schemas'
 
+function extractBranchItems(response: unknown): unknown[] {
+  if (Array.isArray(response)) {
+    return response
+  }
+
+  if (!response || typeof response !== 'object') {
+    return []
+  }
+
+  const payload = response as {
+    branches?: unknown[]
+    data?: unknown[] | { branches?: unknown[], entry?: unknown[], items?: unknown[] }
+    entry?: unknown[]
+    items?: unknown[]
+  }
+
+  if (Array.isArray(payload.branches)) {
+    return payload.branches
+  }
+
+  if (Array.isArray(payload.entry)) {
+    return payload.entry
+  }
+
+  if (Array.isArray(payload.items)) {
+    return payload.items
+  }
+
+  if (Array.isArray(payload.data)) {
+    return payload.data
+  }
+
+  if (payload.data && typeof payload.data === 'object') {
+    if (Array.isArray(payload.data.branches)) {
+      return payload.data.branches
+    }
+
+    if (Array.isArray(payload.data.entry)) {
+      return payload.data.entry
+    }
+
+    if (Array.isArray(payload.data.items)) {
+      return payload.data.items
+    }
+  }
+
+  return []
+}
+
 export const useBranchStore = defineStore('branch', {
   actions: {
     async ensureLoaded() {
@@ -11,9 +60,7 @@ export const useBranchStore = defineStore('branch', {
       }
 
       const response = await useKioskApi().config()
-      const branches = Array.isArray((response as { branches?: unknown[] })?.branches)
-        ? (response as { branches?: unknown[] }).branches || []
-        : []
+      const branches = extractBranchItems(response)
       const parsedBranches: Branch[] = []
 
       for (const branch of branches) {

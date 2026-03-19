@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ru } from '@nuxt/ui/locale'
+
 const colorMode = useColorMode()
 
 colorMode.preference = 'light'
@@ -19,8 +21,8 @@ useHead({
   }
 })
 
-const title = 'Bradobrey Dashboard'
-const description = 'SSR operations dashboard for the Bradobrey barbershop API, built with Nuxt 4, Nuxt UI, and a server-side BFF.'
+const title = 'Панель Bradobrey'
+const description = 'SSR-панель управления для API барбершопа Bradobrey, построенная на Nuxt 4, Nuxt UI и серверном BFF.'
 
 useSeoMeta({
   title,
@@ -34,7 +36,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <UApp :toaster="{ position: 'top-right' }">
+  <UApp :locale="ru" :toaster="{ position: 'top-right' }">
     <NuxtLoadingIndicator />
 
     <NuxtLayout>

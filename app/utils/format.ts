@@ -1,6 +1,6 @@
 export function formatDateTime(value?: string | null) {
   if (!value) {
-    return 'Not available'
+    return 'Недоступно'
   }
 
   const date = new Date(value)
@@ -9,7 +9,7 @@ export function formatDateTime(value?: string | null) {
     return value
   }
 
-  return new Intl.DateTimeFormat('en-GB', {
+  return new Intl.DateTimeFormat('ru-RU', {
     dateStyle: 'medium',
     timeStyle: 'short'
   }).format(date)
@@ -18,7 +18,7 @@ export function formatDateTime(value?: string | null) {
 export function formatMoney(value?: number | string | null, currency = 'UZS') {
   const amount = Number(value || 0)
 
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('ru-RU', {
     currency,
     currencyDisplay: 'narrowSymbol',
     maximumFractionDigits: 0,
@@ -29,7 +29,7 @@ export function formatMoney(value?: number | string | null, currency = 'UZS') {
 export function formatCount(value?: number | string | null) {
   const amount = Number(value || 0)
 
-  return new Intl.NumberFormat('en-US').format(Number.isFinite(amount) ? amount : 0)
+  return new Intl.NumberFormat('ru-RU').format(Number.isFinite(amount) ? amount : 0)
 }
 
 export function formatPercent(value?: number | string | null) {

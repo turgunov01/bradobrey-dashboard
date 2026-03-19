@@ -3,7 +3,6 @@ import { formatCount } from '~/utils/format'
 import { asNumber, pickValue, toKeyLabel } from '~/utils/normalize'
 
 definePageMeta({
-  middleware: 'barber-auth'
 })
 
 const branchStore = useBranchStore()
@@ -75,21 +74,21 @@ const statisticsHighlights = computed(() => {
 
   return [
     {
-      description: 'Global output across the selected range',
+      description: 'Итог по всей системе за выбранный период',
       icon: 'i-lucide-wallet',
-      label: 'Revenue hint',
+      label: 'Выручка',
       value: desired[0] ?? '0'
     },
     {
-      description: 'Tracked queue volume from the analytics endpoint',
+      description: 'Объем очереди по данным аналитики',
       icon: 'i-lucide-users-round',
-      label: 'Orders hint',
+      label: 'Заказы',
       value: desired[1] ?? '0'
     },
     {
-      description: 'Completed traffic detected in the analytics payload',
+      description: 'Количество завершенных записей в аналитике',
       icon: 'i-lucide-check-check',
-      label: 'Completed hint',
+      label: 'Завершено',
       value: desired[2] ?? '0'
     }
   ]
@@ -110,12 +109,12 @@ type ShortcutItem = {
 
 const shortcuts = computed(() =>
   [
-    sessionStore.barber?.id
-      ? { description: 'Run queue actions and break controls', icon: 'i-lucide-scissors-line-dashed', title: 'Workspace', to: '/barbers/workspace' }
-      : null,
-    { description: 'Create kiosk bookings and test branch flows', icon: 'i-lucide-monitor-smartphone', title: 'Kiosk', to: '/kiosk' },
-    { description: 'Manage grouped service definitions', icon: 'i-lucide-badge-dollar-sign', title: 'Services', to: '/services' },
-    { description: 'Inspect every request and response through Nuxt', icon: 'i-lucide-code-xml', title: 'API debug', to: '/api-debug' }
+    // sessionStore.barber?.id
+    //   ? { description: 'Управление очередью и перерывами барбера', icon: 'i-lucide-scissors-line-dashed', title: 'Рабочее место', to: '/barbers/workspace' }
+    //   : null,
+    { description: 'Создание записей через киоск и проверка сценариев филиала', icon: 'i-lucide-monitor-smartphone', title: 'Киоск', to: '/kiosk' },
+    { description: 'Управление сгруппированным каталогом услуг', icon: 'i-lucide-badge-dollar-sign', title: 'Услуги', to: '/services' },
+    { description: 'Просмотр всех запросов и ответов через Nuxt', icon: 'i-lucide-code-xml', title: 'Отладка API', to: '/api-debug' }
   ].filter((shortcut): shortcut is ShortcutItem => Boolean(shortcut))
 )
 </script>
@@ -123,17 +122,17 @@ const shortcuts = computed(() =>
 <template>
   <UDashboardPanel id="overview">
     <template #header>
-      <UDashboardNavbar title="Overview" :ui="{ right: 'gap-3' }">
+      <UDashboardNavbar title="Обзор" :ui="{ right: 'gap-3' }">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
 
         <template #right>
           <UBadge :color="data?.health ? 'primary' : 'neutral'" variant="soft">
-            {{ data?.health ? 'API reachable' : 'Checking API' }}
+            {{ data?.health ? 'API доступен' : 'Проверка API' }}
           </UBadge>
           <UButton color="neutral" icon="i-lucide-refresh-cw" :loading="pending" variant="outline" @click="refresh()">
-            Refresh
+            Обновить
           </UButton>
         </template>
       </UDashboardNavbar>
@@ -142,85 +141,58 @@ const shortcuts = computed(() =>
     <template #body>
       <div class="space-y-6">
         <div class="grid gap-4 xl:grid-cols-4 md:grid-cols-2">
-          <DashboardMetricCard
-            description="Current items assigned to the authenticated barber queue."
-            icon="i-lucide-clock-3"
-            label="Live queue"
-            :value="formatCount(data?.queue?.count)"
-          />
-          <DashboardMetricCard
-            description="Branches loaded from kiosk configuration."
-            icon="i-lucide-map"
-            label="Branches"
-            :value="formatCount(branchStore.branches.length)"
-          />
-          <DashboardMetricCard
-            description="Promo code records reported by the dashboard endpoint."
-            icon="i-lucide-ticket-percent"
-            label="Promo entries"
-            :value="formatCount(promoItems.length)"
-          />
-          <DashboardMetricCard
-            description="Primary health endpoint state."
-            icon="i-lucide-heart-pulse"
-            label="Health"
-            :value="data?.health ? 'OK' : 'Pending'"
-          />
+          <DashboardMetricCard description="Текущие записи очереди, назначенные авторизованному барберу."
+            icon="i-lucide-clock-3" label="Активная очередь" :value="formatCount(data?.queue?.count)" />
+          <DashboardMetricCard description="Филиалы, загруженные из конфигурации киоска." icon="i-lucide-map"
+            label="Филиалы" :value="formatCount(branchStore.branches.length)" />
+          <DashboardMetricCard description="Промокоды, полученные с панели управления." icon="i-lucide-ticket-percent"
+            label="Промокоды" :value="formatCount(promoItems.length)" />
+          <DashboardMetricCard description="Состояние основного health-эндпоинта." icon="i-lucide-heart-pulse"
+            label="Состояние" :value="data?.health ? 'OK' : 'В ожидании'" />
         </div>
 
-        <div class="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+        <div class="grid gap-6 xl:grid-cols-[1]">
           <UCard class="warm-card rounded-[1.9rem] border border-charcoal-200">
             <template #header>
               <div class="space-y-2">
                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
-                  Shop pulse
+                  Пульс салона
                 </p>
                 <h2 class="barbershop-heading text-3xl text-charcoal-950">
-                  Quick operational reading
+                  Быстрая операционная сводка
                 </h2>
               </div>
             </template>
 
             <div class="grid gap-4 md:grid-cols-3">
-              <DashboardMetricCard
-                v-for="card in statisticsHighlights"
-                :key="card.label"
-                :description="card.description"
-                :icon="card.icon"
-                :label="card.label"
-                :value="card.value"
-              />
+              <DashboardMetricCard v-for="card in statisticsHighlights" :key="card.label"
+                :description="card.description" :icon="card.icon" :label="card.label" :value="card.value" />
             </div>
 
             <div class="mt-6 grid gap-3">
-              <div
-                v-for="[key, value] in statRows"
-                :key="key"
-                class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"
-              >
+              <div v-for="[key, value] in statRows" :key="key"
+                class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3">
                 <div class="flex items-center justify-between gap-4">
                   <span class="text-sm font-medium text-charcoal-700">{{ toKeyLabel(key) }}</span>
                   <span class="text-sm font-semibold text-charcoal-950">{{ value }}</span>
                 </div>
                 <div class="mt-3 h-2 rounded-full bg-sand-100">
-                  <div
-                    class="h-full rounded-full bg-brass-400"
-                    :style="{ width: `${Math.min(asNumber(value, 0), 100)}%` }"
-                  />
+                  <div class="h-full rounded-full bg-brass-400"
+                    :style="{ width: `${Math.min(asNumber(value, 0), 100)}%` }" />
                 </div>
               </div>
             </div>
           </UCard>
 
           <div class="space-y-6">
-            <UCard class="warm-card rounded-[1.9rem] border border-charcoal-200">
+            <!-- <UCard class="warm-card rounded-[1.9rem] border border-charcoal-200">
               <template #header>
                 <div class="space-y-2">
                   <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
-                    Branches
+                    Филиалы
                   </p>
                   <h2 class="barbershop-heading text-2xl text-charcoal-950">
-                    Active branch context
+                    Активный контекст филиала
                   </h2>
                 </div>
               </template>
@@ -238,7 +210,7 @@ const shortcuts = computed(() =>
                     <div>
                       <p class="font-medium text-charcoal-950">{{ branch.name }}</p>
                       <p class="text-xs uppercase tracking-[0.18em] text-charcoal-500">
-                        {{ branch.isActive ? 'Current context' : 'Available branch' }}
+                        {{ branch.isActive ? 'Текущий контекст' : 'Доступный филиал' }}
                       </p>
                     </div>
                     <UButton
@@ -247,21 +219,21 @@ const shortcuts = computed(() =>
                       variant="outline"
                       @click="branchStore.setActiveBranch(branch.id)"
                     >
-                      Use branch
+                      Выбрать филиал
                     </UButton>
                   </div>
                 </div>
               </div>
-            </UCard>
+            </UCard> -->
 
-            <UCard class="warm-card rounded-[1.9rem] border border-charcoal-200">
+            <!-- <UCard class="warm-card rounded-[1.9rem] border border-charcoal-200">
               <template #header>
                 <div class="space-y-2">
                   <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
-                    Shortcuts
+                    Быстрые переходы
                   </p>
                   <h2 class="barbershop-heading text-2xl text-charcoal-950">
-                    Jump into tools
+                    Переход к инструментам
                   </h2>
                 </div>
               </template>
@@ -284,7 +256,7 @@ const shortcuts = computed(() =>
                   </div>
                 </NuxtLink>
               </div>
-            </UCard>
+            </UCard> -->
           </div>
         </div>
       </div>

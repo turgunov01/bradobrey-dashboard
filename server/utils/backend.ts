@@ -70,7 +70,7 @@ export async function backendRequest<T>(event: H3Event, options: BackendRequestO
   if (authMode === 'required' && !token) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Barber session is required.'
+      statusMessage: 'Требуется сессия барбера.'
     })
   }
 
@@ -94,7 +94,7 @@ export async function backendRequest<T>(event: H3Event, options: BackendRequestO
   }
   catch (error: any) {
     const statusCode = error?.response?.status || 500
-    const statusMessage = error?.response?._data?.message || error?.message || 'Backend request failed.'
+    const statusMessage = error?.response?._data?.message || error?.message || 'Ошибка запроса к бэкенду.'
 
     throw createError({
       data: error?.response?._data,

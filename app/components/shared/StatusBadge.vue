@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { formatStatusLabel } from '~/utils/display'
+
 const props = defineProps<{
   label?: string | null
 }>()
@@ -24,6 +26,6 @@ const color = computed(() => {
 
 <template>
   <UBadge :color="color" variant="soft">
-    {{ label || 'Unknown' }}
+    {{ formatStatusLabel(label) }}
   </UBadge>
 </template>

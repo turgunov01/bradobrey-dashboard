@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BranchSelector from '~/components/app/BranchSelector.vue'
+
 const open = ref(false)
 const branchStore = useBranchStore()
 const sessionStore = useSessionStore()
@@ -44,13 +46,13 @@ const utilityLinks = computed(() =>
     >
       <template #header="{ collapsed }">
         <div class="w-full space-y-4">
-          <SidebarBrand :collapsed="collapsed" />
           <BranchSelector :collapsed="collapsed" />
         </div>
       </template>
 
       <template #default="{ collapsed }">
         <UDashboardSearchButton :collapsed="collapsed" class="bg-transparent ring-default" />
+        <AppCalculatorModal :collapsed="collapsed" :show-modal="false" />
 
         <UNavigationMenu
           :collapsed="collapsed"
@@ -74,7 +76,13 @@ const utilityLinks = computed(() =>
       </template>
     </UDashboardSidebar>
 
-    <UDashboardSearch :groups="searchGroups" />
+    <UDashboardSearch
+      :groups="searchGroups"
+      description="Быстрый переход по разделам и действиям панели."
+      title="Поиск по панели"
+    />
+
+    <AppCalculatorModal :show-trigger="false" />
 
     <slot />
   </UDashboardGroup>

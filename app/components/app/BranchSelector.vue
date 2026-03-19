@@ -22,16 +22,12 @@ const activeBranchId = computed({
 
 <template>
   <div class="w-full">
-    <p v-if="!collapsed" class="mb-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-charcoal-500">
-      Active branch
-    </p>
-
     <USelectMenu
       v-model="activeBranchId"
       class="w-full"
       color="neutral"
       :items="options"
-      :placeholder="collapsed ? 'Branch' : 'Select branch'"
+      :placeholder="collapsed ? 'Филиал' : 'Выберите филиал'"
       value-key="value"
     />
   </div>

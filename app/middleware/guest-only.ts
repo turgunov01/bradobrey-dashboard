@@ -1,9 +1,9 @@
 export default defineNuxtRouteMiddleware(async () => {
-  const sessionStore = useSessionStore()
+  const sessionStore = useSessionStore();
 
-  await sessionStore.ensureLoaded()
+  await sessionStore.ensureLoaded();
 
   if (sessionStore.isAuthenticated) {
-    return navigateTo('/')
+    return navigateTo("/");
   }
-})
+});

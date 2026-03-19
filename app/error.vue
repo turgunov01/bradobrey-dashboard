@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ru } from '@nuxt/ui/locale'
 import type { NuxtError } from '#app'
 
 defineProps<{
@@ -6,23 +7,23 @@ defineProps<{
 }>()
 
 useSeoMeta({
-  title: 'Dashboard error',
-  description: 'The dashboard could not complete this request.'
+  title: 'Ошибка панели',
+  description: 'Панель не смогла выполнить этот запрос.'
 })
 </script>
 
 <template>
-  <UApp>
+  <UApp :locale="ru">
     <div class="min-h-screen bg-[var(--dashboard-shell)] px-4 py-12">
       <div class="mx-auto max-w-xl">
         <UCard class="warm-card rounded-[2rem] border border-charcoal-200">
           <template #header>
             <div class="space-y-2">
               <p class="text-xs font-semibold uppercase tracking-[0.28em] text-brass-700">
-                Bradobrey dashboard
+                Панель Bradobrey
               </p>
               <h1 class="barbershop-heading text-3xl text-charcoal-950">
-                Something went wrong
+                Что-то пошло не так
               </h1>
             </div>
           </template>
@@ -31,17 +32,17 @@ useSeoMeta({
             <UAlert
               color="error"
               icon="i-lucide-triangle-alert"
-              title="Request failed"
-              :description="error.message || 'An unexpected error occurred while rendering the dashboard.'"
+              title="Ошибка запроса"
+              :description="error.message || 'Во время рендеринга панели произошла непредвиденная ошибка.'"
               variant="soft"
             />
 
             <div class="flex flex-wrap gap-3">
               <UButton color="primary" to="/">
-                Return home
+                На главную
               </UButton>
               <UButton color="neutral" variant="outline" @click="clearError({ redirect: '/' })">
-                Reset app
+                Сбросить приложение
               </UButton>
             </div>
           </div>

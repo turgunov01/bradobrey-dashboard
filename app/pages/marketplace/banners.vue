@@ -1,10 +1,7 @@
 <script setup lang="ts">
-definePageMeta({
-  middleware: 'barber-auth'
-})
-
 const marketplaceApi = useMarketplaceApi()
 
+const bannerModalOpen = ref(false)
 const form = reactive({
   description: '',
   id: '',
@@ -35,9 +32,30 @@ watch(
   { immediate: true }
 )
 
+watch(bannerModalOpen, (open) => {
+  if (!open) {
+    resetForm()
+  }
+})
+
 const selectedBanner = computed(() =>
   (data.value || []).find((item: any) => String(item.id) === selectedBannerId.value) || null
 )
+
+const modalTitle = computed(() =>
+  form.id ? 'Редактировать баннер' : 'Создать баннер'
+)
+
+const modalDescription = computed(() =>
+  form.id
+    ? 'Обновите данные выбранного баннера.'
+    : 'Заполните форму, чтобы добавить новый баннер в маркетплейс.'
+)
+
+function openCreateModal() {
+  resetForm()
+  bannerModalOpen.value = true
+}
 
 function editBanner(item: any) {
   form.description = item.description || ''
@@ -46,6 +64,7 @@ function editBanner(item: any) {
   form.locale = item.locale || 'uz'
   form.title = item.title || ''
   selectedBannerId.value = String(item.id)
+  bannerModalOpen.value = true
 }
 
 function resetForm() {
@@ -83,6 +102,7 @@ async function submitBanner() {
 
   resetForm()
   await refresh()
+  bannerModalOpen.value = false
 }
 
 async function toggleBanner(item: any) {
@@ -94,14 +114,14 @@ async function toggleBanner(item: any) {
 <template>
   <UDashboardPanel id="marketplace-banners">
     <template #header>
-      <UDashboardNavbar title="Marketplace Banners" :ui="{ right: 'gap-3' }">
+      <UDashboardNavbar title="Баннеры маркетплейса" :ui="{ right: 'gap-3' }">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
 
         <template #right>
           <UButton color="neutral" icon="i-lucide-refresh-cw" :loading="pending" variant="outline" @click="refresh()">
-            Refresh
+            Обновить
           </UButton>
         </template>
       </UDashboardNavbar>
@@ -111,13 +131,19 @@ async function toggleBanner(item: any) {
       <div class="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <UCard class="warm-card rounded-[1.9rem] border border-charcoal-200">
           <template #header>
-            <div class="space-y-2">
-              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
-                Banner list
-              </p>
-              <h2 class="barbershop-heading text-3xl text-charcoal-950">
-                Create, edit, activate, deactivate
-              </h2>
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div class="space-y-2">
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
+                  Список баннеров
+                </p>
+                <h2 class="barbershop-heading text-3xl text-charcoal-950">
+                  Создание, редактирование и активация
+                </h2>
+              </div>
+
+              <UButton color="primary" icon="i-lucide-plus" @click="openCreateModal">
+                Создать баннер
+              </UButton>
             </div>
           </template>
 
@@ -134,16 +160,16 @@ async function toggleBanner(item: any) {
             >
               <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div class="space-y-1">
-                  <p class="font-medium text-charcoal-950">{{ item.title || 'Untitled banner' }}</p>
-                  <p class="text-sm text-charcoal-500">{{ item.locale || 'No locale' }}</p>
+                  <p class="font-medium text-charcoal-950">{{ item.title || 'Баннер без названия' }}</p>
+                  <p class="text-sm text-charcoal-500">{{ item.locale || 'Локаль не указана' }}</p>
                 </div>
                 <div class="flex flex-wrap gap-2">
                   <SharedStatusBadge :label="item.is_active ? 'active' : 'inactive'" />
                   <UButton color="neutral" size="xs" variant="outline" @click.stop="editBanner(item)">
-                    Edit
+                    Редактировать
                   </UButton>
                   <UButton color="neutral" size="xs" variant="outline" @click.stop="toggleBanner(item)">
-                    {{ item.is_active ? 'Deactivate' : 'Activate' }}
+                    {{ item.is_active ? 'Деактивировать' : 'Активировать' }}
                   </UButton>
                 </div>
               </div>
@@ -151,73 +177,72 @@ async function toggleBanner(item: any) {
           </div>
           <SharedEmptyState
             v-else
-            description="The marketplace banners endpoint returned no banners."
+            description="Эндпоинт баннеров маркетплейса не вернул ни одного баннера."
             icon="i-lucide-image-up"
-            title="No banners"
+            title="Баннеров нет"
           />
         </UCard>
 
-        <div class="space-y-6">
-          <UCard class="warm-card rounded-[1.9rem] border border-charcoal-200">
-            <template #header>
-              <div class="space-y-2">
-                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
-                  {{ form.id ? 'Edit' : 'Create' }}
-                </p>
-                <h2 class="barbershop-heading text-3xl text-charcoal-950">
-                  Banner form
-                </h2>
-              </div>
-            </template>
-
-            <div class="space-y-4">
-              <UFormField label="Title">
-                <UInput v-model="form.title" />
-              </UFormField>
-              <UFormField label="Description">
-                <UTextarea v-model="form.description" :rows="4" />
-              </UFormField>
-              <UFormField label="Locale">
-                <UInput v-model="form.locale" />
-              </UFormField>
-              <UCheckbox v-model="form.is_active" label="Banner is active" />
-              <UFormField label="Image file">
-                <UInput type="file" @change="onFileChange" />
-              </UFormField>
-
-              <div class="flex flex-wrap justify-end gap-3">
-                <UButton color="neutral" variant="outline" @click="resetForm">
-                  Reset
-                </UButton>
-                <UButton color="primary" icon="i-lucide-save" @click="submitBanner">
-                  {{ form.id ? 'Update banner' : 'Create banner' }}
-                </UButton>
-              </div>
+        <UCard class="warm-card rounded-[1.9rem] border border-charcoal-200">
+          <template #header>
+            <div class="space-y-2">
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
+                Выбранные данные
+              </p>
+              <h2 class="barbershop-heading text-2xl text-charcoal-950">
+                Детали баннера
+              </h2>
             </div>
-          </UCard>
+          </template>
 
-          <UCard class="warm-card rounded-[1.9rem] border border-charcoal-200">
-            <template #header>
-              <div class="space-y-2">
-                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
-                  Selected payload
-                </p>
-                <h2 class="barbershop-heading text-2xl text-charcoal-950">
-                  Banner detail
-                </h2>
-              </div>
-            </template>
-
-            <SharedJsonBlock v-if="selectedBanner" label="Banner" :value="selectedBanner" />
-            <SharedEmptyState
-              v-else
-              description="Pick a banner from the list to inspect the raw payload."
-              icon="i-lucide-gallery-vertical-end"
-              title="No banner selected"
-            />
-          </UCard>
-        </div>
+          <SharedJsonBlock v-if="selectedBanner" label="Баннер" :value="selectedBanner" />
+          <SharedEmptyState
+            v-else
+            description="Выберите баннер из списка, чтобы посмотреть его сырые данные."
+            icon="i-lucide-gallery-vertical-end"
+            title="Баннер не выбран"
+          />
+        </UCard>
       </div>
+
+      <UModal
+        v-model:open="bannerModalOpen"
+        class="sm:max-w-xl"
+        :description="modalDescription"
+        :title="modalTitle"
+      >
+        <template #body>
+          <div class="space-y-4">
+            <UFormField label="Заголовок">
+              <UInput v-model="form.title" />
+            </UFormField>
+            <UFormField label="Описание">
+              <UTextarea v-model="form.description" :rows="4" />
+            </UFormField>
+            <UFormField label="Локаль">
+              <UInput v-model="form.locale" />
+            </UFormField>
+            <UCheckbox v-model="form.is_active" label="Баннер активен" />
+            <UFormField label="Файл изображения">
+              <UInput type="file" @change="onFileChange" />
+            </UFormField>
+          </div>
+        </template>
+
+        <template #footer="{ close }">
+          <div class="flex w-full flex-wrap justify-end gap-3">
+            <UButton color="neutral" variant="outline" @click="resetForm">
+              Сбросить
+            </UButton>
+            <UButton color="neutral" variant="ghost" @click="close">
+              Закрыть
+            </UButton>
+            <UButton color="primary" icon="i-lucide-save" @click="submitBanner">
+              {{ form.id ? 'Обновить баннер' : 'Создать баннер' }}
+            </UButton>
+          </div>
+        </template>
+      </UModal>
     </template>
   </UDashboardPanel>
 </template>

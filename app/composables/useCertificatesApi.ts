@@ -9,8 +9,11 @@ export function useCertificatesApi() {
       return client.request('/api/certificate/add', {
         body: payload,
         method: 'POST',
-        successMessage: 'Certificate created'
+        successMessage: 'Сертификат создан'
       })
+    },
+    listActive() {
+      return client.request('/api/certificate/active')
     },
     lookup(code: string) {
       return kioskApi.certificate(code)

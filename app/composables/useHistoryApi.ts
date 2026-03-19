@@ -5,9 +5,12 @@ export function useHistoryApi() {
     barber(query?: Record<string, unknown>) {
       return client.request('/api/history/barber', { query })
     },
-    branch(branchId: string) {
+    branch(branchId: string, query?: Record<string, unknown>) {
       return client.request('/api/history/branch', {
-        query: { id: branchId }
+        query: {
+          ...query,
+          id: branchId
+        }
       })
     },
     list(query?: Record<string, unknown>) {
