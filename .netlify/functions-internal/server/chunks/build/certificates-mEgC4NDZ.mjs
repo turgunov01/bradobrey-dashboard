@@ -10,13 +10,11 @@ import { _ as _sfc_main$7 } from './Input-DcPP1NGC.mjs';
 import { _ as _sfc_main$8 } from './SelectMenu-9fuPONhl.mjs';
 import { _ as _sfc_main$9 } from './Textarea-DeTQfUen.mjs';
 import { _ as __nuxt_component_10 } from './JsonBlock-DvPUbwNJ.mjs';
-import { defineComponent, ref, reactive, withAsyncContext, computed, watch, mergeProps, withCtx, unref, createVNode, toDisplayString, createTextVNode, openBlock, createBlock, Fragment, renderList, isRef, createCommentVNode, useSSRContext } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/index.mjs';
-import { ssrRenderComponent, ssrInterpolate, ssrRenderList } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/server-renderer/index.mjs';
 import { d as certificateCreateSchema } from '../_/index.mjs';
 import { f as formatDateTime } from './format-DDcTL-sj.mjs';
 import { f as flattenServicesPayload } from './services-D0S0WuHG.mjs';
 import { u as useKioskApi } from './useKioskApi-l3XfHmhL.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/reka-ui/dist/index.js';
+import { v as vueExports, s as ssrRenderComponent_1, c as ssrInterpolate_1, d as ssrRenderList_1 } from '../routes/renderer.mjs';
 import './index-qsfWWCYt.mjs';
 import '../_/nitro.mjs';
 import 'node:crypto';
@@ -29,18 +27,16 @@ import 'node:path';
 import 'node:process';
 import 'node:tty';
 import 'node:fs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/pinia@3.0.4_typescript@5.9.3_vue@3.5.30_typescript@5.9.3_/node_modules/pinia/dist/pinia.prod.cjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/vue-router/vue-router.node.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/perfect-debounce@2.1.0/node_modules/perfect-debounce/dist/index.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/@vue/shared/dist/shared.cjs.prod.js';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/tailwindcss@4.2.1/node_modules/tailwindcss/dist/colors.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/@iconify/vue/dist/iconify.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/tailwind-variants/dist/index.js';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/unhead@2.1.12/node_modules/unhead/dist/plugins.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/unhead@2.1.12/node_modules/unhead/dist/utils.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/@tanstack/vue-table/build/lib/index.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/@tanstack/vue-virtual/dist/esm/index.js';
+import '../_/shared.cjs.prod.mjs';
+import '../virtual/_commonjsHelpers.mjs';
+import '../_/index2.mjs';
 import './display-CyQec-Wd.mjs';
+import '../_/FocusScope.mjs';
+import '../_/useId.mjs';
+import '../_/PopperArrow.mjs';
+import '../_/utils.mjs';
+import '../_/VisuallyHiddenInput.mjs';
+import 'node:stream';
 
 function useCertificatesApi() {
   const client = useApiClient();
@@ -61,7 +57,7 @@ function useCertificatesApi() {
     }
   };
 }
-const _sfc_main = /* @__PURE__ */ defineComponent({
+const _sfc_main = /* @__PURE__ */ vueExports.defineComponent({
   __name: "certificates",
   __ssrInlineRender: true,
   async setup(__props) {
@@ -104,16 +100,16 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     }
     const certificatesApi = useCertificatesApi();
     const kioskApi = useKioskApi();
-    const createModalOpen = ref(false);
-    const lookupModalOpen = ref(false);
-    const form = reactive({
+    const createModalOpen = vueExports.ref(false);
+    const lookupModalOpen = vueExports.ref(false);
+    const form = vueExports.reactive({
       code: "",
       expires_at: "",
       metadata: "{}",
       service_ids: []
     });
-    const lookupCode = ref("");
-    const lookupResult = ref(null);
+    const lookupCode = vueExports.ref("");
+    const lookupResult = vueExports.ref(null);
     const certificateColumns = [
       { accessorKey: "code", header: "Код" },
       { id: "services", header: "Услуги" },
@@ -121,7 +117,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       { id: "metadata", header: "Метаданные" },
       { id: "status", header: "Статус" }
     ];
-    const { data, pending, refresh } = ([__temp, __restore] = withAsyncContext(async () => useAsyncData("certificates-dashboard", async () => {
+    const { data, pending, refresh } = ([__temp, __restore] = vueExports.withAsyncContext(async () => useAsyncData("certificates-dashboard", async () => {
       const [servicesResult, certificatesResult] = await Promise.allSettled([
         kioskApi.services({ active: true, grouped: false }),
         certificatesApi.listActive()
@@ -131,31 +127,31 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         services: servicesResult.status === "fulfilled" ? flattenServicesPayload(servicesResult.value) : []
       };
     })), __temp = await __temp, __restore(), __temp);
-    const services = computed(() => data.value?.services || []);
-    const activeCertificates = computed(() => data.value?.certificates || []);
-    const serviceNameMap = computed(
+    const services = vueExports.computed(() => data.value?.services || []);
+    const activeCertificates = vueExports.computed(() => data.value?.certificates || []);
+    const serviceNameMap = vueExports.computed(
       () => new Map(
         services.value.map((service) => [String(service.id), service.name || `Услуга ${service.id}`])
       )
     );
-    const serviceOptions = computed(
+    const serviceOptions = vueExports.computed(
       () => services.value.map((service) => ({
         label: `${service.name || "Услуга без названия"} / ${service.duration_minutes ?? service.duration ?? 0} мин`,
         value: String(service.id)
       }))
     );
-    const createModalDescription = computed(
+    const createModalDescription = vueExports.computed(
       () => "Заполните код, набор услуг и срок действия нового сертификата."
     );
-    const lookupModalDescription = computed(
+    const lookupModalDescription = vueExports.computed(
       () => "Введите код сертификата и получите его текущий статус и payload."
     );
-    watch(createModalOpen, (open) => {
+    vueExports.watch(createModalOpen, (open) => {
       if (!open) {
         resetCreateForm();
       }
     });
-    watch(lookupModalOpen, (open) => {
+    vueExports.watch(lookupModalOpen, (open) => {
       if (!open) {
         resetLookupState();
       }
@@ -223,37 +219,37 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       const _component_USelectMenu = _sfc_main$8;
       const _component_UTextarea = _sfc_main$9;
       const _component_SharedJsonBlock = __nuxt_component_10;
-      _push(ssrRenderComponent(_component_UDashboardPanel, mergeProps({ id: "certificates" }, _attrs), {
-        header: withCtx((_, _push2, _parent2, _scopeId) => {
+      _push(ssrRenderComponent_1(_component_UDashboardPanel, vueExports.mergeProps({ id: "certificates" }, _attrs), {
+        header: vueExports.withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
-            _push2(ssrRenderComponent(_component_UDashboardNavbar, {
+            _push2(ssrRenderComponent_1(_component_UDashboardNavbar, {
               title: "Сертификаты",
               ui: { right: "gap-3" }
             }, {
-              leading: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              leading: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
-                  _push3(ssrRenderComponent(_component_UDashboardSidebarCollapse, null, null, _parent3, _scopeId2));
+                  _push3(ssrRenderComponent_1(_component_UDashboardSidebarCollapse, null, null, _parent3, _scopeId2));
                 } else {
                   return [
-                    createVNode(_component_UDashboardSidebarCollapse)
+                    vueExports.createVNode(_component_UDashboardSidebarCollapse)
                   ];
                 }
               }),
-              right: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              right: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
-                  _push3(ssrRenderComponent(_component_UButton, {
+                  _push3(ssrRenderComponent_1(_component_UButton, {
                     color: "neutral",
                     icon: "i-lucide-refresh-cw",
-                    loading: unref(pending),
+                    loading: vueExports.unref(pending),
                     variant: "outline",
-                    onClick: ($event) => unref(refresh)()
+                    onClick: ($event) => vueExports.unref(refresh)()
                   }, {
-                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                    default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
                         _push4(` Обновить `);
                       } else {
                         return [
-                          createTextVNode(" Обновить ")
+                          vueExports.createTextVNode(" Обновить ")
                         ];
                       }
                     }),
@@ -261,15 +257,15 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   }, _parent3, _scopeId2));
                 } else {
                   return [
-                    createVNode(_component_UButton, {
+                    vueExports.createVNode(_component_UButton, {
                       color: "neutral",
                       icon: "i-lucide-refresh-cw",
-                      loading: unref(pending),
+                      loading: vueExports.unref(pending),
                       variant: "outline",
-                      onClick: ($event) => unref(refresh)()
+                      onClick: ($event) => vueExports.unref(refresh)()
                     }, {
-                      default: withCtx(() => [
-                        createTextVNode(" Обновить ")
+                      default: vueExports.withCtx(() => [
+                        vueExports.createTextVNode(" Обновить ")
                       ]),
                       _: 1
                     }, 8, ["loading", "onClick"])
@@ -280,23 +276,23 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             }, _parent2, _scopeId));
           } else {
             return [
-              createVNode(_component_UDashboardNavbar, {
+              vueExports.createVNode(_component_UDashboardNavbar, {
                 title: "Сертификаты",
                 ui: { right: "gap-3" }
               }, {
-                leading: withCtx(() => [
-                  createVNode(_component_UDashboardSidebarCollapse)
+                leading: vueExports.withCtx(() => [
+                  vueExports.createVNode(_component_UDashboardSidebarCollapse)
                 ]),
-                right: withCtx(() => [
-                  createVNode(_component_UButton, {
+                right: vueExports.withCtx(() => [
+                  vueExports.createVNode(_component_UButton, {
                     color: "neutral",
                     icon: "i-lucide-refresh-cw",
-                    loading: unref(pending),
+                    loading: vueExports.unref(pending),
                     variant: "outline",
-                    onClick: ($event) => unref(refresh)()
+                    onClick: ($event) => vueExports.unref(refresh)()
                   }, {
-                    default: withCtx(() => [
-                      createTextVNode(" Обновить ")
+                    default: vueExports.withCtx(() => [
+                      vueExports.createTextVNode(" Обновить ")
                     ]),
                     _: 1
                   }, 8, ["loading", "onClick"])
@@ -306,56 +302,56 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             ];
           }
         }),
-        body: withCtx((_, _push2, _parent2, _scopeId) => {
+        body: vueExports.withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
-            _push2(ssrRenderComponent(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-              header: withCtx((_2, _push3, _parent3, _scopeId2) => {
+            _push2(ssrRenderComponent_1(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+              header: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
                   _push3(`<div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"${_scopeId2}><div class="space-y-2"${_scopeId2}><p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500"${_scopeId2}> Активный реестр </p><h2 class="barbershop-heading text-3xl text-charcoal-950"${_scopeId2}> Действующие сертификаты </h2></div><div class="flex flex-wrap items-center gap-3"${_scopeId2}>`);
-                  _push3(ssrRenderComponent(_component_UBadge, {
+                  _push3(ssrRenderComponent_1(_component_UBadge, {
                     color: "neutral",
                     size: "lg",
                     variant: "soft"
                   }, {
-                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                    default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
-                        _push4(`${ssrInterpolate(unref(activeCertificates).length)} активных `);
+                        _push4(`${ssrInterpolate_1(vueExports.unref(activeCertificates).length)} активных `);
                       } else {
                         return [
-                          createTextVNode(toDisplayString(unref(activeCertificates).length) + " активных ", 1)
+                          vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(activeCertificates).length) + " активных ", 1)
                         ];
                       }
                     }),
                     _: 1
                   }, _parent3, _scopeId2));
-                  _push3(ssrRenderComponent(_component_UButton, {
+                  _push3(ssrRenderComponent_1(_component_UButton, {
                     color: "primary",
                     icon: "i-lucide-plus",
                     onClick: openCreateModal
                   }, {
-                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                    default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
                         _push4(` Создать `);
                       } else {
                         return [
-                          createTextVNode(" Создать ")
+                          vueExports.createTextVNode(" Создать ")
                         ];
                       }
                     }),
                     _: 1
                   }, _parent3, _scopeId2));
-                  _push3(ssrRenderComponent(_component_UButton, {
+                  _push3(ssrRenderComponent_1(_component_UButton, {
                     color: "neutral",
                     icon: "i-lucide-search",
                     variant: "outline",
                     onClick: openLookupModal
                   }, {
-                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                    default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
                         _push4(` Проверить `);
                       } else {
                         return [
-                          createTextVNode(" Проверить ")
+                          vueExports.createTextVNode(" Проверить ")
                         ];
                       }
                     }),
@@ -364,40 +360,40 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   _push3(`</div></div>`);
                 } else {
                   return [
-                    createVNode("div", { class: "flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between" }, [
-                      createVNode("div", { class: "space-y-2" }, [
-                        createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Активный реестр "),
-                        createVNode("h2", { class: "barbershop-heading text-3xl text-charcoal-950" }, " Действующие сертификаты ")
+                    vueExports.createVNode("div", { class: "flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between" }, [
+                      vueExports.createVNode("div", { class: "space-y-2" }, [
+                        vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Активный реестр "),
+                        vueExports.createVNode("h2", { class: "barbershop-heading text-3xl text-charcoal-950" }, " Действующие сертификаты ")
                       ]),
-                      createVNode("div", { class: "flex flex-wrap items-center gap-3" }, [
-                        createVNode(_component_UBadge, {
+                      vueExports.createVNode("div", { class: "flex flex-wrap items-center gap-3" }, [
+                        vueExports.createVNode(_component_UBadge, {
                           color: "neutral",
                           size: "lg",
                           variant: "soft"
                         }, {
-                          default: withCtx(() => [
-                            createTextVNode(toDisplayString(unref(activeCertificates).length) + " активных ", 1)
+                          default: vueExports.withCtx(() => [
+                            vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(activeCertificates).length) + " активных ", 1)
                           ]),
                           _: 1
                         }),
-                        createVNode(_component_UButton, {
+                        vueExports.createVNode(_component_UButton, {
                           color: "primary",
                           icon: "i-lucide-plus",
                           onClick: openCreateModal
                         }, {
-                          default: withCtx(() => [
-                            createTextVNode(" Создать ")
+                          default: vueExports.withCtx(() => [
+                            vueExports.createTextVNode(" Создать ")
                           ]),
                           _: 1
                         }),
-                        createVNode(_component_UButton, {
+                        vueExports.createVNode(_component_UButton, {
                           color: "neutral",
                           icon: "i-lucide-search",
                           variant: "outline",
                           onClick: openLookupModal
                         }, {
-                          default: withCtx(() => [
-                            createTextVNode(" Проверить ")
+                          default: vueExports.withCtx(() => [
+                            vueExports.createTextVNode(" Проверить ")
                           ]),
                           _: 1
                         })
@@ -406,14 +402,14 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   ];
                 }
               }),
-              default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              default: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
-                  if (unref(activeCertificates).length) {
+                  if (vueExports.unref(activeCertificates).length) {
                     _push3(`<div class="overflow-hidden rounded-[1.25rem] border border-charcoal-200 bg-white/90"${_scopeId2}><div class="max-h-[42rem] overflow-auto"${_scopeId2}>`);
-                    _push3(ssrRenderComponent(_component_UTable, {
+                    _push3(ssrRenderComponent_1(_component_UTable, {
                       columns: certificateColumns,
-                      data: unref(activeCertificates),
-                      loading: unref(pending),
+                      data: vueExports.unref(activeCertificates),
+                      loading: vueExports.unref(pending),
                       sticky: "header",
                       ui: {
                         root: "w-full overflow-auto",
@@ -424,30 +420,30 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                         td: "px-4 py-4 text-sm text-charcoal-700 align-middle"
                       }
                     }, {
-                      "code-cell": withCtx(({ row }, _push4, _parent4, _scopeId3) => {
+                      "code-cell": vueExports.withCtx(({ row }, _push4, _parent4, _scopeId3) => {
                         if (_push4) {
-                          _push4(`<span class="font-mono font-medium text-charcoal-950"${_scopeId3}>${ssrInterpolate(row.original.code)}</span>`);
+                          _push4(`<span class="font-mono font-medium text-charcoal-950"${_scopeId3}>${ssrInterpolate_1(row.original.code)}</span>`);
                         } else {
                           return [
-                            createVNode("span", { class: "font-mono font-medium text-charcoal-950" }, toDisplayString(row.original.code), 1)
+                            vueExports.createVNode("span", { class: "font-mono font-medium text-charcoal-950" }, vueExports.toDisplayString(row.original.code), 1)
                           ];
                         }
                       }),
-                      "services-cell": withCtx(({ row }, _push4, _parent4, _scopeId3) => {
+                      "services-cell": vueExports.withCtx(({ row }, _push4, _parent4, _scopeId3) => {
                         if (_push4) {
                           _push4(`<div class="flex max-w-[22rem] flex-wrap gap-2"${_scopeId3}><!--[-->`);
-                          ssrRenderList(row.original.service_ids, (serviceId) => {
-                            _push4(ssrRenderComponent(_component_UBadge, {
+                          ssrRenderList_1(row.original.service_ids, (serviceId) => {
+                            _push4(ssrRenderComponent_1(_component_UBadge, {
                               key: serviceId,
                               color: "neutral",
                               variant: "soft"
                             }, {
-                              default: withCtx((_3, _push5, _parent5, _scopeId4) => {
+                              default: vueExports.withCtx((_3, _push5, _parent5, _scopeId4) => {
                                 if (_push5) {
-                                  _push5(`${ssrInterpolate(unref(serviceNameMap).get(serviceId) || serviceId)}`);
+                                  _push5(`${ssrInterpolate_1(vueExports.unref(serviceNameMap).get(serviceId) || serviceId)}`);
                                 } else {
                                   return [
-                                    createTextVNode(toDisplayString(unref(serviceNameMap).get(serviceId) || serviceId), 1)
+                                    vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(serviceNameMap).get(serviceId) || serviceId), 1)
                                   ];
                                 }
                               }),
@@ -457,15 +453,15 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                           _push4(`<!--]--></div>`);
                         } else {
                           return [
-                            createVNode("div", { class: "flex max-w-[22rem] flex-wrap gap-2" }, [
-                              (openBlock(true), createBlock(Fragment, null, renderList(row.original.service_ids, (serviceId) => {
-                                return openBlock(), createBlock(_component_UBadge, {
+                            vueExports.createVNode("div", { class: "flex max-w-[22rem] flex-wrap gap-2" }, [
+                              (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(row.original.service_ids, (serviceId) => {
+                                return vueExports.openBlock(), vueExports.createBlock(_component_UBadge, {
                                   key: serviceId,
                                   color: "neutral",
                                   variant: "soft"
                                 }, {
-                                  default: withCtx(() => [
-                                    createTextVNode(toDisplayString(unref(serviceNameMap).get(serviceId) || serviceId), 1)
+                                  default: vueExports.withCtx(() => [
+                                    vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(serviceNameMap).get(serviceId) || serviceId), 1)
                                   ]),
                                   _: 2
                                 }, 1024);
@@ -474,32 +470,32 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                           ];
                         }
                       }),
-                      "expires_at-cell": withCtx(({ row }, _push4, _parent4, _scopeId3) => {
+                      "expires_at-cell": vueExports.withCtx(({ row }, _push4, _parent4, _scopeId3) => {
                         if (_push4) {
-                          _push4(`${ssrInterpolate(row.original.expires_at ? unref(formatDateTime)(row.original.expires_at) : "Без срока")}`);
+                          _push4(`${ssrInterpolate_1(row.original.expires_at ? vueExports.unref(formatDateTime)(row.original.expires_at) : "Без срока")}`);
                         } else {
                           return [
-                            createTextVNode(toDisplayString(row.original.expires_at ? unref(formatDateTime)(row.original.expires_at) : "Без срока"), 1)
+                            vueExports.createTextVNode(vueExports.toDisplayString(row.original.expires_at ? vueExports.unref(formatDateTime)(row.original.expires_at) : "Без срока"), 1)
                           ];
                         }
                       }),
-                      "metadata-cell": withCtx(({ row }, _push4, _parent4, _scopeId3) => {
+                      "metadata-cell": vueExports.withCtx(({ row }, _push4, _parent4, _scopeId3) => {
                         if (_push4) {
-                          _push4(`<span class="block max-w-[18rem] truncate text-charcoal-500"${_scopeId3}>${ssrInterpolate(formatMetadataPreview(row.original.metadata))}</span>`);
+                          _push4(`<span class="block max-w-[18rem] truncate text-charcoal-500"${_scopeId3}>${ssrInterpolate_1(formatMetadataPreview(row.original.metadata))}</span>`);
                         } else {
                           return [
-                            createVNode("span", { class: "block max-w-[18rem] truncate text-charcoal-500" }, toDisplayString(formatMetadataPreview(row.original.metadata)), 1)
+                            vueExports.createVNode("span", { class: "block max-w-[18rem] truncate text-charcoal-500" }, vueExports.toDisplayString(formatMetadataPreview(row.original.metadata)), 1)
                           ];
                         }
                       }),
-                      "status-cell": withCtx(({ row }, _push4, _parent4, _scopeId3) => {
+                      "status-cell": vueExports.withCtx(({ row }, _push4, _parent4, _scopeId3) => {
                         if (_push4) {
-                          _push4(ssrRenderComponent(_component_SharedStatusBadge, {
+                          _push4(ssrRenderComponent_1(_component_SharedStatusBadge, {
                             label: row.original.is_used ? "used" : "active"
                           }, null, _parent4, _scopeId3));
                         } else {
                           return [
-                            createVNode(_component_SharedStatusBadge, {
+                            vueExports.createVNode(_component_SharedStatusBadge, {
                               label: row.original.is_used ? "used" : "active"
                             }, null, 8, ["label"])
                           ];
@@ -509,7 +505,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     }, _parent3, _scopeId2));
                     _push3(`</div></div>`);
                   } else {
-                    _push3(ssrRenderComponent(_component_SharedEmptyState, {
+                    _push3(ssrRenderComponent_1(_component_SharedEmptyState, {
                       description: "Не найдено ни одного действующего сертификата.",
                       icon: "i-lucide-id-card",
                       title: "Активных сертификатов нет"
@@ -517,15 +513,15 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   }
                 } else {
                   return [
-                    unref(activeCertificates).length ? (openBlock(), createBlock("div", {
+                    vueExports.unref(activeCertificates).length ? (vueExports.openBlock(), vueExports.createBlock("div", {
                       key: 0,
                       class: "overflow-hidden rounded-[1.25rem] border border-charcoal-200 bg-white/90"
                     }, [
-                      createVNode("div", { class: "max-h-[42rem] overflow-auto" }, [
-                        createVNode(_component_UTable, {
+                      vueExports.createVNode("div", { class: "max-h-[42rem] overflow-auto" }, [
+                        vueExports.createVNode(_component_UTable, {
                           columns: certificateColumns,
-                          data: unref(activeCertificates),
-                          loading: unref(pending),
+                          data: vueExports.unref(activeCertificates),
+                          loading: vueExports.unref(pending),
                           sticky: "header",
                           ui: {
                             root: "w-full overflow-auto",
@@ -536,40 +532,40 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                             td: "px-4 py-4 text-sm text-charcoal-700 align-middle"
                           }
                         }, {
-                          "code-cell": withCtx(({ row }) => [
-                            createVNode("span", { class: "font-mono font-medium text-charcoal-950" }, toDisplayString(row.original.code), 1)
+                          "code-cell": vueExports.withCtx(({ row }) => [
+                            vueExports.createVNode("span", { class: "font-mono font-medium text-charcoal-950" }, vueExports.toDisplayString(row.original.code), 1)
                           ]),
-                          "services-cell": withCtx(({ row }) => [
-                            createVNode("div", { class: "flex max-w-[22rem] flex-wrap gap-2" }, [
-                              (openBlock(true), createBlock(Fragment, null, renderList(row.original.service_ids, (serviceId) => {
-                                return openBlock(), createBlock(_component_UBadge, {
+                          "services-cell": vueExports.withCtx(({ row }) => [
+                            vueExports.createVNode("div", { class: "flex max-w-[22rem] flex-wrap gap-2" }, [
+                              (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(row.original.service_ids, (serviceId) => {
+                                return vueExports.openBlock(), vueExports.createBlock(_component_UBadge, {
                                   key: serviceId,
                                   color: "neutral",
                                   variant: "soft"
                                 }, {
-                                  default: withCtx(() => [
-                                    createTextVNode(toDisplayString(unref(serviceNameMap).get(serviceId) || serviceId), 1)
+                                  default: vueExports.withCtx(() => [
+                                    vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(serviceNameMap).get(serviceId) || serviceId), 1)
                                   ]),
                                   _: 2
                                 }, 1024);
                               }), 128))
                             ])
                           ]),
-                          "expires_at-cell": withCtx(({ row }) => [
-                            createTextVNode(toDisplayString(row.original.expires_at ? unref(formatDateTime)(row.original.expires_at) : "Без срока"), 1)
+                          "expires_at-cell": vueExports.withCtx(({ row }) => [
+                            vueExports.createTextVNode(vueExports.toDisplayString(row.original.expires_at ? vueExports.unref(formatDateTime)(row.original.expires_at) : "Без срока"), 1)
                           ]),
-                          "metadata-cell": withCtx(({ row }) => [
-                            createVNode("span", { class: "block max-w-[18rem] truncate text-charcoal-500" }, toDisplayString(formatMetadataPreview(row.original.metadata)), 1)
+                          "metadata-cell": vueExports.withCtx(({ row }) => [
+                            vueExports.createVNode("span", { class: "block max-w-[18rem] truncate text-charcoal-500" }, vueExports.toDisplayString(formatMetadataPreview(row.original.metadata)), 1)
                           ]),
-                          "status-cell": withCtx(({ row }) => [
-                            createVNode(_component_SharedStatusBadge, {
+                          "status-cell": vueExports.withCtx(({ row }) => [
+                            vueExports.createVNode(_component_SharedStatusBadge, {
                               label: row.original.is_used ? "used" : "active"
                             }, null, 8, ["label"])
                           ]),
                           _: 1
                         }, 8, ["data", "loading"])
                       ])
-                    ])) : (openBlock(), createBlock(_component_SharedEmptyState, {
+                    ])) : (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                       key: 1,
                       description: "Не найдено ни одного действующего сертификата.",
                       icon: "i-lucide-id-card",
@@ -580,53 +576,53 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
               }),
               _: 1
             }, _parent2, _scopeId));
-            _push2(ssrRenderComponent(_component_UModal, {
-              open: unref(createModalOpen),
-              "onUpdate:open": ($event) => isRef(createModalOpen) ? createModalOpen.value = $event : null,
+            _push2(ssrRenderComponent_1(_component_UModal, {
+              open: vueExports.unref(createModalOpen),
+              "onUpdate:open": ($event) => vueExports.isRef(createModalOpen) ? createModalOpen.value = $event : null,
               class: "sm:max-w-2xl",
-              description: unref(createModalDescription),
+              description: vueExports.unref(createModalDescription),
               title: "Создать сертификат"
             }, {
-              body: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              body: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
                   _push3(`<div class="space-y-4"${_scopeId2}>`);
-                  _push3(ssrRenderComponent(_component_UFormField, { label: "Код сертификата" }, {
-                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                  _push3(ssrRenderComponent_1(_component_UFormField, { label: "Код сертификата" }, {
+                    default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
-                        _push4(ssrRenderComponent(_component_UInput, {
-                          modelValue: unref(form).code,
-                          "onUpdate:modelValue": ($event) => unref(form).code = $event
+                        _push4(ssrRenderComponent_1(_component_UInput, {
+                          modelValue: vueExports.unref(form).code,
+                          "onUpdate:modelValue": ($event) => vueExports.unref(form).code = $event
                         }, null, _parent4, _scopeId3));
                       } else {
                         return [
-                          createVNode(_component_UInput, {
-                            modelValue: unref(form).code,
-                            "onUpdate:modelValue": ($event) => unref(form).code = $event
+                          vueExports.createVNode(_component_UInput, {
+                            modelValue: vueExports.unref(form).code,
+                            "onUpdate:modelValue": ($event) => vueExports.unref(form).code = $event
                           }, null, 8, ["modelValue", "onUpdate:modelValue"])
                         ];
                       }
                     }),
                     _: 1
                   }, _parent3, _scopeId2));
-                  _push3(ssrRenderComponent(_component_UFormField, { label: "Услуги" }, {
-                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                  _push3(ssrRenderComponent_1(_component_UFormField, { label: "Услуги" }, {
+                    default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
-                        _push4(ssrRenderComponent(_component_USelectMenu, {
-                          modelValue: unref(form).service_ids,
-                          "onUpdate:modelValue": ($event) => unref(form).service_ids = $event,
+                        _push4(ssrRenderComponent_1(_component_USelectMenu, {
+                          modelValue: vueExports.unref(form).service_ids,
+                          "onUpdate:modelValue": ($event) => vueExports.unref(form).service_ids = $event,
                           class: "w-full",
-                          items: unref(serviceOptions),
+                          items: vueExports.unref(serviceOptions),
                           multiple: "",
                           placeholder: "Выберите услуги",
                           "value-key": "value"
                         }, null, _parent4, _scopeId3));
                       } else {
                         return [
-                          createVNode(_component_USelectMenu, {
-                            modelValue: unref(form).service_ids,
-                            "onUpdate:modelValue": ($event) => unref(form).service_ids = $event,
+                          vueExports.createVNode(_component_USelectMenu, {
+                            modelValue: vueExports.unref(form).service_ids,
+                            "onUpdate:modelValue": ($event) => vueExports.unref(form).service_ids = $event,
                             class: "w-full",
-                            items: unref(serviceOptions),
+                            items: vueExports.unref(serviceOptions),
                             multiple: "",
                             placeholder: "Выберите услуги",
                             "value-key": "value"
@@ -636,19 +632,19 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     }),
                     _: 1
                   }, _parent3, _scopeId2));
-                  _push3(ssrRenderComponent(_component_UFormField, { label: "Действует до" }, {
-                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                  _push3(ssrRenderComponent_1(_component_UFormField, { label: "Действует до" }, {
+                    default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
-                        _push4(ssrRenderComponent(_component_UInput, {
-                          modelValue: unref(form).expires_at,
-                          "onUpdate:modelValue": ($event) => unref(form).expires_at = $event,
+                        _push4(ssrRenderComponent_1(_component_UInput, {
+                          modelValue: vueExports.unref(form).expires_at,
+                          "onUpdate:modelValue": ($event) => vueExports.unref(form).expires_at = $event,
                           type: "date"
                         }, null, _parent4, _scopeId3));
                       } else {
                         return [
-                          createVNode(_component_UInput, {
-                            modelValue: unref(form).expires_at,
-                            "onUpdate:modelValue": ($event) => unref(form).expires_at = $event,
+                          vueExports.createVNode(_component_UInput, {
+                            modelValue: vueExports.unref(form).expires_at,
+                            "onUpdate:modelValue": ($event) => vueExports.unref(form).expires_at = $event,
                             type: "date"
                           }, null, 8, ["modelValue", "onUpdate:modelValue"])
                         ];
@@ -656,19 +652,19 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     }),
                     _: 1
                   }, _parent3, _scopeId2));
-                  _push3(ssrRenderComponent(_component_UFormField, { label: "JSON метаданных" }, {
-                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                  _push3(ssrRenderComponent_1(_component_UFormField, { label: "JSON метаданных" }, {
+                    default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
-                        _push4(ssrRenderComponent(_component_UTextarea, {
-                          modelValue: unref(form).metadata,
-                          "onUpdate:modelValue": ($event) => unref(form).metadata = $event,
+                        _push4(ssrRenderComponent_1(_component_UTextarea, {
+                          modelValue: vueExports.unref(form).metadata,
+                          "onUpdate:modelValue": ($event) => vueExports.unref(form).metadata = $event,
                           rows: 5
                         }, null, _parent4, _scopeId3));
                       } else {
                         return [
-                          createVNode(_component_UTextarea, {
-                            modelValue: unref(form).metadata,
-                            "onUpdate:modelValue": ($event) => unref(form).metadata = $event,
+                          vueExports.createVNode(_component_UTextarea, {
+                            modelValue: vueExports.unref(form).metadata,
+                            "onUpdate:modelValue": ($event) => vueExports.unref(form).metadata = $event,
                             rows: 5
                           }, null, 8, ["modelValue", "onUpdate:modelValue"])
                         ];
@@ -679,23 +675,23 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   _push3(`</div>`);
                 } else {
                   return [
-                    createVNode("div", { class: "space-y-4" }, [
-                      createVNode(_component_UFormField, { label: "Код сертификата" }, {
-                        default: withCtx(() => [
-                          createVNode(_component_UInput, {
-                            modelValue: unref(form).code,
-                            "onUpdate:modelValue": ($event) => unref(form).code = $event
+                    vueExports.createVNode("div", { class: "space-y-4" }, [
+                      vueExports.createVNode(_component_UFormField, { label: "Код сертификата" }, {
+                        default: vueExports.withCtx(() => [
+                          vueExports.createVNode(_component_UInput, {
+                            modelValue: vueExports.unref(form).code,
+                            "onUpdate:modelValue": ($event) => vueExports.unref(form).code = $event
                           }, null, 8, ["modelValue", "onUpdate:modelValue"])
                         ]),
                         _: 1
                       }),
-                      createVNode(_component_UFormField, { label: "Услуги" }, {
-                        default: withCtx(() => [
-                          createVNode(_component_USelectMenu, {
-                            modelValue: unref(form).service_ids,
-                            "onUpdate:modelValue": ($event) => unref(form).service_ids = $event,
+                      vueExports.createVNode(_component_UFormField, { label: "Услуги" }, {
+                        default: vueExports.withCtx(() => [
+                          vueExports.createVNode(_component_USelectMenu, {
+                            modelValue: vueExports.unref(form).service_ids,
+                            "onUpdate:modelValue": ($event) => vueExports.unref(form).service_ids = $event,
                             class: "w-full",
-                            items: unref(serviceOptions),
+                            items: vueExports.unref(serviceOptions),
                             multiple: "",
                             placeholder: "Выберите услуги",
                             "value-key": "value"
@@ -703,21 +699,21 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                         ]),
                         _: 1
                       }),
-                      createVNode(_component_UFormField, { label: "Действует до" }, {
-                        default: withCtx(() => [
-                          createVNode(_component_UInput, {
-                            modelValue: unref(form).expires_at,
-                            "onUpdate:modelValue": ($event) => unref(form).expires_at = $event,
+                      vueExports.createVNode(_component_UFormField, { label: "Действует до" }, {
+                        default: vueExports.withCtx(() => [
+                          vueExports.createVNode(_component_UInput, {
+                            modelValue: vueExports.unref(form).expires_at,
+                            "onUpdate:modelValue": ($event) => vueExports.unref(form).expires_at = $event,
                             type: "date"
                           }, null, 8, ["modelValue", "onUpdate:modelValue"])
                         ]),
                         _: 1
                       }),
-                      createVNode(_component_UFormField, { label: "JSON метаданных" }, {
-                        default: withCtx(() => [
-                          createVNode(_component_UTextarea, {
-                            modelValue: unref(form).metadata,
-                            "onUpdate:modelValue": ($event) => unref(form).metadata = $event,
+                      vueExports.createVNode(_component_UFormField, { label: "JSON метаданных" }, {
+                        default: vueExports.withCtx(() => [
+                          vueExports.createVNode(_component_UTextarea, {
+                            modelValue: vueExports.unref(form).metadata,
+                            "onUpdate:modelValue": ($event) => vueExports.unref(form).metadata = $event,
                             rows: 5
                           }, null, 8, ["modelValue", "onUpdate:modelValue"])
                         ]),
@@ -727,52 +723,52 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   ];
                 }
               }),
-              footer: withCtx(({ close }, _push3, _parent3, _scopeId2) => {
+              footer: vueExports.withCtx(({ close }, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
                   _push3(`<div class="flex w-full flex-wrap justify-end gap-3"${_scopeId2}>`);
-                  _push3(ssrRenderComponent(_component_UButton, {
+                  _push3(ssrRenderComponent_1(_component_UButton, {
                     color: "neutral",
                     variant: "outline",
                     onClick: resetCreateForm
                   }, {
-                    default: withCtx((_2, _push4, _parent4, _scopeId3) => {
+                    default: vueExports.withCtx((_2, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
                         _push4(` Сбросить `);
                       } else {
                         return [
-                          createTextVNode(" Сбросить ")
+                          vueExports.createTextVNode(" Сбросить ")
                         ];
                       }
                     }),
                     _: 2
                   }, _parent3, _scopeId2));
-                  _push3(ssrRenderComponent(_component_UButton, {
+                  _push3(ssrRenderComponent_1(_component_UButton, {
                     color: "neutral",
                     variant: "ghost",
                     onClick: close
                   }, {
-                    default: withCtx((_2, _push4, _parent4, _scopeId3) => {
+                    default: vueExports.withCtx((_2, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
                         _push4(` Закрыть `);
                       } else {
                         return [
-                          createTextVNode(" Закрыть ")
+                          vueExports.createTextVNode(" Закрыть ")
                         ];
                       }
                     }),
                     _: 2
                   }, _parent3, _scopeId2));
-                  _push3(ssrRenderComponent(_component_UButton, {
+                  _push3(ssrRenderComponent_1(_component_UButton, {
                     color: "primary",
                     icon: "i-lucide-id-card",
                     onClick: createCertificate
                   }, {
-                    default: withCtx((_2, _push4, _parent4, _scopeId3) => {
+                    default: vueExports.withCtx((_2, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
                         _push4(` Создать сертификат `);
                       } else {
                         return [
-                          createTextVNode(" Создать сертификат ")
+                          vueExports.createTextVNode(" Создать сертификат ")
                         ];
                       }
                     }),
@@ -781,34 +777,34 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   _push3(`</div>`);
                 } else {
                   return [
-                    createVNode("div", { class: "flex w-full flex-wrap justify-end gap-3" }, [
-                      createVNode(_component_UButton, {
+                    vueExports.createVNode("div", { class: "flex w-full flex-wrap justify-end gap-3" }, [
+                      vueExports.createVNode(_component_UButton, {
                         color: "neutral",
                         variant: "outline",
                         onClick: resetCreateForm
                       }, {
-                        default: withCtx(() => [
-                          createTextVNode(" Сбросить ")
+                        default: vueExports.withCtx(() => [
+                          vueExports.createTextVNode(" Сбросить ")
                         ]),
                         _: 1
                       }),
-                      createVNode(_component_UButton, {
+                      vueExports.createVNode(_component_UButton, {
                         color: "neutral",
                         variant: "ghost",
                         onClick: close
                       }, {
-                        default: withCtx(() => [
-                          createTextVNode(" Закрыть ")
+                        default: vueExports.withCtx(() => [
+                          vueExports.createTextVNode(" Закрыть ")
                         ]),
                         _: 1
                       }, 8, ["onClick"]),
-                      createVNode(_component_UButton, {
+                      vueExports.createVNode(_component_UButton, {
                         color: "primary",
                         icon: "i-lucide-id-card",
                         onClick: createCertificate
                       }, {
-                        default: withCtx(() => [
-                          createTextVNode(" Создать сертификат ")
+                        default: vueExports.withCtx(() => [
+                          vueExports.createTextVNode(" Создать сертификат ")
                         ]),
                         _: 1
                       })
@@ -818,28 +814,28 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
               }),
               _: 1
             }, _parent2, _scopeId));
-            _push2(ssrRenderComponent(_component_UModal, {
-              open: unref(lookupModalOpen),
-              "onUpdate:open": ($event) => isRef(lookupModalOpen) ? lookupModalOpen.value = $event : null,
+            _push2(ssrRenderComponent_1(_component_UModal, {
+              open: vueExports.unref(lookupModalOpen),
+              "onUpdate:open": ($event) => vueExports.isRef(lookupModalOpen) ? lookupModalOpen.value = $event : null,
               class: "sm:max-w-2xl",
-              description: unref(lookupModalDescription),
+              description: vueExports.unref(lookupModalDescription),
               title: "Проверить сертификат"
             }, {
-              body: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              body: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
                   _push3(`<div class="space-y-4"${_scopeId2}>`);
-                  _push3(ssrRenderComponent(_component_UFormField, { label: "Код сертификата" }, {
-                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                  _push3(ssrRenderComponent_1(_component_UFormField, { label: "Код сертификата" }, {
+                    default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
-                        _push4(ssrRenderComponent(_component_UInput, {
-                          modelValue: unref(lookupCode),
-                          "onUpdate:modelValue": ($event) => isRef(lookupCode) ? lookupCode.value = $event : null
+                        _push4(ssrRenderComponent_1(_component_UInput, {
+                          modelValue: vueExports.unref(lookupCode),
+                          "onUpdate:modelValue": ($event) => vueExports.isRef(lookupCode) ? lookupCode.value = $event : null
                         }, null, _parent4, _scopeId3));
                       } else {
                         return [
-                          createVNode(_component_UInput, {
-                            modelValue: unref(lookupCode),
-                            "onUpdate:modelValue": ($event) => isRef(lookupCode) ? lookupCode.value = $event : null
+                          vueExports.createVNode(_component_UInput, {
+                            modelValue: vueExports.unref(lookupCode),
+                            "onUpdate:modelValue": ($event) => vueExports.isRef(lookupCode) ? lookupCode.value = $event : null
                           }, null, 8, ["modelValue", "onUpdate:modelValue"])
                         ];
                       }
@@ -847,28 +843,28 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     _: 1
                   }, _parent3, _scopeId2));
                   _push3(`<div class="flex justify-end"${_scopeId2}>`);
-                  _push3(ssrRenderComponent(_component_UButton, {
+                  _push3(ssrRenderComponent_1(_component_UButton, {
                     color: "neutral",
                     icon: "i-lucide-search",
                     variant: "outline",
                     onClick: lookupCertificate
                   }, {
-                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                    default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
                         _push4(` Проверить `);
                       } else {
                         return [
-                          createTextVNode(" Проверить ")
+                          vueExports.createTextVNode(" Проверить ")
                         ];
                       }
                     }),
                     _: 1
                   }, _parent3, _scopeId2));
                   _push3(`</div>`);
-                  if (unref(lookupResult)) {
-                    _push3(ssrRenderComponent(_component_SharedJsonBlock, {
+                  if (vueExports.unref(lookupResult)) {
+                    _push3(ssrRenderComponent_1(_component_SharedJsonBlock, {
                       label: "Ответ поиска",
-                      value: unref(lookupResult)
+                      value: vueExports.unref(lookupResult)
                     }, null, _parent3, _scopeId2));
                   } else {
                     _push3(`<!---->`);
@@ -876,68 +872,68 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   _push3(`</div>`);
                 } else {
                   return [
-                    createVNode("div", { class: "space-y-4" }, [
-                      createVNode(_component_UFormField, { label: "Код сертификата" }, {
-                        default: withCtx(() => [
-                          createVNode(_component_UInput, {
-                            modelValue: unref(lookupCode),
-                            "onUpdate:modelValue": ($event) => isRef(lookupCode) ? lookupCode.value = $event : null
+                    vueExports.createVNode("div", { class: "space-y-4" }, [
+                      vueExports.createVNode(_component_UFormField, { label: "Код сертификата" }, {
+                        default: vueExports.withCtx(() => [
+                          vueExports.createVNode(_component_UInput, {
+                            modelValue: vueExports.unref(lookupCode),
+                            "onUpdate:modelValue": ($event) => vueExports.isRef(lookupCode) ? lookupCode.value = $event : null
                           }, null, 8, ["modelValue", "onUpdate:modelValue"])
                         ]),
                         _: 1
                       }),
-                      createVNode("div", { class: "flex justify-end" }, [
-                        createVNode(_component_UButton, {
+                      vueExports.createVNode("div", { class: "flex justify-end" }, [
+                        vueExports.createVNode(_component_UButton, {
                           color: "neutral",
                           icon: "i-lucide-search",
                           variant: "outline",
                           onClick: lookupCertificate
                         }, {
-                          default: withCtx(() => [
-                            createTextVNode(" Проверить ")
+                          default: vueExports.withCtx(() => [
+                            vueExports.createTextVNode(" Проверить ")
                           ]),
                           _: 1
                         })
                       ]),
-                      unref(lookupResult) ? (openBlock(), createBlock(_component_SharedJsonBlock, {
+                      vueExports.unref(lookupResult) ? (vueExports.openBlock(), vueExports.createBlock(_component_SharedJsonBlock, {
                         key: 0,
                         label: "Ответ поиска",
-                        value: unref(lookupResult)
-                      }, null, 8, ["value"])) : createCommentVNode("", true)
+                        value: vueExports.unref(lookupResult)
+                      }, null, 8, ["value"])) : vueExports.createCommentVNode("", true)
                     ])
                   ];
                 }
               }),
-              footer: withCtx(({ close }, _push3, _parent3, _scopeId2) => {
+              footer: vueExports.withCtx(({ close }, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
                   _push3(`<div class="flex w-full flex-wrap justify-end gap-3"${_scopeId2}>`);
-                  _push3(ssrRenderComponent(_component_UButton, {
+                  _push3(ssrRenderComponent_1(_component_UButton, {
                     color: "neutral",
                     variant: "outline",
                     onClick: resetLookupState
                   }, {
-                    default: withCtx((_2, _push4, _parent4, _scopeId3) => {
+                    default: vueExports.withCtx((_2, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
                         _push4(` Сбросить `);
                       } else {
                         return [
-                          createTextVNode(" Сбросить ")
+                          vueExports.createTextVNode(" Сбросить ")
                         ];
                       }
                     }),
                     _: 2
                   }, _parent3, _scopeId2));
-                  _push3(ssrRenderComponent(_component_UButton, {
+                  _push3(ssrRenderComponent_1(_component_UButton, {
                     color: "neutral",
                     variant: "ghost",
                     onClick: close
                   }, {
-                    default: withCtx((_2, _push4, _parent4, _scopeId3) => {
+                    default: vueExports.withCtx((_2, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
                         _push4(` Закрыть `);
                       } else {
                         return [
-                          createTextVNode(" Закрыть ")
+                          vueExports.createTextVNode(" Закрыть ")
                         ];
                       }
                     }),
@@ -946,24 +942,24 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   _push3(`</div>`);
                 } else {
                   return [
-                    createVNode("div", { class: "flex w-full flex-wrap justify-end gap-3" }, [
-                      createVNode(_component_UButton, {
+                    vueExports.createVNode("div", { class: "flex w-full flex-wrap justify-end gap-3" }, [
+                      vueExports.createVNode(_component_UButton, {
                         color: "neutral",
                         variant: "outline",
                         onClick: resetLookupState
                       }, {
-                        default: withCtx(() => [
-                          createTextVNode(" Сбросить ")
+                        default: vueExports.withCtx(() => [
+                          vueExports.createTextVNode(" Сбросить ")
                         ]),
                         _: 1
                       }),
-                      createVNode(_component_UButton, {
+                      vueExports.createVNode(_component_UButton, {
                         color: "neutral",
                         variant: "ghost",
                         onClick: close
                       }, {
-                        default: withCtx(() => [
-                          createTextVNode(" Закрыть ")
+                        default: vueExports.withCtx(() => [
+                          vueExports.createTextVNode(" Закрыть ")
                         ]),
                         _: 1
                       }, 8, ["onClick"])
@@ -975,58 +971,58 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             }, _parent2, _scopeId));
           } else {
             return [
-              createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-                header: withCtx(() => [
-                  createVNode("div", { class: "flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between" }, [
-                    createVNode("div", { class: "space-y-2" }, [
-                      createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Активный реестр "),
-                      createVNode("h2", { class: "barbershop-heading text-3xl text-charcoal-950" }, " Действующие сертификаты ")
+              vueExports.createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+                header: vueExports.withCtx(() => [
+                  vueExports.createVNode("div", { class: "flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between" }, [
+                    vueExports.createVNode("div", { class: "space-y-2" }, [
+                      vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Активный реестр "),
+                      vueExports.createVNode("h2", { class: "barbershop-heading text-3xl text-charcoal-950" }, " Действующие сертификаты ")
                     ]),
-                    createVNode("div", { class: "flex flex-wrap items-center gap-3" }, [
-                      createVNode(_component_UBadge, {
+                    vueExports.createVNode("div", { class: "flex flex-wrap items-center gap-3" }, [
+                      vueExports.createVNode(_component_UBadge, {
                         color: "neutral",
                         size: "lg",
                         variant: "soft"
                       }, {
-                        default: withCtx(() => [
-                          createTextVNode(toDisplayString(unref(activeCertificates).length) + " активных ", 1)
+                        default: vueExports.withCtx(() => [
+                          vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(activeCertificates).length) + " активных ", 1)
                         ]),
                         _: 1
                       }),
-                      createVNode(_component_UButton, {
+                      vueExports.createVNode(_component_UButton, {
                         color: "primary",
                         icon: "i-lucide-plus",
                         onClick: openCreateModal
                       }, {
-                        default: withCtx(() => [
-                          createTextVNode(" Создать ")
+                        default: vueExports.withCtx(() => [
+                          vueExports.createTextVNode(" Создать ")
                         ]),
                         _: 1
                       }),
-                      createVNode(_component_UButton, {
+                      vueExports.createVNode(_component_UButton, {
                         color: "neutral",
                         icon: "i-lucide-search",
                         variant: "outline",
                         onClick: openLookupModal
                       }, {
-                        default: withCtx(() => [
-                          createTextVNode(" Проверить ")
+                        default: vueExports.withCtx(() => [
+                          vueExports.createTextVNode(" Проверить ")
                         ]),
                         _: 1
                       })
                     ])
                   ])
                 ]),
-                default: withCtx(() => [
-                  unref(activeCertificates).length ? (openBlock(), createBlock("div", {
+                default: vueExports.withCtx(() => [
+                  vueExports.unref(activeCertificates).length ? (vueExports.openBlock(), vueExports.createBlock("div", {
                     key: 0,
                     class: "overflow-hidden rounded-[1.25rem] border border-charcoal-200 bg-white/90"
                   }, [
-                    createVNode("div", { class: "max-h-[42rem] overflow-auto" }, [
-                      createVNode(_component_UTable, {
+                    vueExports.createVNode("div", { class: "max-h-[42rem] overflow-auto" }, [
+                      vueExports.createVNode(_component_UTable, {
                         columns: certificateColumns,
-                        data: unref(activeCertificates),
-                        loading: unref(pending),
+                        data: vueExports.unref(activeCertificates),
+                        loading: vueExports.unref(pending),
                         sticky: "header",
                         ui: {
                           root: "w-full overflow-auto",
@@ -1037,40 +1033,40 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                           td: "px-4 py-4 text-sm text-charcoal-700 align-middle"
                         }
                       }, {
-                        "code-cell": withCtx(({ row }) => [
-                          createVNode("span", { class: "font-mono font-medium text-charcoal-950" }, toDisplayString(row.original.code), 1)
+                        "code-cell": vueExports.withCtx(({ row }) => [
+                          vueExports.createVNode("span", { class: "font-mono font-medium text-charcoal-950" }, vueExports.toDisplayString(row.original.code), 1)
                         ]),
-                        "services-cell": withCtx(({ row }) => [
-                          createVNode("div", { class: "flex max-w-[22rem] flex-wrap gap-2" }, [
-                            (openBlock(true), createBlock(Fragment, null, renderList(row.original.service_ids, (serviceId) => {
-                              return openBlock(), createBlock(_component_UBadge, {
+                        "services-cell": vueExports.withCtx(({ row }) => [
+                          vueExports.createVNode("div", { class: "flex max-w-[22rem] flex-wrap gap-2" }, [
+                            (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(row.original.service_ids, (serviceId) => {
+                              return vueExports.openBlock(), vueExports.createBlock(_component_UBadge, {
                                 key: serviceId,
                                 color: "neutral",
                                 variant: "soft"
                               }, {
-                                default: withCtx(() => [
-                                  createTextVNode(toDisplayString(unref(serviceNameMap).get(serviceId) || serviceId), 1)
+                                default: vueExports.withCtx(() => [
+                                  vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(serviceNameMap).get(serviceId) || serviceId), 1)
                                 ]),
                                 _: 2
                               }, 1024);
                             }), 128))
                           ])
                         ]),
-                        "expires_at-cell": withCtx(({ row }) => [
-                          createTextVNode(toDisplayString(row.original.expires_at ? unref(formatDateTime)(row.original.expires_at) : "Без срока"), 1)
+                        "expires_at-cell": vueExports.withCtx(({ row }) => [
+                          vueExports.createTextVNode(vueExports.toDisplayString(row.original.expires_at ? vueExports.unref(formatDateTime)(row.original.expires_at) : "Без срока"), 1)
                         ]),
-                        "metadata-cell": withCtx(({ row }) => [
-                          createVNode("span", { class: "block max-w-[18rem] truncate text-charcoal-500" }, toDisplayString(formatMetadataPreview(row.original.metadata)), 1)
+                        "metadata-cell": vueExports.withCtx(({ row }) => [
+                          vueExports.createVNode("span", { class: "block max-w-[18rem] truncate text-charcoal-500" }, vueExports.toDisplayString(formatMetadataPreview(row.original.metadata)), 1)
                         ]),
-                        "status-cell": withCtx(({ row }) => [
-                          createVNode(_component_SharedStatusBadge, {
+                        "status-cell": vueExports.withCtx(({ row }) => [
+                          vueExports.createVNode(_component_SharedStatusBadge, {
                             label: row.original.is_used ? "used" : "active"
                           }, null, 8, ["label"])
                         ]),
                         _: 1
                       }, 8, ["data", "loading"])
                     ])
-                  ])) : (openBlock(), createBlock(_component_SharedEmptyState, {
+                  ])) : (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                     key: 1,
                     description: "Не найдено ни одного действующего сертификата.",
                     icon: "i-lucide-id-card",
@@ -1079,31 +1075,31 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 ]),
                 _: 1
               }),
-              createVNode(_component_UModal, {
-                open: unref(createModalOpen),
-                "onUpdate:open": ($event) => isRef(createModalOpen) ? createModalOpen.value = $event : null,
+              vueExports.createVNode(_component_UModal, {
+                open: vueExports.unref(createModalOpen),
+                "onUpdate:open": ($event) => vueExports.isRef(createModalOpen) ? createModalOpen.value = $event : null,
                 class: "sm:max-w-2xl",
-                description: unref(createModalDescription),
+                description: vueExports.unref(createModalDescription),
                 title: "Создать сертификат"
               }, {
-                body: withCtx(() => [
-                  createVNode("div", { class: "space-y-4" }, [
-                    createVNode(_component_UFormField, { label: "Код сертификата" }, {
-                      default: withCtx(() => [
-                        createVNode(_component_UInput, {
-                          modelValue: unref(form).code,
-                          "onUpdate:modelValue": ($event) => unref(form).code = $event
+                body: vueExports.withCtx(() => [
+                  vueExports.createVNode("div", { class: "space-y-4" }, [
+                    vueExports.createVNode(_component_UFormField, { label: "Код сертификата" }, {
+                      default: vueExports.withCtx(() => [
+                        vueExports.createVNode(_component_UInput, {
+                          modelValue: vueExports.unref(form).code,
+                          "onUpdate:modelValue": ($event) => vueExports.unref(form).code = $event
                         }, null, 8, ["modelValue", "onUpdate:modelValue"])
                       ]),
                       _: 1
                     }),
-                    createVNode(_component_UFormField, { label: "Услуги" }, {
-                      default: withCtx(() => [
-                        createVNode(_component_USelectMenu, {
-                          modelValue: unref(form).service_ids,
-                          "onUpdate:modelValue": ($event) => unref(form).service_ids = $event,
+                    vueExports.createVNode(_component_UFormField, { label: "Услуги" }, {
+                      default: vueExports.withCtx(() => [
+                        vueExports.createVNode(_component_USelectMenu, {
+                          modelValue: vueExports.unref(form).service_ids,
+                          "onUpdate:modelValue": ($event) => vueExports.unref(form).service_ids = $event,
                           class: "w-full",
-                          items: unref(serviceOptions),
+                          items: vueExports.unref(serviceOptions),
                           multiple: "",
                           placeholder: "Выберите услуги",
                           "value-key": "value"
@@ -1111,21 +1107,21 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                       ]),
                       _: 1
                     }),
-                    createVNode(_component_UFormField, { label: "Действует до" }, {
-                      default: withCtx(() => [
-                        createVNode(_component_UInput, {
-                          modelValue: unref(form).expires_at,
-                          "onUpdate:modelValue": ($event) => unref(form).expires_at = $event,
+                    vueExports.createVNode(_component_UFormField, { label: "Действует до" }, {
+                      default: vueExports.withCtx(() => [
+                        vueExports.createVNode(_component_UInput, {
+                          modelValue: vueExports.unref(form).expires_at,
+                          "onUpdate:modelValue": ($event) => vueExports.unref(form).expires_at = $event,
                           type: "date"
                         }, null, 8, ["modelValue", "onUpdate:modelValue"])
                       ]),
                       _: 1
                     }),
-                    createVNode(_component_UFormField, { label: "JSON метаданных" }, {
-                      default: withCtx(() => [
-                        createVNode(_component_UTextarea, {
-                          modelValue: unref(form).metadata,
-                          "onUpdate:modelValue": ($event) => unref(form).metadata = $event,
+                    vueExports.createVNode(_component_UFormField, { label: "JSON метаданных" }, {
+                      default: vueExports.withCtx(() => [
+                        vueExports.createVNode(_component_UTextarea, {
+                          modelValue: vueExports.unref(form).metadata,
+                          "onUpdate:modelValue": ($event) => vueExports.unref(form).metadata = $event,
                           rows: 5
                         }, null, 8, ["modelValue", "onUpdate:modelValue"])
                       ]),
@@ -1133,35 +1129,35 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     })
                   ])
                 ]),
-                footer: withCtx(({ close }) => [
-                  createVNode("div", { class: "flex w-full flex-wrap justify-end gap-3" }, [
-                    createVNode(_component_UButton, {
+                footer: vueExports.withCtx(({ close }) => [
+                  vueExports.createVNode("div", { class: "flex w-full flex-wrap justify-end gap-3" }, [
+                    vueExports.createVNode(_component_UButton, {
                       color: "neutral",
                       variant: "outline",
                       onClick: resetCreateForm
                     }, {
-                      default: withCtx(() => [
-                        createTextVNode(" Сбросить ")
+                      default: vueExports.withCtx(() => [
+                        vueExports.createTextVNode(" Сбросить ")
                       ]),
                       _: 1
                     }),
-                    createVNode(_component_UButton, {
+                    vueExports.createVNode(_component_UButton, {
                       color: "neutral",
                       variant: "ghost",
                       onClick: close
                     }, {
-                      default: withCtx(() => [
-                        createTextVNode(" Закрыть ")
+                      default: vueExports.withCtx(() => [
+                        vueExports.createTextVNode(" Закрыть ")
                       ]),
                       _: 1
                     }, 8, ["onClick"]),
-                    createVNode(_component_UButton, {
+                    vueExports.createVNode(_component_UButton, {
                       color: "primary",
                       icon: "i-lucide-id-card",
                       onClick: createCertificate
                     }, {
-                      default: withCtx(() => [
-                        createTextVNode(" Создать сертификат ")
+                      default: vueExports.withCtx(() => [
+                        vueExports.createTextVNode(" Создать сертификат ")
                       ]),
                       _: 1
                     })
@@ -1169,63 +1165,63 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 ]),
                 _: 1
               }, 8, ["open", "onUpdate:open", "description"]),
-              createVNode(_component_UModal, {
-                open: unref(lookupModalOpen),
-                "onUpdate:open": ($event) => isRef(lookupModalOpen) ? lookupModalOpen.value = $event : null,
+              vueExports.createVNode(_component_UModal, {
+                open: vueExports.unref(lookupModalOpen),
+                "onUpdate:open": ($event) => vueExports.isRef(lookupModalOpen) ? lookupModalOpen.value = $event : null,
                 class: "sm:max-w-2xl",
-                description: unref(lookupModalDescription),
+                description: vueExports.unref(lookupModalDescription),
                 title: "Проверить сертификат"
               }, {
-                body: withCtx(() => [
-                  createVNode("div", { class: "space-y-4" }, [
-                    createVNode(_component_UFormField, { label: "Код сертификата" }, {
-                      default: withCtx(() => [
-                        createVNode(_component_UInput, {
-                          modelValue: unref(lookupCode),
-                          "onUpdate:modelValue": ($event) => isRef(lookupCode) ? lookupCode.value = $event : null
+                body: vueExports.withCtx(() => [
+                  vueExports.createVNode("div", { class: "space-y-4" }, [
+                    vueExports.createVNode(_component_UFormField, { label: "Код сертификата" }, {
+                      default: vueExports.withCtx(() => [
+                        vueExports.createVNode(_component_UInput, {
+                          modelValue: vueExports.unref(lookupCode),
+                          "onUpdate:modelValue": ($event) => vueExports.isRef(lookupCode) ? lookupCode.value = $event : null
                         }, null, 8, ["modelValue", "onUpdate:modelValue"])
                       ]),
                       _: 1
                     }),
-                    createVNode("div", { class: "flex justify-end" }, [
-                      createVNode(_component_UButton, {
+                    vueExports.createVNode("div", { class: "flex justify-end" }, [
+                      vueExports.createVNode(_component_UButton, {
                         color: "neutral",
                         icon: "i-lucide-search",
                         variant: "outline",
                         onClick: lookupCertificate
                       }, {
-                        default: withCtx(() => [
-                          createTextVNode(" Проверить ")
+                        default: vueExports.withCtx(() => [
+                          vueExports.createTextVNode(" Проверить ")
                         ]),
                         _: 1
                       })
                     ]),
-                    unref(lookupResult) ? (openBlock(), createBlock(_component_SharedJsonBlock, {
+                    vueExports.unref(lookupResult) ? (vueExports.openBlock(), vueExports.createBlock(_component_SharedJsonBlock, {
                       key: 0,
                       label: "Ответ поиска",
-                      value: unref(lookupResult)
-                    }, null, 8, ["value"])) : createCommentVNode("", true)
+                      value: vueExports.unref(lookupResult)
+                    }, null, 8, ["value"])) : vueExports.createCommentVNode("", true)
                   ])
                 ]),
-                footer: withCtx(({ close }) => [
-                  createVNode("div", { class: "flex w-full flex-wrap justify-end gap-3" }, [
-                    createVNode(_component_UButton, {
+                footer: vueExports.withCtx(({ close }) => [
+                  vueExports.createVNode("div", { class: "flex w-full flex-wrap justify-end gap-3" }, [
+                    vueExports.createVNode(_component_UButton, {
                       color: "neutral",
                       variant: "outline",
                       onClick: resetLookupState
                     }, {
-                      default: withCtx(() => [
-                        createTextVNode(" Сбросить ")
+                      default: vueExports.withCtx(() => [
+                        vueExports.createTextVNode(" Сбросить ")
                       ]),
                       _: 1
                     }),
-                    createVNode(_component_UButton, {
+                    vueExports.createVNode(_component_UButton, {
                       color: "neutral",
                       variant: "ghost",
                       onClick: close
                     }, {
-                      default: withCtx(() => [
-                        createTextVNode(" Закрыть ")
+                      default: vueExports.withCtx(() => [
+                        vueExports.createTextVNode(" Закрыть ")
                       ]),
                       _: 1
                     }, 8, ["onClick"])
@@ -1243,7 +1239,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
 });
 const _sfc_setup = _sfc_main.setup;
 _sfc_main.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
+  const ssrContext = vueExports.useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("pages/certificates.vue");
   return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
 };

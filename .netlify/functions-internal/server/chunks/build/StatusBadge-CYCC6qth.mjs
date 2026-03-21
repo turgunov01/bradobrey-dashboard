@@ -1,9 +1,8 @@
 globalThis.__timing__.logStart('Load chunks/build/StatusBadge-CYCC6qth');import { _ as _sfc_main$1 } from './Badge-CHxj5N7w.mjs';
-import { defineComponent, computed, mergeProps, unref, withCtx, createTextVNode, toDisplayString, useSSRContext } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/index.mjs';
-import { ssrRenderComponent, ssrInterpolate } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/server-renderer/index.mjs';
 import { a as formatStatusLabel } from './display-CyQec-Wd.mjs';
+import { v as vueExports, s as ssrRenderComponent_1, c as ssrInterpolate_1 } from '../routes/renderer.mjs';
 
-const _sfc_main = /* @__PURE__ */ defineComponent({
+const _sfc_main = /* @__PURE__ */ vueExports.defineComponent({
   __name: "StatusBadge",
   __ssrInlineRender: true,
   props: {
@@ -11,7 +10,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
   },
   setup(__props) {
     const props = __props;
-    const color = computed(() => {
+    const color = vueExports.computed(() => {
       const value = String(props.label || "").toLowerCase();
       if (["completed", "done", "paid", "active", "ready", "success"].includes(value)) {
         return "primary";
@@ -26,16 +25,16 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     });
     return (_ctx, _push, _parent, _attrs) => {
       const _component_UBadge = _sfc_main$1;
-      _push(ssrRenderComponent(_component_UBadge, mergeProps({
-        color: unref(color),
+      _push(ssrRenderComponent_1(_component_UBadge, vueExports.mergeProps({
+        color: vueExports.unref(color),
         variant: "soft"
       }, _attrs), {
-        default: withCtx((_, _push2, _parent2, _scopeId) => {
+        default: vueExports.withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
-            _push2(`${ssrInterpolate(unref(formatStatusLabel)(__props.label))}`);
+            _push2(`${ssrInterpolate_1(vueExports.unref(formatStatusLabel)(__props.label))}`);
           } else {
             return [
-              createTextVNode(toDisplayString(unref(formatStatusLabel)(__props.label)), 1)
+              vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(formatStatusLabel)(__props.label)), 1)
             ];
           }
         }),
@@ -46,7 +45,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
 });
 const _sfc_setup = _sfc_main.setup;
 _sfc_main.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
+  const ssrContext = vueExports.useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/shared/StatusBadge.vue");
   return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
 };

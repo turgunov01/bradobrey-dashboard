@@ -1,10 +1,9 @@
 globalThis.__timing__.logStart('Load chunks/build/login-CbuY2-jF');import { f as useSessionStore, c as _sfc_main$3, d as _sfc_main$a, e as useApiClient, n as navigateTo } from './server.mjs';
 import { _ as _sfc_main$1 } from './FormField-CfjXEpv-.mjs';
 import { _ as _sfc_main$2 } from './Input-DcPP1NGC.mjs';
-import { defineComponent, reactive, ref, mergeProps, withCtx, unref, createVNode, createTextVNode, withModifiers, useSSRContext } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/index.mjs';
-import { ssrRenderComponent } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/server-renderer/index.mjs';
 import { l as loginSchema } from '../_/index.mjs';
 import { u as useBranchStore } from './branch-nC1tN9Zp.mjs';
+import { v as vueExports, s as ssrRenderComponent_1 } from '../routes/renderer.mjs';
 import '../_/nitro.mjs';
 import 'node:crypto';
 import 'node:http';
@@ -16,35 +15,28 @@ import 'node:path';
 import 'node:process';
 import 'node:tty';
 import 'node:fs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/pinia@3.0.4_typescript@5.9.3_vue@3.5.30_typescript@5.9.3_/node_modules/pinia/dist/pinia.prod.cjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/vue-router/vue-router.node.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/perfect-debounce@2.1.0/node_modules/perfect-debounce/dist/index.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/@vue/shared/dist/shared.cjs.prod.js';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/tailwindcss@4.2.1/node_modules/tailwindcss/dist/colors.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/@iconify/vue/dist/iconify.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/reka-ui/dist/index.js';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/tailwind-variants/dist/index.js';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/unhead@2.1.12/node_modules/unhead/dist/plugins.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/unhead@2.1.12/node_modules/unhead/dist/utils.mjs';
+import '../_/shared.cjs.prod.mjs';
+import '../virtual/_commonjsHelpers.mjs';
 import './index-qsfWWCYt.mjs';
 import './useKioskApi-l3XfHmhL.mjs';
+import 'node:stream';
 
-const _sfc_main = /* @__PURE__ */ defineComponent({
+const _sfc_main = /* @__PURE__ */ vueExports.defineComponent({
   __name: "login",
   __ssrInlineRender: true,
   setup(__props) {
     const branchStore = useBranchStore();
     const sessionStore = useSessionStore();
-    const form = reactive({
+    const form = vueExports.reactive({
       branch_id: branchStore.activeBranchId || null,
       login: "",
       password: ""
     });
-    const fieldErrors = reactive({
+    const fieldErrors = vueExports.reactive({
       login: "",
       password: ""
     });
-    const loading = ref(false);
+    const loading = vueExports.ref(false);
     function resetFieldErrors() {
       fieldErrors.login = "";
       fieldErrors.password = "";
@@ -85,20 +77,20 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       const _component_UFormField = _sfc_main$1;
       const _component_UInput = _sfc_main$2;
       const _component_UButton = _sfc_main$a;
-      _push(ssrRenderComponent(_component_UCard, mergeProps({ class: "warm-card w-full max-w-md rounded-[2.25rem] border border-charcoal-200 shadow-[0_24px_70px_rgba(18,15,13,0.10)]" }, _attrs), {
-        default: withCtx((_, _push2, _parent2, _scopeId) => {
+      _push(ssrRenderComponent_1(_component_UCard, vueExports.mergeProps({ class: "warm-card w-full max-w-md rounded-[2.25rem] border border-charcoal-200 shadow-[0_24px_70px_rgba(18,15,13,0.10)]" }, _attrs), {
+        default: vueExports.withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
             _push2(`<form class="space-y-5"${_scopeId}><div class="space-y-1"${_scopeId}><h1 class="barbershop-heading text-3xl text-charcoal-950"${_scopeId}> Вход </h1></div>`);
-            _push2(ssrRenderComponent(_component_UFormField, {
+            _push2(ssrRenderComponent_1(_component_UFormField, {
               label: "Логин",
               name: "login",
-              error: unref(fieldErrors).login
+              error: vueExports.unref(fieldErrors).login
             }, {
-              default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              default: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
-                  _push3(ssrRenderComponent(_component_UInput, {
-                    modelValue: unref(form).login,
-                    "onUpdate:modelValue": ($event) => unref(form).login = $event,
+                  _push3(ssrRenderComponent_1(_component_UInput, {
+                    modelValue: vueExports.unref(form).login,
+                    "onUpdate:modelValue": ($event) => vueExports.unref(form).login = $event,
                     autocomplete: "username",
                     autofocus: "",
                     class: "w-full",
@@ -106,9 +98,9 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   }, null, _parent3, _scopeId2));
                 } else {
                   return [
-                    createVNode(_component_UInput, {
-                      modelValue: unref(form).login,
-                      "onUpdate:modelValue": ($event) => unref(form).login = $event,
+                    vueExports.createVNode(_component_UInput, {
+                      modelValue: vueExports.unref(form).login,
+                      "onUpdate:modelValue": ($event) => vueExports.unref(form).login = $event,
                       autocomplete: "username",
                       autofocus: "",
                       class: "w-full",
@@ -119,16 +111,16 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
               }),
               _: 1
             }, _parent2, _scopeId));
-            _push2(ssrRenderComponent(_component_UFormField, {
+            _push2(ssrRenderComponent_1(_component_UFormField, {
               label: "Пароль",
               name: "password",
-              error: unref(fieldErrors).password
+              error: vueExports.unref(fieldErrors).password
             }, {
-              default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              default: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
-                  _push3(ssrRenderComponent(_component_UInput, {
-                    modelValue: unref(form).password,
-                    "onUpdate:modelValue": ($event) => unref(form).password = $event,
+                  _push3(ssrRenderComponent_1(_component_UInput, {
+                    modelValue: vueExports.unref(form).password,
+                    "onUpdate:modelValue": ($event) => vueExports.unref(form).password = $event,
                     autocomplete: "current-password",
                     class: "w-full",
                     placeholder: "Введите пароль",
@@ -136,9 +128,9 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   }, null, _parent3, _scopeId2));
                 } else {
                   return [
-                    createVNode(_component_UInput, {
-                      modelValue: unref(form).password,
-                      "onUpdate:modelValue": ($event) => unref(form).password = $event,
+                    vueExports.createVNode(_component_UInput, {
+                      modelValue: vueExports.unref(form).password,
+                      "onUpdate:modelValue": ($event) => vueExports.unref(form).password = $event,
                       autocomplete: "current-password",
                       class: "w-full",
                       placeholder: "Введите пароль",
@@ -150,19 +142,19 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
               _: 1
             }, _parent2, _scopeId));
             _push2(`<div class="pt-1"${_scopeId}>`);
-            _push2(ssrRenderComponent(_component_UButton, {
+            _push2(ssrRenderComponent_1(_component_UButton, {
               block: "",
-              loading: unref(loading),
+              loading: vueExports.unref(loading),
               color: "primary",
               size: "lg",
               type: "submit"
             }, {
-              default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              default: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
                   _push3(` Войти `);
                 } else {
                   return [
-                    createTextVNode(" Войти ")
+                    vueExports.createTextVNode(" Войти ")
                   ];
                 }
               }),
@@ -171,22 +163,22 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             _push2(`</div></form>`);
           } else {
             return [
-              createVNode("form", {
+              vueExports.createVNode("form", {
                 class: "space-y-5",
-                onSubmit: withModifiers(submit, ["prevent"])
+                onSubmit: vueExports.withModifiers(submit, ["prevent"])
               }, [
-                createVNode("div", { class: "space-y-1" }, [
-                  createVNode("h1", { class: "barbershop-heading text-3xl text-charcoal-950" }, " Вход ")
+                vueExports.createVNode("div", { class: "space-y-1" }, [
+                  vueExports.createVNode("h1", { class: "barbershop-heading text-3xl text-charcoal-950" }, " Вход ")
                 ]),
-                createVNode(_component_UFormField, {
+                vueExports.createVNode(_component_UFormField, {
                   label: "Логин",
                   name: "login",
-                  error: unref(fieldErrors).login
+                  error: vueExports.unref(fieldErrors).login
                 }, {
-                  default: withCtx(() => [
-                    createVNode(_component_UInput, {
-                      modelValue: unref(form).login,
-                      "onUpdate:modelValue": ($event) => unref(form).login = $event,
+                  default: vueExports.withCtx(() => [
+                    vueExports.createVNode(_component_UInput, {
+                      modelValue: vueExports.unref(form).login,
+                      "onUpdate:modelValue": ($event) => vueExports.unref(form).login = $event,
                       autocomplete: "username",
                       autofocus: "",
                       class: "w-full",
@@ -195,15 +187,15 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   ]),
                   _: 1
                 }, 8, ["error"]),
-                createVNode(_component_UFormField, {
+                vueExports.createVNode(_component_UFormField, {
                   label: "Пароль",
                   name: "password",
-                  error: unref(fieldErrors).password
+                  error: vueExports.unref(fieldErrors).password
                 }, {
-                  default: withCtx(() => [
-                    createVNode(_component_UInput, {
-                      modelValue: unref(form).password,
-                      "onUpdate:modelValue": ($event) => unref(form).password = $event,
+                  default: vueExports.withCtx(() => [
+                    vueExports.createVNode(_component_UInput, {
+                      modelValue: vueExports.unref(form).password,
+                      "onUpdate:modelValue": ($event) => vueExports.unref(form).password = $event,
                       autocomplete: "current-password",
                       class: "w-full",
                       placeholder: "Введите пароль",
@@ -212,16 +204,16 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   ]),
                   _: 1
                 }, 8, ["error"]),
-                createVNode("div", { class: "pt-1" }, [
-                  createVNode(_component_UButton, {
+                vueExports.createVNode("div", { class: "pt-1" }, [
+                  vueExports.createVNode(_component_UButton, {
                     block: "",
-                    loading: unref(loading),
+                    loading: vueExports.unref(loading),
                     color: "primary",
                     size: "lg",
                     type: "submit"
                   }, {
-                    default: withCtx(() => [
-                      createTextVNode(" Войти ")
+                    default: vueExports.withCtx(() => [
+                      vueExports.createTextVNode(" Войти ")
                     ]),
                     _: 1
                   }, 8, ["loading"])
@@ -237,7 +229,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
 });
 const _sfc_setup = _sfc_main.setup;
 _sfc_main.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
+  const ssrContext = vueExports.useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("pages/login.vue");
   return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
 };

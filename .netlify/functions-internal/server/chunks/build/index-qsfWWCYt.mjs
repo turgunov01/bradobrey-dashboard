@@ -1,16 +1,16 @@
-globalThis.__timing__.logStart('Load chunks/build/index-qsfWWCYt');import { O as makeDestructurable, P as watchPausable, Q as tryOnMounted, R as camelize, S as toArray, T as watchImmediate, U as isObject, V as noop, W as tryOnScopeDispose, X as isDef, Y as notNullish } from './server.mjs';
-import { shallowRef, defineComponent, ref, computed, toValue, watch, unref, getCurrentInstance, nextTick, watchEffect } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/index.mjs';
+globalThis.__timing__.logStart('Load chunks/build/index-qsfWWCYt');import { a2 as makeDestructurable, a3 as watchPausable, a4 as tryOnMounted, a5 as camelize, a6 as toArray, a7 as watchImmediate, a8 as isObject, a9 as noop, aa as tryOnScopeDispose, ab as isDef, ac as notNullish } from './server.mjs';
+import { v as vueExports } from '../routes/renderer.mjs';
 
 // @__NO_SIDE_EFFECTS__
 function createReusableTemplate(options = {}) {
   const { inheritAttrs = true } = options;
-  const render = shallowRef();
-  const define = defineComponent({ setup(_, { slots }) {
+  const render = vueExports.shallowRef();
+  const define = vueExports.defineComponent({ setup(_, { slots }) {
     return () => {
       render.value = slots.default;
     };
   } });
-  const reuse = defineComponent({
+  const reuse = vueExports.defineComponent({
     inheritAttrs,
     props: options.props,
     setup(props, { attrs, slots }) {
@@ -38,7 +38,7 @@ function keysToCamelKebabCase(obj) {
 const defaultWindow = void 0;
 function unrefElement(elRef) {
   var _$el;
-  const plain = toValue(elRef);
+  const plain = vueExports.toValue(elRef);
   return (_$el = plain === null || plain === void 0 ? void 0 : plain.$el) !== null && _$el !== void 0 ? _$el : plain;
 }
 function useEventListener(...args) {
@@ -46,17 +46,17 @@ function useEventListener(...args) {
     el.addEventListener(event, listener, options);
     return () => el.removeEventListener(event, listener, options);
   };
-  const firstParamTargets = computed(() => {
-    const test = toArray(toValue(args[0])).filter((e) => e != null);
+  const firstParamTargets = vueExports.computed(() => {
+    const test = toArray(vueExports.toValue(args[0])).filter((e) => e != null);
     return test.every((e) => typeof e !== "string") ? test : void 0;
   });
   return watchImmediate(() => {
     var _firstParamTargets$va, _firstParamTargets$va2;
     return [
       (_firstParamTargets$va = (_firstParamTargets$va2 = firstParamTargets.value) === null || _firstParamTargets$va2 === void 0 ? void 0 : _firstParamTargets$va2.map((e) => unrefElement(e))) !== null && _firstParamTargets$va !== void 0 ? _firstParamTargets$va : [defaultWindow].filter((e) => e != null),
-      toArray(toValue(firstParamTargets.value ? args[1] : args[0])),
-      toArray(unref(firstParamTargets.value ? args[2] : args[1])),
-      toValue(firstParamTargets.value ? args[3] : args[2])
+      toArray(vueExports.toValue(firstParamTargets.value ? args[1] : args[0])),
+      toArray(vueExports.unref(firstParamTargets.value ? args[2] : args[1])),
+      vueExports.toValue(firstParamTargets.value ? args[3] : args[2])
     ];
   }, ([raw_targets, raw_events, raw_listeners, raw_options], _, onCleanup) => {
     if (!(raw_targets === null || raw_targets === void 0 ? void 0 : raw_targets.length) || !(raw_events === null || raw_events === void 0 ? void 0 : raw_events.length) || !(raw_listeners === null || raw_listeners === void 0 ? void 0 : raw_listeners.length)) return;
@@ -69,14 +69,14 @@ function useEventListener(...args) {
 }
 // @__NO_SIDE_EFFECTS__
 function useMounted() {
-  const isMounted = shallowRef(false);
-  getCurrentInstance();
+  const isMounted = vueExports.shallowRef(false);
+  vueExports.getCurrentInstance();
   return isMounted;
 }
 // @__NO_SIDE_EFFECTS__
 function useSupported(callback) {
   const isMounted = /* @__PURE__ */ useMounted();
-  return computed(() => {
+  return vueExports.computed(() => {
     isMounted.value;
     return Boolean(callback());
   });
@@ -91,8 +91,8 @@ function useMutationObserver(target, callback, options = {}) {
       observer = void 0;
     }
   };
-  const stopWatch = watch(computed(() => {
-    const items = toArray(toValue(target)).map(unrefElement).filter(notNullish);
+  const stopWatch = vueExports.watch(vueExports.computed(() => {
+    const items = toArray(vueExports.toValue(target)).map(unrefElement).filter(notNullish);
     return new Set(items);
   }), (newTargets) => {
     cleanup();
@@ -126,7 +126,7 @@ function onElementRemoval(target, callback, options = {}) {
     stopFn === null || stopFn === void 0 || stopFn();
     stopFn = fn;
   };
-  const stopWatch = watchEffect(() => {
+  const stopWatch = vueExports.watchEffect(() => {
     const el = unrefElement(target);
     if (el) {
       const { stop } = useMutationObserver(document$1, (mutationsList) => {
@@ -159,7 +159,7 @@ function useActiveElement(options = {}) {
     }
     return element;
   };
-  const activeElement = shallowRef();
+  const activeElement = vueExports.shallowRef();
   const trigger = () => {
     activeElement.value = getDeepActiveElement();
   };
@@ -234,15 +234,15 @@ function useStorage(key, defaults$1, storage, options = {}) {
   const { flush = "pre", deep = true, listenToStorageChanges = true, writeDefaults = true, mergeDefaults = false, shallow, window: window$1 = defaultWindow, eventFilter, onError = (e) => {
     console.error(e);
   }, initOnMounted } = options;
-  const data = (shallow ? shallowRef : ref)(typeof defaults$1 === "function" ? defaults$1() : defaults$1);
-  const keyComputed = computed(() => toValue(key));
+  const data = (shallow ? vueExports.shallowRef : vueExports.ref)(typeof defaults$1 === "function" ? defaults$1() : defaults$1);
+  const keyComputed = vueExports.computed(() => vueExports.toValue(key));
   if (!storage) try {
     storage = getSSRHandler("getDefaultStorage", () => defaultWindow === null || defaultWindow === void 0 ? void 0 : defaultWindow.localStorage)();
   } catch (e) {
     onError(e);
   }
   if (!storage) return data;
-  const rawInit = toValue(defaults$1);
+  const rawInit = vueExports.toValue(defaults$1);
   const type = guessSerializerType(rawInit);
   const serializer = (_options$serializer = options.serializer) !== null && _options$serializer !== void 0 ? _options$serializer : StorageSerializers[type];
   const { pause: pauseWatch, resume: resumeWatch } = watchPausable(data, (newValue) => write(newValue), {
@@ -250,7 +250,7 @@ function useStorage(key, defaults$1, storage, options = {}) {
     deep,
     eventFilter
   });
-  watch(keyComputed, () => update(), { flush });
+  vueExports.watch(keyComputed, () => update(), { flush });
   let firstMounted = false;
   const onStorageEvent = (ev) => {
     if (initOnMounted && !firstMounted) return;
@@ -325,7 +325,7 @@ function useStorage(key, defaults$1, storage, options = {}) {
     } catch (e) {
       onError(e);
     } finally {
-      if (event) nextTick(resumeWatch);
+      if (event) vueExports.nextTick(resumeWatch);
       else resumeWatch();
     }
   }
@@ -338,7 +338,7 @@ function useStorage(key, defaults$1, storage, options = {}) {
 function useVModel(props, key, emit, options = {}) {
   var _vm$$emit, _vm$proxy;
   const { clone = false, passive = false, eventName, deep = false, defaultValue, shouldEmit } = options;
-  const vm = getCurrentInstance();
+  const vm = vueExports.getCurrentInstance();
   const _emit = emit || (vm === null || vm === void 0 ? void 0 : vm.emit) || (vm === null || vm === void 0 || (_vm$$emit = vm.$emit) === null || _vm$$emit === void 0 ? void 0 : _vm$$emit.bind(vm)) || (vm === null || vm === void 0 || (_vm$proxy = vm.proxy) === null || _vm$proxy === void 0 || (_vm$proxy = _vm$proxy.$emit) === null || _vm$proxy === void 0 ? void 0 : _vm$proxy.bind(vm === null || vm === void 0 ? void 0 : vm.proxy));
   let event = eventName;
   event = event || `update:${key.toString()}`;
@@ -350,20 +350,20 @@ function useVModel(props, key, emit, options = {}) {
     } else _emit(event, value);
   };
   if (passive) {
-    const proxy = ref(getValue$1());
+    const proxy = vueExports.ref(getValue$1());
     let isUpdating = false;
-    watch(() => props[key], (v) => {
+    vueExports.watch(() => props[key], (v) => {
       if (!isUpdating) {
         isUpdating = true;
         proxy.value = cloneFn(v);
-        nextTick(() => isUpdating = false);
+        vueExports.nextTick(() => isUpdating = false);
       }
     });
-    watch(proxy, (v) => {
+    vueExports.watch(proxy, (v) => {
       if (!isUpdating && (v !== props[key] || deep)) triggerEmit(v);
     }, { deep });
     return proxy;
-  } else return computed({
+  } else return vueExports.computed({
     get() {
       return getValue$1();
     },

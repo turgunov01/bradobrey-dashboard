@@ -2,14 +2,12 @@ globalThis.__timing__.logStart('Load chunks/build/index-CfyOMG60');import { _ as
 import { _ as _sfc_main$4 } from './Badge-CHxj5N7w.mjs';
 import { f as useSessionStore, g as useUiStore, a as useBarbersApi, b as useAsyncData, c as _sfc_main$3, d as _sfc_main$a } from './server.mjs';
 import { _ as __nuxt_component_5 } from './MetricCard-CDSLylAv.mjs';
-import { defineComponent, withAsyncContext, computed, mergeProps, withCtx, unref, createVNode, openBlock, createBlock, Fragment, renderList, toDisplayString, createTextVNode, useSSRContext } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/index.mjs';
-import { ssrRenderComponent, ssrRenderList, ssrInterpolate, ssrRenderStyle } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/server-renderer/index.mjs';
 import { b as formatCount } from './format-DDcTL-sj.mjs';
 import { u as useStatisticsApi, p as pickValue, t as toKeyLabel, a as asNumber } from './useStatisticsApi-D5PxREFa.mjs';
 import { u as useBranchStore } from './branch-nC1tN9Zp.mjs';
 import { u as usePromoApi } from './usePromoApi-DE1sz-6g.mjs';
 import { u as useRealtimeQueue } from './useRealtimeQueue-CK9yRiyf.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/reka-ui/dist/index.js';
+import { v as vueExports, s as ssrRenderComponent_1, d as ssrRenderList_1, c as ssrInterpolate_1, g as ssrRenderStyle_1 } from '../routes/renderer.mjs';
 import './index-qsfWWCYt.mjs';
 import '../_/nitro.mjs';
 import 'node:crypto';
@@ -22,19 +20,13 @@ import 'node:path';
 import 'node:process';
 import 'node:tty';
 import 'node:fs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/pinia@3.0.4_typescript@5.9.3_vue@3.5.30_typescript@5.9.3_/node_modules/pinia/dist/pinia.prod.cjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/vue-router/vue-router.node.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/perfect-debounce@2.1.0/node_modules/perfect-debounce/dist/index.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/@vue/shared/dist/shared.cjs.prod.js';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/tailwindcss@4.2.1/node_modules/tailwindcss/dist/colors.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/@iconify/vue/dist/iconify.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/tailwind-variants/dist/index.js';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/unhead@2.1.12/node_modules/unhead/dist/plugins.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/unhead@2.1.12/node_modules/unhead/dist/utils.mjs';
+import '../_/shared.cjs.prod.mjs';
+import '../virtual/_commonjsHelpers.mjs';
 import '../_/index.mjs';
 import './useKioskApi-l3XfHmhL.mjs';
+import 'node:stream';
 
-const _sfc_main = /* @__PURE__ */ defineComponent({
+const _sfc_main = /* @__PURE__ */ vueExports.defineComponent({
   __name: "index",
   __ssrInlineRender: true,
   async setup(__props) {
@@ -46,11 +38,11 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     const promoApi = usePromoApi();
     const statisticsApi = useStatisticsApi();
     useRealtimeQueue();
-    [__temp, __restore] = withAsyncContext(() => Promise.all([
+    [__temp, __restore] = vueExports.withAsyncContext(() => Promise.all([
       branchStore.ensureLoaded(),
       sessionStore.ensureLoaded()
     ])), await __temp, __restore();
-    const { data, pending, refresh } = ([__temp, __restore] = withAsyncContext(async () => useAsyncData("overview-dashboard", async () => {
+    const { data, pending, refresh } = ([__temp, __restore] = vueExports.withAsyncContext(async () => useAsyncData("overview-dashboard", async () => {
       const [health, queue, promoDashboard, statistics] = await Promise.all([
         $fetch("/api/health"),
         sessionStore.barber?.id ? barbersApi.queue() : Promise.resolve({ count: 0, items: [] }),
@@ -69,7 +61,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     }, {
       watch: [() => uiStore.statisticsRange.end, () => uiStore.statisticsRange.start]
     })), __temp = await __temp, __restore(), __temp);
-    const promoItems = computed(() => {
+    const promoItems = vueExports.computed(() => {
       const dashboard = data.value?.promoDashboard;
       if (Array.isArray(dashboard)) {
         return dashboard;
@@ -79,14 +71,14 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       }
       return [];
     });
-    computed(
+    vueExports.computed(
       () => branchStore.branches.map((branch) => ({
         id: branch.id,
         isActive: branch.id === branchStore.activeBranchId,
         name: branch.name
       }))
     );
-    const statisticsHighlights = computed(() => {
+    const statisticsHighlights = vueExports.computed(() => {
       const payload = data.value?.statistics || {};
       const desired = [
         pickValue(payload, ["revenue", "total_revenue", "amount", "total_amount"], "0"),
@@ -114,10 +106,10 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         }
       ];
     });
-    const statRows = computed(
+    const statRows = vueExports.computed(
       () => Object.entries(data.value?.statistics || {}).filter(([, value]) => ["number", "string"].includes(typeof value)).slice(0, 8)
     );
-    computed(
+    vueExports.computed(
       () => [
         // sessionStore.barber?.id
         //   ? { description: 'Управление очередью и перерывами барбера', icon: 'i-lucide-scissors-line-dashed', title: 'Рабочее место', to: '/barbers/workspace' }
@@ -135,52 +127,52 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       const _component_UButton = _sfc_main$a;
       const _component_DashboardMetricCard = __nuxt_component_5;
       const _component_UCard = _sfc_main$3;
-      _push(ssrRenderComponent(_component_UDashboardPanel, mergeProps({ id: "overview" }, _attrs), {
-        header: withCtx((_, _push2, _parent2, _scopeId) => {
+      _push(ssrRenderComponent_1(_component_UDashboardPanel, vueExports.mergeProps({ id: "overview" }, _attrs), {
+        header: vueExports.withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
-            _push2(ssrRenderComponent(_component_UDashboardNavbar, {
+            _push2(ssrRenderComponent_1(_component_UDashboardNavbar, {
               title: "Обзор",
               ui: { right: "gap-3" }
             }, {
-              leading: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              leading: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
-                  _push3(ssrRenderComponent(_component_UDashboardSidebarCollapse, null, null, _parent3, _scopeId2));
+                  _push3(ssrRenderComponent_1(_component_UDashboardSidebarCollapse, null, null, _parent3, _scopeId2));
                 } else {
                   return [
-                    createVNode(_component_UDashboardSidebarCollapse)
+                    vueExports.createVNode(_component_UDashboardSidebarCollapse)
                   ];
                 }
               }),
-              right: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              right: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
-                  _push3(ssrRenderComponent(_component_UBadge, {
-                    color: unref(data)?.health ? "primary" : "neutral",
+                  _push3(ssrRenderComponent_1(_component_UBadge, {
+                    color: vueExports.unref(data)?.health ? "primary" : "neutral",
                     variant: "soft"
                   }, {
-                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                    default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
-                        _push4(`${ssrInterpolate(unref(data)?.health ? "API доступен" : "Проверка API")}`);
+                        _push4(`${ssrInterpolate_1(vueExports.unref(data)?.health ? "API доступен" : "Проверка API")}`);
                       } else {
                         return [
-                          createTextVNode(toDisplayString(unref(data)?.health ? "API доступен" : "Проверка API"), 1)
+                          vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(data)?.health ? "API доступен" : "Проверка API"), 1)
                         ];
                       }
                     }),
                     _: 1
                   }, _parent3, _scopeId2));
-                  _push3(ssrRenderComponent(_component_UButton, {
+                  _push3(ssrRenderComponent_1(_component_UButton, {
                     color: "neutral",
                     icon: "i-lucide-refresh-cw",
-                    loading: unref(pending),
+                    loading: vueExports.unref(pending),
                     variant: "outline",
-                    onClick: ($event) => unref(refresh)()
+                    onClick: ($event) => vueExports.unref(refresh)()
                   }, {
-                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                    default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
                         _push4(` Обновить `);
                       } else {
                         return [
-                          createTextVNode(" Обновить ")
+                          vueExports.createTextVNode(" Обновить ")
                         ];
                       }
                     }),
@@ -188,24 +180,24 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   }, _parent3, _scopeId2));
                 } else {
                   return [
-                    createVNode(_component_UBadge, {
-                      color: unref(data)?.health ? "primary" : "neutral",
+                    vueExports.createVNode(_component_UBadge, {
+                      color: vueExports.unref(data)?.health ? "primary" : "neutral",
                       variant: "soft"
                     }, {
-                      default: withCtx(() => [
-                        createTextVNode(toDisplayString(unref(data)?.health ? "API доступен" : "Проверка API"), 1)
+                      default: vueExports.withCtx(() => [
+                        vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(data)?.health ? "API доступен" : "Проверка API"), 1)
                       ]),
                       _: 1
                     }, 8, ["color"]),
-                    createVNode(_component_UButton, {
+                    vueExports.createVNode(_component_UButton, {
                       color: "neutral",
                       icon: "i-lucide-refresh-cw",
-                      loading: unref(pending),
+                      loading: vueExports.unref(pending),
                       variant: "outline",
-                      onClick: ($event) => unref(refresh)()
+                      onClick: ($event) => vueExports.unref(refresh)()
                     }, {
-                      default: withCtx(() => [
-                        createTextVNode(" Обновить ")
+                      default: vueExports.withCtx(() => [
+                        vueExports.createTextVNode(" Обновить ")
                       ]),
                       _: 1
                     }, 8, ["loading", "onClick"])
@@ -216,32 +208,32 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             }, _parent2, _scopeId));
           } else {
             return [
-              createVNode(_component_UDashboardNavbar, {
+              vueExports.createVNode(_component_UDashboardNavbar, {
                 title: "Обзор",
                 ui: { right: "gap-3" }
               }, {
-                leading: withCtx(() => [
-                  createVNode(_component_UDashboardSidebarCollapse)
+                leading: vueExports.withCtx(() => [
+                  vueExports.createVNode(_component_UDashboardSidebarCollapse)
                 ]),
-                right: withCtx(() => [
-                  createVNode(_component_UBadge, {
-                    color: unref(data)?.health ? "primary" : "neutral",
+                right: vueExports.withCtx(() => [
+                  vueExports.createVNode(_component_UBadge, {
+                    color: vueExports.unref(data)?.health ? "primary" : "neutral",
                     variant: "soft"
                   }, {
-                    default: withCtx(() => [
-                      createTextVNode(toDisplayString(unref(data)?.health ? "API доступен" : "Проверка API"), 1)
+                    default: vueExports.withCtx(() => [
+                      vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(data)?.health ? "API доступен" : "Проверка API"), 1)
                     ]),
                     _: 1
                   }, 8, ["color"]),
-                  createVNode(_component_UButton, {
+                  vueExports.createVNode(_component_UButton, {
                     color: "neutral",
                     icon: "i-lucide-refresh-cw",
-                    loading: unref(pending),
+                    loading: vueExports.unref(pending),
                     variant: "outline",
-                    onClick: ($event) => unref(refresh)()
+                    onClick: ($event) => vueExports.unref(refresh)()
                   }, {
-                    default: withCtx(() => [
-                      createTextVNode(" Обновить ")
+                    default: vueExports.withCtx(() => [
+                      vueExports.createTextVNode(" Обновить ")
                     ]),
                     _: 1
                   }, 8, ["loading", "onClick"])
@@ -251,52 +243,52 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             ];
           }
         }),
-        body: withCtx((_, _push2, _parent2, _scopeId) => {
+        body: vueExports.withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
             _push2(`<div class="space-y-6"${_scopeId}><div class="grid gap-4 xl:grid-cols-4 md:grid-cols-2"${_scopeId}>`);
-            _push2(ssrRenderComponent(_component_DashboardMetricCard, {
+            _push2(ssrRenderComponent_1(_component_DashboardMetricCard, {
               description: "Текущие записи очереди, назначенные авторизованному барберу.",
               icon: "i-lucide-clock-3",
               label: "Активная очередь",
-              value: unref(formatCount)(unref(data)?.queue?.count)
+              value: vueExports.unref(formatCount)(vueExports.unref(data)?.queue?.count)
             }, null, _parent2, _scopeId));
-            _push2(ssrRenderComponent(_component_DashboardMetricCard, {
+            _push2(ssrRenderComponent_1(_component_DashboardMetricCard, {
               description: "Филиалы, загруженные из конфигурации киоска.",
               icon: "i-lucide-map",
               label: "Филиалы",
-              value: unref(formatCount)(unref(branchStore).branches.length)
+              value: vueExports.unref(formatCount)(vueExports.unref(branchStore).branches.length)
             }, null, _parent2, _scopeId));
-            _push2(ssrRenderComponent(_component_DashboardMetricCard, {
+            _push2(ssrRenderComponent_1(_component_DashboardMetricCard, {
               description: "Промокоды, полученные с панели управления.",
               icon: "i-lucide-ticket-percent",
               label: "Промокоды",
-              value: unref(formatCount)(unref(promoItems).length)
+              value: vueExports.unref(formatCount)(vueExports.unref(promoItems).length)
             }, null, _parent2, _scopeId));
-            _push2(ssrRenderComponent(_component_DashboardMetricCard, {
+            _push2(ssrRenderComponent_1(_component_DashboardMetricCard, {
               description: "Состояние основного health-эндпоинта.",
               icon: "i-lucide-heart-pulse",
               label: "Состояние",
-              value: unref(data)?.health ? "OK" : "В ожидании"
+              value: vueExports.unref(data)?.health ? "OK" : "В ожидании"
             }, null, _parent2, _scopeId));
             _push2(`</div><div class="grid gap-6 xl:grid-cols-[1]"${_scopeId}>`);
-            _push2(ssrRenderComponent(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-              header: withCtx((_2, _push3, _parent3, _scopeId2) => {
+            _push2(ssrRenderComponent_1(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+              header: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
                   _push3(`<div class="space-y-2"${_scopeId2}><p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500"${_scopeId2}> Пульс салона </p><h2 class="barbershop-heading text-3xl text-charcoal-950"${_scopeId2}> Быстрая операционная сводка </h2></div>`);
                 } else {
                   return [
-                    createVNode("div", { class: "space-y-2" }, [
-                      createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Пульс салона "),
-                      createVNode("h2", { class: "barbershop-heading text-3xl text-charcoal-950" }, " Быстрая операционная сводка ")
+                    vueExports.createVNode("div", { class: "space-y-2" }, [
+                      vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Пульс салона "),
+                      vueExports.createVNode("h2", { class: "barbershop-heading text-3xl text-charcoal-950" }, " Быстрая операционная сводка ")
                     ])
                   ];
                 }
               }),
-              default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              default: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
                   _push3(`<div class="grid gap-4 md:grid-cols-3"${_scopeId2}><!--[-->`);
-                  ssrRenderList(unref(statisticsHighlights), (card) => {
-                    _push3(ssrRenderComponent(_component_DashboardMetricCard, {
+                  ssrRenderList_1(vueExports.unref(statisticsHighlights), (card) => {
+                    _push3(ssrRenderComponent_1(_component_DashboardMetricCard, {
                       key: card.label,
                       description: card.description,
                       icon: card.icon,
@@ -305,15 +297,15 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     }, null, _parent3, _scopeId2));
                   });
                   _push3(`<!--]--></div><div class="mt-6 grid gap-3"${_scopeId2}><!--[-->`);
-                  ssrRenderList(unref(statRows), ([key, value]) => {
-                    _push3(`<div class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"${_scopeId2}><div class="flex items-center justify-between gap-4"${_scopeId2}><span class="text-sm font-medium text-charcoal-700"${_scopeId2}>${ssrInterpolate(unref(toKeyLabel)(key))}</span><span class="text-sm font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate(value)}</span></div><div class="mt-3 h-2 rounded-full bg-sand-100"${_scopeId2}><div class="h-full rounded-full bg-brass-400" style="${ssrRenderStyle({ width: `${Math.min(unref(asNumber)(value, 0), 100)}%` })}"${_scopeId2}></div></div></div>`);
+                  ssrRenderList_1(vueExports.unref(statRows), ([key, value]) => {
+                    _push3(`<div class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"${_scopeId2}><div class="flex items-center justify-between gap-4"${_scopeId2}><span class="text-sm font-medium text-charcoal-700"${_scopeId2}>${ssrInterpolate_1(vueExports.unref(toKeyLabel)(key))}</span><span class="text-sm font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate_1(value)}</span></div><div class="mt-3 h-2 rounded-full bg-sand-100"${_scopeId2}><div class="h-full rounded-full bg-brass-400" style="${ssrRenderStyle_1({ width: `${Math.min(vueExports.unref(asNumber)(value, 0), 100)}%` })}"${_scopeId2}></div></div></div>`);
                   });
                   _push3(`<!--]--></div>`);
                 } else {
                   return [
-                    createVNode("div", { class: "grid gap-4 md:grid-cols-3" }, [
-                      (openBlock(true), createBlock(Fragment, null, renderList(unref(statisticsHighlights), (card) => {
-                        return openBlock(), createBlock(_component_DashboardMetricCard, {
+                    vueExports.createVNode("div", { class: "grid gap-4 md:grid-cols-3" }, [
+                      (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(statisticsHighlights), (card) => {
+                        return vueExports.openBlock(), vueExports.createBlock(_component_DashboardMetricCard, {
                           key: card.label,
                           description: card.description,
                           icon: card.icon,
@@ -322,20 +314,20 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                         }, null, 8, ["description", "icon", "label", "value"]);
                       }), 128))
                     ]),
-                    createVNode("div", { class: "mt-6 grid gap-3" }, [
-                      (openBlock(true), createBlock(Fragment, null, renderList(unref(statRows), ([key, value]) => {
-                        return openBlock(), createBlock("div", {
+                    vueExports.createVNode("div", { class: "mt-6 grid gap-3" }, [
+                      (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(statRows), ([key, value]) => {
+                        return vueExports.openBlock(), vueExports.createBlock("div", {
                           key,
                           class: "rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"
                         }, [
-                          createVNode("div", { class: "flex items-center justify-between gap-4" }, [
-                            createVNode("span", { class: "text-sm font-medium text-charcoal-700" }, toDisplayString(unref(toKeyLabel)(key)), 1),
-                            createVNode("span", { class: "text-sm font-semibold text-charcoal-950" }, toDisplayString(value), 1)
+                          vueExports.createVNode("div", { class: "flex items-center justify-between gap-4" }, [
+                            vueExports.createVNode("span", { class: "text-sm font-medium text-charcoal-700" }, vueExports.toDisplayString(vueExports.unref(toKeyLabel)(key)), 1),
+                            vueExports.createVNode("span", { class: "text-sm font-semibold text-charcoal-950" }, vueExports.toDisplayString(value), 1)
                           ]),
-                          createVNode("div", { class: "mt-3 h-2 rounded-full bg-sand-100" }, [
-                            createVNode("div", {
+                          vueExports.createVNode("div", { class: "mt-3 h-2 rounded-full bg-sand-100" }, [
+                            vueExports.createVNode("div", {
                               class: "h-full rounded-full bg-brass-400",
-                              style: { width: `${Math.min(unref(asNumber)(value, 0), 100)}%` }
+                              style: { width: `${Math.min(vueExports.unref(asNumber)(value, 0), 100)}%` }
                             }, null, 4)
                           ])
                         ]);
@@ -349,45 +341,45 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             _push2(`<div class="space-y-6"${_scopeId}></div></div></div>`);
           } else {
             return [
-              createVNode("div", { class: "space-y-6" }, [
-                createVNode("div", { class: "grid gap-4 xl:grid-cols-4 md:grid-cols-2" }, [
-                  createVNode(_component_DashboardMetricCard, {
+              vueExports.createVNode("div", { class: "space-y-6" }, [
+                vueExports.createVNode("div", { class: "grid gap-4 xl:grid-cols-4 md:grid-cols-2" }, [
+                  vueExports.createVNode(_component_DashboardMetricCard, {
                     description: "Текущие записи очереди, назначенные авторизованному барберу.",
                     icon: "i-lucide-clock-3",
                     label: "Активная очередь",
-                    value: unref(formatCount)(unref(data)?.queue?.count)
+                    value: vueExports.unref(formatCount)(vueExports.unref(data)?.queue?.count)
                   }, null, 8, ["value"]),
-                  createVNode(_component_DashboardMetricCard, {
+                  vueExports.createVNode(_component_DashboardMetricCard, {
                     description: "Филиалы, загруженные из конфигурации киоска.",
                     icon: "i-lucide-map",
                     label: "Филиалы",
-                    value: unref(formatCount)(unref(branchStore).branches.length)
+                    value: vueExports.unref(formatCount)(vueExports.unref(branchStore).branches.length)
                   }, null, 8, ["value"]),
-                  createVNode(_component_DashboardMetricCard, {
+                  vueExports.createVNode(_component_DashboardMetricCard, {
                     description: "Промокоды, полученные с панели управления.",
                     icon: "i-lucide-ticket-percent",
                     label: "Промокоды",
-                    value: unref(formatCount)(unref(promoItems).length)
+                    value: vueExports.unref(formatCount)(vueExports.unref(promoItems).length)
                   }, null, 8, ["value"]),
-                  createVNode(_component_DashboardMetricCard, {
+                  vueExports.createVNode(_component_DashboardMetricCard, {
                     description: "Состояние основного health-эндпоинта.",
                     icon: "i-lucide-heart-pulse",
                     label: "Состояние",
-                    value: unref(data)?.health ? "OK" : "В ожидании"
+                    value: vueExports.unref(data)?.health ? "OK" : "В ожидании"
                   }, null, 8, ["value"])
                 ]),
-                createVNode("div", { class: "grid gap-6 xl:grid-cols-[1]" }, [
-                  createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-                    header: withCtx(() => [
-                      createVNode("div", { class: "space-y-2" }, [
-                        createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Пульс салона "),
-                        createVNode("h2", { class: "barbershop-heading text-3xl text-charcoal-950" }, " Быстрая операционная сводка ")
+                vueExports.createVNode("div", { class: "grid gap-6 xl:grid-cols-[1]" }, [
+                  vueExports.createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+                    header: vueExports.withCtx(() => [
+                      vueExports.createVNode("div", { class: "space-y-2" }, [
+                        vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Пульс салона "),
+                        vueExports.createVNode("h2", { class: "barbershop-heading text-3xl text-charcoal-950" }, " Быстрая операционная сводка ")
                       ])
                     ]),
-                    default: withCtx(() => [
-                      createVNode("div", { class: "grid gap-4 md:grid-cols-3" }, [
-                        (openBlock(true), createBlock(Fragment, null, renderList(unref(statisticsHighlights), (card) => {
-                          return openBlock(), createBlock(_component_DashboardMetricCard, {
+                    default: vueExports.withCtx(() => [
+                      vueExports.createVNode("div", { class: "grid gap-4 md:grid-cols-3" }, [
+                        (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(statisticsHighlights), (card) => {
+                          return vueExports.openBlock(), vueExports.createBlock(_component_DashboardMetricCard, {
                             key: card.label,
                             description: card.description,
                             icon: card.icon,
@@ -396,20 +388,20 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                           }, null, 8, ["description", "icon", "label", "value"]);
                         }), 128))
                       ]),
-                      createVNode("div", { class: "mt-6 grid gap-3" }, [
-                        (openBlock(true), createBlock(Fragment, null, renderList(unref(statRows), ([key, value]) => {
-                          return openBlock(), createBlock("div", {
+                      vueExports.createVNode("div", { class: "mt-6 grid gap-3" }, [
+                        (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(statRows), ([key, value]) => {
+                          return vueExports.openBlock(), vueExports.createBlock("div", {
                             key,
                             class: "rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"
                           }, [
-                            createVNode("div", { class: "flex items-center justify-between gap-4" }, [
-                              createVNode("span", { class: "text-sm font-medium text-charcoal-700" }, toDisplayString(unref(toKeyLabel)(key)), 1),
-                              createVNode("span", { class: "text-sm font-semibold text-charcoal-950" }, toDisplayString(value), 1)
+                            vueExports.createVNode("div", { class: "flex items-center justify-between gap-4" }, [
+                              vueExports.createVNode("span", { class: "text-sm font-medium text-charcoal-700" }, vueExports.toDisplayString(vueExports.unref(toKeyLabel)(key)), 1),
+                              vueExports.createVNode("span", { class: "text-sm font-semibold text-charcoal-950" }, vueExports.toDisplayString(value), 1)
                             ]),
-                            createVNode("div", { class: "mt-3 h-2 rounded-full bg-sand-100" }, [
-                              createVNode("div", {
+                            vueExports.createVNode("div", { class: "mt-3 h-2 rounded-full bg-sand-100" }, [
+                              vueExports.createVNode("div", {
                                 class: "h-full rounded-full bg-brass-400",
-                                style: { width: `${Math.min(unref(asNumber)(value, 0), 100)}%` }
+                                style: { width: `${Math.min(vueExports.unref(asNumber)(value, 0), 100)}%` }
                               }, null, 4)
                             ])
                           ]);
@@ -418,7 +410,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     ]),
                     _: 1
                   }),
-                  createVNode("div", { class: "space-y-6" })
+                  vueExports.createVNode("div", { class: "space-y-6" })
                 ])
               ])
             ];
@@ -431,7 +423,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
 });
 const _sfc_setup = _sfc_main.setup;
 _sfc_main.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
+  const ssrContext = vueExports.useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("pages/index.vue");
   return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
 };

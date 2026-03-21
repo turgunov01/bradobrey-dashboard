@@ -1,5 +1,17 @@
-globalThis.__timing__.logStart('Load chunks/build/auth-Duc4oGv1');import { useSSRContext, mergeProps } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/index.mjs';
-import { ssrRenderAttrs, ssrRenderSlot } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/server-renderer/index.mjs';
+globalThis.__timing__.logStart('Load chunks/build/auth-Duc4oGv1');import { v as vueExports, h as ssrRenderAttrs_1, a as ssrRenderSlot_1 } from '../routes/renderer.mjs';
+import '../_/nitro.mjs';
+import 'node:crypto';
+import 'node:http';
+import 'node:https';
+import 'node:events';
+import 'node:buffer';
+import 'node:util';
+import 'node:path';
+import 'node:process';
+import 'node:tty';
+import 'node:fs';
+import '../virtual/_commonjsHelpers.mjs';
+import 'node:stream';
 
 const _export_sfc = (sfc, props) => {
   const target = sfc.__vccOpts || sfc;
@@ -10,13 +22,13 @@ const _export_sfc = (sfc, props) => {
 };
 const _sfc_main = {};
 function _sfc_ssrRender(_ctx, _push, _parent, _attrs) {
-  _push(`<div${ssrRenderAttrs(mergeProps({ class: "min-h-screen bg-[var(--dashboard-shell)] px-4 py-8 sm:px-6 lg:px-8" }, _attrs))}><div class="mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl items-center justify-center">`);
-  ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
+  _push(`<div${ssrRenderAttrs_1(vueExports.mergeProps({ class: "min-h-screen bg-[var(--dashboard-shell)] px-4 py-8 sm:px-6 lg:px-8" }, _attrs))}><div class="mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl items-center justify-center">`);
+  ssrRenderSlot_1(_ctx.$slots, "default", {}, null, _push, _parent);
   _push(`</div></div>`);
 }
 const _sfc_setup = _sfc_main.setup;
 _sfc_main.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
+  const ssrContext = vueExports.useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("layouts/auth.vue");
   return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
 };

@@ -1,7 +1,424 @@
-globalThis.__timing__.logStart('Load chunks/build/Pagination-t5D_AaGq');import { useSlots, computed, unref, mergeProps, withCtx, renderSlot, createVNode, openBlock, createBlock, createCommentVNode, Fragment, renderList, useSSRContext } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/index.mjs';
-import { ssrRenderComponent, ssrRenderSlot, ssrRenderList } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/server-renderer/index.mjs';
-import { useForwardPropsEmits, PaginationRoot, PaginationList, PaginationFirst, PaginationPrev, PaginationListItem, PaginationEllipsis, PaginationNext, PaginationLast } from 'file://D:/projects/bradobrey-dashboard/node_modules/reka-ui/dist/index.js';
-import { k as useLocale, h as useAppConfig, i as useComponentUI, y as reactivePick, t as tv, d as _sfc_main$a } from './server.mjs';
+globalThis.__timing__.logStart('Load chunks/build/Pagination-t5D_AaGq');import { m as useForwardExpose, P as Primitive, E as useVModel, F as createContext, l as useLocale, h as useAppConfig, i as useComponentUI, J as useForwardPropsEmits, L as reactivePick, t as tv, d as _sfc_main$a } from './server.mjs';
+import { v as vueExports, s as ssrRenderComponent_1, a as ssrRenderSlot_1, d as ssrRenderList_1 } from '../routes/renderer.mjs';
+
+//#region src/Pagination/PaginationEllipsis.vue?vue&type=script&setup=true&lang.ts
+var PaginationEllipsis_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ vueExports.defineComponent({
+	__name: "PaginationEllipsis",
+	props: {
+		asChild: {
+			type: Boolean,
+			required: false
+		},
+		as: {
+			type: null,
+			required: false
+		}
+	},
+	setup(__props) {
+		const props = __props;
+		useForwardExpose();
+		return (_ctx, _cache) => {
+			return vueExports.openBlock(), vueExports.createBlock(vueExports.unref(Primitive), vueExports.mergeProps(props, { "data-type": "ellipsis" }), {
+				default: vueExports.withCtx(() => [vueExports.renderSlot(_ctx.$slots, "default", {}, () => [_cache[0] || (_cache[0] = vueExports.createTextVNode("…"))])]),
+				_: 3
+			}, 16);
+		};
+	}
+});
+
+//#endregion
+//#region src/Pagination/PaginationEllipsis.vue
+var PaginationEllipsis_default = PaginationEllipsis_vue_vue_type_script_setup_true_lang_default;
+
+//#region src/Pagination/PaginationRoot.vue?vue&type=script&setup=true&lang.ts
+const [injectPaginationRootContext, providePaginationRootContext] = createContext("PaginationRoot");
+var PaginationRoot_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ vueExports.defineComponent({
+	__name: "PaginationRoot",
+	props: {
+		page: {
+			type: Number,
+			required: false
+		},
+		defaultPage: {
+			type: Number,
+			required: false,
+			default: 1
+		},
+		itemsPerPage: {
+			type: Number,
+			required: true
+		},
+		total: {
+			type: Number,
+			required: false,
+			default: 0
+		},
+		siblingCount: {
+			type: Number,
+			required: false,
+			default: 2
+		},
+		disabled: {
+			type: Boolean,
+			required: false
+		},
+		showEdges: {
+			type: Boolean,
+			required: false,
+			default: false
+		},
+		asChild: {
+			type: Boolean,
+			required: false
+		},
+		as: {
+			type: null,
+			required: false,
+			default: "nav"
+		}
+	},
+	emits: ["update:page"],
+	setup(__props, { emit: __emit }) {
+		const props = __props;
+		const emits = __emit;
+		const { siblingCount, disabled, showEdges } = vueExports.toRefs(props);
+		useForwardExpose();
+		const page = useVModel(props, "page", emits, {
+			defaultValue: props.defaultPage,
+			passive: props.page === void 0
+		});
+		const pageCount = vueExports.computed(() => Math.max(1, Math.ceil(props.total / (props.itemsPerPage || 1))));
+		providePaginationRootContext({
+			page,
+			onPageChange(value) {
+				page.value = value;
+			},
+			pageCount,
+			siblingCount,
+			disabled,
+			showEdges
+		});
+		return (_ctx, _cache) => {
+			return vueExports.openBlock(), vueExports.createBlock(vueExports.unref(Primitive), {
+				as: _ctx.as,
+				"as-child": _ctx.asChild
+			}, {
+				default: vueExports.withCtx(() => [vueExports.renderSlot(_ctx.$slots, "default", {
+					page: vueExports.unref(page),
+					pageCount: pageCount.value
+				})]),
+				_: 3
+			}, 8, ["as", "as-child"]);
+		};
+	}
+});
+
+//#endregion
+//#region src/Pagination/PaginationRoot.vue
+var PaginationRoot_default = PaginationRoot_vue_vue_type_script_setup_true_lang_default;
+
+//#region src/Pagination/PaginationFirst.vue?vue&type=script&setup=true&lang.ts
+var PaginationFirst_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ vueExports.defineComponent({
+	__name: "PaginationFirst",
+	props: {
+		asChild: {
+			type: Boolean,
+			required: false
+		},
+		as: {
+			type: null,
+			required: false,
+			default: "button"
+		}
+	},
+	setup(__props) {
+		const props = __props;
+		const rootContext = injectPaginationRootContext();
+		useForwardExpose();
+		const disabled = vueExports.computed(() => rootContext.page.value === 1 || rootContext.disabled.value);
+		return (_ctx, _cache) => {
+			return vueExports.openBlock(), vueExports.createBlock(vueExports.unref(Primitive), vueExports.mergeProps(props, {
+				"aria-label": "First Page",
+				type: _ctx.as === "button" ? "button" : void 0,
+				disabled: disabled.value,
+				onClick: _cache[0] || (_cache[0] = ($event) => !disabled.value && vueExports.unref(rootContext).onPageChange(1))
+			}), {
+				default: vueExports.withCtx(() => [vueExports.renderSlot(_ctx.$slots, "default", {}, () => [_cache[1] || (_cache[1] = vueExports.createTextVNode("First page"))])]),
+				_: 3
+			}, 16, ["type", "disabled"]);
+		};
+	}
+});
+
+//#endregion
+//#region src/Pagination/PaginationFirst.vue
+var PaginationFirst_default = PaginationFirst_vue_vue_type_script_setup_true_lang_default;
+
+//#region src/Pagination/PaginationLast.vue?vue&type=script&setup=true&lang.ts
+var PaginationLast_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ vueExports.defineComponent({
+	__name: "PaginationLast",
+	props: {
+		asChild: {
+			type: Boolean,
+			required: false
+		},
+		as: {
+			type: null,
+			required: false,
+			default: "button"
+		}
+	},
+	setup(__props) {
+		const props = __props;
+		const rootContext = injectPaginationRootContext();
+		useForwardExpose();
+		const disabled = vueExports.computed(() => rootContext.page.value === rootContext.pageCount.value || rootContext.disabled.value);
+		return (_ctx, _cache) => {
+			return vueExports.openBlock(), vueExports.createBlock(vueExports.unref(Primitive), vueExports.mergeProps(props, {
+				"aria-label": "Last Page",
+				type: _ctx.as === "button" ? "button" : void 0,
+				disabled: disabled.value,
+				onClick: _cache[0] || (_cache[0] = ($event) => !disabled.value && vueExports.unref(rootContext).onPageChange(vueExports.unref(rootContext).pageCount.value))
+			}), {
+				default: vueExports.withCtx(() => [vueExports.renderSlot(_ctx.$slots, "default", {}, () => [_cache[1] || (_cache[1] = vueExports.createTextVNode("Last page"))])]),
+				_: 3
+			}, 16, ["type", "disabled"]);
+		};
+	}
+});
+
+//#endregion
+//#region src/Pagination/PaginationLast.vue
+var PaginationLast_default = PaginationLast_vue_vue_type_script_setup_true_lang_default;
+
+//#region src/Pagination/utils.ts
+function range(start, end) {
+	const length = end - start + 1;
+	return Array.from({ length }, (_, idx) => idx + start);
+}
+function transform(items) {
+	return items.map((value) => {
+		if (typeof value === "number") return {
+			type: "page",
+			value
+		};
+		return { type: "ellipsis" };
+	});
+}
+const ELLIPSIS = "ellipsis";
+function getRange(currentPage, pageCount, siblingCount, showEdges) {
+	const firstPageIndex = 1;
+	const lastPageIndex = pageCount;
+	const leftSiblingIndex = Math.max(currentPage - siblingCount, firstPageIndex);
+	const rightSiblingIndex = Math.min(currentPage + siblingCount, lastPageIndex);
+	if (showEdges) {
+		/**
+		* `2 * siblingCount + 5` explanation:
+		* 2 * siblingCount for left/right siblings
+		* 5 for 2x left/right ellipsis, 2x first/last page + 1x current page
+		*
+		* For some page counts (e.g. totalPages: 8, siblingCount: 2),
+		* calculated max page is higher than total pages,
+		* so we need to take the minimum of both.
+		*/
+		const totalPageNumbers = Math.min(2 * siblingCount + 5, pageCount);
+		const itemCount = totalPageNumbers - 2;
+		const showLeftEllipsis = leftSiblingIndex > firstPageIndex + 2 && Math.abs(lastPageIndex - itemCount - firstPageIndex + 1) > 2 && Math.abs(leftSiblingIndex - firstPageIndex) > 2;
+		const showRightEllipsis = rightSiblingIndex < lastPageIndex - 2 && Math.abs(lastPageIndex - itemCount) > 2 && Math.abs(lastPageIndex - rightSiblingIndex) > 2;
+		if (!showLeftEllipsis && showRightEllipsis) {
+			const leftRange = range(1, itemCount);
+			return [
+				...leftRange,
+				ELLIPSIS,
+				lastPageIndex
+			];
+		}
+		if (showLeftEllipsis && !showRightEllipsis) {
+			const rightRange = range(lastPageIndex - itemCount + 1, lastPageIndex);
+			return [
+				firstPageIndex,
+				ELLIPSIS,
+				...rightRange
+			];
+		}
+		if (showLeftEllipsis && showRightEllipsis) {
+			const middleRange = range(leftSiblingIndex, rightSiblingIndex);
+			return [
+				firstPageIndex,
+				ELLIPSIS,
+				...middleRange,
+				ELLIPSIS,
+				lastPageIndex
+			];
+		}
+		const fullRange = range(firstPageIndex, lastPageIndex);
+		return fullRange;
+	} else {
+		const itemCount = siblingCount * 2 + 1;
+		if (pageCount < itemCount) return range(1, lastPageIndex);
+		else if (currentPage <= siblingCount + 1) return range(firstPageIndex, itemCount);
+		else if (pageCount - currentPage <= siblingCount) return range(pageCount - itemCount + 1, lastPageIndex);
+		else return range(leftSiblingIndex, rightSiblingIndex);
+	}
+}
+
+//#region src/Pagination/PaginationList.vue?vue&type=script&setup=true&lang.ts
+var PaginationList_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ vueExports.defineComponent({
+	__name: "PaginationList",
+	props: {
+		asChild: {
+			type: Boolean,
+			required: false
+		},
+		as: {
+			type: null,
+			required: false
+		}
+	},
+	setup(__props) {
+		const props = __props;
+		useForwardExpose();
+		const rootContext = injectPaginationRootContext();
+		const transformedRange = vueExports.computed(() => {
+			return transform(getRange(rootContext.page.value, rootContext.pageCount.value, rootContext.siblingCount.value, rootContext.showEdges.value));
+		});
+		return (_ctx, _cache) => {
+			return vueExports.openBlock(), vueExports.createBlock(vueExports.unref(Primitive), vueExports.normalizeProps(vueExports.guardReactiveProps(props)), {
+				default: vueExports.withCtx(() => [vueExports.renderSlot(_ctx.$slots, "default", { items: transformedRange.value })]),
+				_: 3
+			}, 16);
+		};
+	}
+});
+
+//#endregion
+//#region src/Pagination/PaginationList.vue
+var PaginationList_default = PaginationList_vue_vue_type_script_setup_true_lang_default;
+
+//#region src/Pagination/PaginationListItem.vue?vue&type=script&setup=true&lang.ts
+var PaginationListItem_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ vueExports.defineComponent({
+	__name: "PaginationListItem",
+	props: {
+		value: {
+			type: Number,
+			required: true
+		},
+		asChild: {
+			type: Boolean,
+			required: false
+		},
+		as: {
+			type: null,
+			required: false,
+			default: "button"
+		}
+	},
+	setup(__props) {
+		const props = __props;
+		useForwardExpose();
+		const rootContext = injectPaginationRootContext();
+		const isSelected = vueExports.computed(() => rootContext.page.value === props.value);
+		const disabled = vueExports.computed(() => rootContext.disabled.value);
+		return (_ctx, _cache) => {
+			return vueExports.openBlock(), vueExports.createBlock(vueExports.unref(Primitive), vueExports.mergeProps(props, {
+				"data-type": "page",
+				"aria-label": `Page ${_ctx.value}`,
+				"aria-current": isSelected.value ? "page" : void 0,
+				"data-selected": isSelected.value ? "true" : void 0,
+				disabled: disabled.value,
+				type: _ctx.as === "button" ? "button" : void 0,
+				onClick: _cache[0] || (_cache[0] = ($event) => !disabled.value && vueExports.unref(rootContext).onPageChange(_ctx.value))
+			}), {
+				default: vueExports.withCtx(() => [vueExports.renderSlot(_ctx.$slots, "default", {}, () => [vueExports.createTextVNode(vueExports.toDisplayString(_ctx.value), 1)])]),
+				_: 3
+			}, 16, [
+				"aria-label",
+				"aria-current",
+				"data-selected",
+				"disabled",
+				"type"
+			]);
+		};
+	}
+});
+
+//#endregion
+//#region src/Pagination/PaginationListItem.vue
+var PaginationListItem_default = PaginationListItem_vue_vue_type_script_setup_true_lang_default;
+
+//#region src/Pagination/PaginationNext.vue?vue&type=script&setup=true&lang.ts
+var PaginationNext_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ vueExports.defineComponent({
+	__name: "PaginationNext",
+	props: {
+		asChild: {
+			type: Boolean,
+			required: false
+		},
+		as: {
+			type: null,
+			required: false,
+			default: "button"
+		}
+	},
+	setup(__props) {
+		const props = __props;
+		useForwardExpose();
+		const rootContext = injectPaginationRootContext();
+		const disabled = vueExports.computed(() => rootContext.page.value === rootContext.pageCount.value || rootContext.disabled.value);
+		return (_ctx, _cache) => {
+			return vueExports.openBlock(), vueExports.createBlock(vueExports.unref(Primitive), vueExports.mergeProps(props, {
+				"aria-label": "Next Page",
+				type: _ctx.as === "button" ? "button" : void 0,
+				disabled: disabled.value,
+				onClick: _cache[0] || (_cache[0] = ($event) => !disabled.value && vueExports.unref(rootContext).onPageChange(vueExports.unref(rootContext).page.value + 1))
+			}), {
+				default: vueExports.withCtx(() => [vueExports.renderSlot(_ctx.$slots, "default", {}, () => [_cache[1] || (_cache[1] = vueExports.createTextVNode("Next page"))])]),
+				_: 3
+			}, 16, ["type", "disabled"]);
+		};
+	}
+});
+
+//#endregion
+//#region src/Pagination/PaginationNext.vue
+var PaginationNext_default = PaginationNext_vue_vue_type_script_setup_true_lang_default;
+
+//#region src/Pagination/PaginationPrev.vue?vue&type=script&setup=true&lang.ts
+var PaginationPrev_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ vueExports.defineComponent({
+	__name: "PaginationPrev",
+	props: {
+		asChild: {
+			type: Boolean,
+			required: false
+		},
+		as: {
+			type: null,
+			required: false,
+			default: "button"
+		}
+	},
+	setup(__props) {
+		const props = __props;
+		useForwardExpose();
+		const rootContext = injectPaginationRootContext();
+		const disabled = vueExports.computed(() => rootContext.page.value === 1 || rootContext.disabled.value);
+		return (_ctx, _cache) => {
+			return vueExports.openBlock(), vueExports.createBlock(vueExports.unref(Primitive), vueExports.mergeProps(props, {
+				"aria-label": "Previous Page",
+				type: _ctx.as === "button" ? "button" : void 0,
+				disabled: disabled.value,
+				onClick: _cache[0] || (_cache[0] = ($event) => !disabled.value && vueExports.unref(rootContext).onPageChange(vueExports.unref(rootContext).page.value - 1))
+			}), {
+				default: vueExports.withCtx(() => [vueExports.renderSlot(_ctx.$slots, "default", {}, () => [_cache[1] || (_cache[1] = vueExports.createTextVNode("Prev page"))])]),
+				_: 3
+			}, 16, ["type", "disabled"]);
+		};
+	}
+});
+
+//#endregion
+//#region src/Pagination/PaginationPrev.vue
+var PaginationPrev_default = PaginationPrev_vue_vue_type_script_setup_true_lang_default;
 
 const theme = {
   "slots": {
@@ -47,39 +464,39 @@ const _sfc_main = {
   setup(__props, { emit: __emit }) {
     const props = __props;
     const emits = __emit;
-    const slots = useSlots();
+    const slots = vueExports.useSlots();
     const { dir } = useLocale();
     const appConfig = useAppConfig();
     const uiProp = useComponentUI("pagination", props);
     const rootProps = useForwardPropsEmits(reactivePick(props, "as", "defaultPage", "disabled", "itemsPerPage", "page", "showEdges", "siblingCount", "total"), emits);
-    const firstIcon = computed(() => props.firstIcon || (dir.value === "rtl" ? appConfig.ui.icons.chevronDoubleRight : appConfig.ui.icons.chevronDoubleLeft));
-    const prevIcon = computed(() => props.prevIcon || (dir.value === "rtl" ? appConfig.ui.icons.chevronRight : appConfig.ui.icons.chevronLeft));
-    const nextIcon = computed(() => props.nextIcon || (dir.value === "rtl" ? appConfig.ui.icons.chevronLeft : appConfig.ui.icons.chevronRight));
-    const lastIcon = computed(() => props.lastIcon || (dir.value === "rtl" ? appConfig.ui.icons.chevronDoubleLeft : appConfig.ui.icons.chevronDoubleRight));
-    const ui = computed(() => tv({ extend: tv(theme), ...appConfig.ui?.pagination || {} })());
+    const firstIcon = vueExports.computed(() => props.firstIcon || (dir.value === "rtl" ? appConfig.ui.icons.chevronDoubleRight : appConfig.ui.icons.chevronDoubleLeft));
+    const prevIcon = vueExports.computed(() => props.prevIcon || (dir.value === "rtl" ? appConfig.ui.icons.chevronRight : appConfig.ui.icons.chevronLeft));
+    const nextIcon = vueExports.computed(() => props.nextIcon || (dir.value === "rtl" ? appConfig.ui.icons.chevronLeft : appConfig.ui.icons.chevronRight));
+    const lastIcon = vueExports.computed(() => props.lastIcon || (dir.value === "rtl" ? appConfig.ui.icons.chevronDoubleLeft : appConfig.ui.icons.chevronDoubleRight));
+    const ui = vueExports.computed(() => tv({ extend: tv(theme), ...appConfig.ui?.pagination || {} })());
     return (_ctx, _push, _parent, _attrs) => {
-      _push(ssrRenderComponent(unref(PaginationRoot), mergeProps(unref(rootProps), {
+      _push(ssrRenderComponent_1(vueExports.unref(PaginationRoot_default), vueExports.mergeProps(vueExports.unref(rootProps), {
         "data-slot": "root",
-        class: ui.value.root({ class: [unref(uiProp)?.root, props.class] })
+        class: ui.value.root({ class: [vueExports.unref(uiProp)?.root, props.class] })
       }, _attrs), {
-        default: withCtx(({ page, pageCount }, _push2, _parent2, _scopeId) => {
+        default: vueExports.withCtx(({ page, pageCount }, _push2, _parent2, _scopeId) => {
           if (_push2) {
-            _push2(ssrRenderComponent(unref(PaginationList), {
+            _push2(ssrRenderComponent_1(vueExports.unref(PaginationList_default), {
               "data-slot": "list",
-              class: ui.value.list({ class: unref(uiProp)?.list })
+              class: ui.value.list({ class: vueExports.unref(uiProp)?.list })
             }, {
-              default: withCtx(({ items }, _push3, _parent3, _scopeId2) => {
+              default: vueExports.withCtx(({ items }, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
                   if (__props.showControls || !!slots.first) {
-                    _push3(ssrRenderComponent(unref(PaginationFirst), {
+                    _push3(ssrRenderComponent_1(vueExports.unref(PaginationFirst_default), {
                       "as-child": "",
                       "data-slot": "first",
-                      class: ui.value.first({ class: unref(uiProp)?.first })
+                      class: ui.value.first({ class: vueExports.unref(uiProp)?.first })
                     }, {
-                      default: withCtx((_, _push4, _parent4, _scopeId3) => {
+                      default: vueExports.withCtx((_, _push4, _parent4, _scopeId3) => {
                         if (_push4) {
-                          ssrRenderSlot(_ctx.$slots, "first", {}, () => {
-                            _push4(ssrRenderComponent(_sfc_main$a, {
+                          ssrRenderSlot_1(_ctx.$slots, "first", {}, () => {
+                            _push4(ssrRenderComponent_1(_sfc_main$a, {
                               color: __props.color,
                               variant: __props.variant,
                               size: __props.size,
@@ -89,8 +506,8 @@ const _sfc_main = {
                           }, _push4, _parent4, _scopeId3);
                         } else {
                           return [
-                            renderSlot(_ctx.$slots, "first", {}, () => [
-                              createVNode(_sfc_main$a, {
+                            vueExports.renderSlot(_ctx.$slots, "first", {}, () => [
+                              vueExports.createVNode(_sfc_main$a, {
                                 color: __props.color,
                                 variant: __props.variant,
                                 size: __props.size,
@@ -107,15 +524,15 @@ const _sfc_main = {
                     _push3(`<!---->`);
                   }
                   if (__props.showControls || !!slots.prev) {
-                    _push3(ssrRenderComponent(unref(PaginationPrev), {
+                    _push3(ssrRenderComponent_1(vueExports.unref(PaginationPrev_default), {
                       "as-child": "",
                       "data-slot": "prev",
-                      class: ui.value.prev({ class: unref(uiProp)?.prev })
+                      class: ui.value.prev({ class: vueExports.unref(uiProp)?.prev })
                     }, {
-                      default: withCtx((_, _push4, _parent4, _scopeId3) => {
+                      default: vueExports.withCtx((_, _push4, _parent4, _scopeId3) => {
                         if (_push4) {
-                          ssrRenderSlot(_ctx.$slots, "prev", {}, () => {
-                            _push4(ssrRenderComponent(_sfc_main$a, {
+                          ssrRenderSlot_1(_ctx.$slots, "prev", {}, () => {
+                            _push4(ssrRenderComponent_1(_sfc_main$a, {
                               color: __props.color,
                               variant: __props.variant,
                               size: __props.size,
@@ -125,8 +542,8 @@ const _sfc_main = {
                           }, _push4, _parent4, _scopeId3);
                         } else {
                           return [
-                            renderSlot(_ctx.$slots, "prev", {}, () => [
-                              createVNode(_sfc_main$a, {
+                            vueExports.renderSlot(_ctx.$slots, "prev", {}, () => [
+                              vueExports.createVNode(_sfc_main$a, {
                                 color: __props.color,
                                 variant: __props.variant,
                                 size: __props.size,
@@ -143,19 +560,19 @@ const _sfc_main = {
                     _push3(`<!---->`);
                   }
                   _push3(`<!--[-->`);
-                  ssrRenderList(items, (item, index) => {
+                  ssrRenderList_1(items, (item, index) => {
                     _push3(`<!--[-->`);
                     if (item.type === "page") {
-                      _push3(ssrRenderComponent(unref(PaginationListItem), {
+                      _push3(ssrRenderComponent_1(vueExports.unref(PaginationListItem_default), {
                         "as-child": "",
                         value: item.value,
                         "data-slot": "item",
-                        class: ui.value.item({ class: unref(uiProp)?.item })
+                        class: ui.value.item({ class: vueExports.unref(uiProp)?.item })
                       }, {
-                        default: withCtx((_, _push4, _parent4, _scopeId3) => {
+                        default: vueExports.withCtx((_, _push4, _parent4, _scopeId3) => {
                           if (_push4) {
-                            ssrRenderSlot(_ctx.$slots, "item", mergeProps({ ref_for: true }, { item, index, page, pageCount }), () => {
-                              _push4(ssrRenderComponent(_sfc_main$a, {
+                            ssrRenderSlot_1(_ctx.$slots, "item", vueExports.mergeProps({ ref_for: true }, { item, index, page, pageCount }), () => {
+                              _push4(ssrRenderComponent_1(_sfc_main$a, {
                                 color: page === item.value ? __props.activeColor : __props.color,
                                 variant: page === item.value ? __props.activeVariant : __props.variant,
                                 size: __props.size,
@@ -167,8 +584,8 @@ const _sfc_main = {
                             }, _push4, _parent4, _scopeId3);
                           } else {
                             return [
-                              renderSlot(_ctx.$slots, "item", mergeProps({ ref_for: true }, { item, index, page, pageCount }), () => [
-                                createVNode(_sfc_main$a, {
+                              vueExports.renderSlot(_ctx.$slots, "item", vueExports.mergeProps({ ref_for: true }, { item, index, page, pageCount }), () => [
+                                vueExports.createVNode(_sfc_main$a, {
                                   color: page === item.value ? __props.activeColor : __props.color,
                                   variant: page === item.value ? __props.activeVariant : __props.variant,
                                   size: __props.size,
@@ -184,31 +601,31 @@ const _sfc_main = {
                         _: 2
                       }, _parent3, _scopeId2));
                     } else {
-                      _push3(ssrRenderComponent(unref(PaginationEllipsis), {
+                      _push3(ssrRenderComponent_1(vueExports.unref(PaginationEllipsis_default), {
                         "as-child": "",
                         "data-slot": "ellipsis",
-                        class: ui.value.ellipsis({ class: unref(uiProp)?.ellipsis })
+                        class: ui.value.ellipsis({ class: vueExports.unref(uiProp)?.ellipsis })
                       }, {
-                        default: withCtx((_, _push4, _parent4, _scopeId3) => {
+                        default: vueExports.withCtx((_, _push4, _parent4, _scopeId3) => {
                           if (_push4) {
-                            ssrRenderSlot(_ctx.$slots, "ellipsis", { ui: ui.value }, () => {
-                              _push4(ssrRenderComponent(_sfc_main$a, {
+                            ssrRenderSlot_1(_ctx.$slots, "ellipsis", { ui: ui.value }, () => {
+                              _push4(ssrRenderComponent_1(_sfc_main$a, {
                                 as: "div",
                                 color: __props.color,
                                 variant: __props.variant,
                                 size: __props.size,
-                                icon: __props.ellipsisIcon || unref(appConfig).ui.icons.ellipsis
+                                icon: __props.ellipsisIcon || vueExports.unref(appConfig).ui.icons.ellipsis
                               }, null, _parent4, _scopeId3));
                             }, _push4, _parent4, _scopeId3);
                           } else {
                             return [
-                              renderSlot(_ctx.$slots, "ellipsis", { ui: ui.value }, () => [
-                                createVNode(_sfc_main$a, {
+                              vueExports.renderSlot(_ctx.$slots, "ellipsis", { ui: ui.value }, () => [
+                                vueExports.createVNode(_sfc_main$a, {
                                   as: "div",
                                   color: __props.color,
                                   variant: __props.variant,
                                   size: __props.size,
-                                  icon: __props.ellipsisIcon || unref(appConfig).ui.icons.ellipsis
+                                  icon: __props.ellipsisIcon || vueExports.unref(appConfig).ui.icons.ellipsis
                                 }, null, 8, ["color", "variant", "size", "icon"])
                               ])
                             ];
@@ -221,15 +638,15 @@ const _sfc_main = {
                   });
                   _push3(`<!--]-->`);
                   if (__props.showControls || !!slots.next) {
-                    _push3(ssrRenderComponent(unref(PaginationNext), {
+                    _push3(ssrRenderComponent_1(vueExports.unref(PaginationNext_default), {
                       "as-child": "",
                       "data-slot": "next",
-                      class: ui.value.next({ class: unref(uiProp)?.next })
+                      class: ui.value.next({ class: vueExports.unref(uiProp)?.next })
                     }, {
-                      default: withCtx((_, _push4, _parent4, _scopeId3) => {
+                      default: vueExports.withCtx((_, _push4, _parent4, _scopeId3) => {
                         if (_push4) {
-                          ssrRenderSlot(_ctx.$slots, "next", {}, () => {
-                            _push4(ssrRenderComponent(_sfc_main$a, {
+                          ssrRenderSlot_1(_ctx.$slots, "next", {}, () => {
+                            _push4(ssrRenderComponent_1(_sfc_main$a, {
                               color: __props.color,
                               variant: __props.variant,
                               size: __props.size,
@@ -239,8 +656,8 @@ const _sfc_main = {
                           }, _push4, _parent4, _scopeId3);
                         } else {
                           return [
-                            renderSlot(_ctx.$slots, "next", {}, () => [
-                              createVNode(_sfc_main$a, {
+                            vueExports.renderSlot(_ctx.$slots, "next", {}, () => [
+                              vueExports.createVNode(_sfc_main$a, {
                                 color: __props.color,
                                 variant: __props.variant,
                                 size: __props.size,
@@ -257,15 +674,15 @@ const _sfc_main = {
                     _push3(`<!---->`);
                   }
                   if (__props.showControls || !!slots.last) {
-                    _push3(ssrRenderComponent(unref(PaginationLast), {
+                    _push3(ssrRenderComponent_1(vueExports.unref(PaginationLast_default), {
                       "as-child": "",
                       "data-slot": "last",
-                      class: ui.value.last({ class: unref(uiProp)?.last })
+                      class: ui.value.last({ class: vueExports.unref(uiProp)?.last })
                     }, {
-                      default: withCtx((_, _push4, _parent4, _scopeId3) => {
+                      default: vueExports.withCtx((_, _push4, _parent4, _scopeId3) => {
                         if (_push4) {
-                          ssrRenderSlot(_ctx.$slots, "last", {}, () => {
-                            _push4(ssrRenderComponent(_sfc_main$a, {
+                          ssrRenderSlot_1(_ctx.$slots, "last", {}, () => {
+                            _push4(ssrRenderComponent_1(_sfc_main$a, {
                               color: __props.color,
                               variant: __props.variant,
                               size: __props.size,
@@ -275,8 +692,8 @@ const _sfc_main = {
                           }, _push4, _parent4, _scopeId3);
                         } else {
                           return [
-                            renderSlot(_ctx.$slots, "last", {}, () => [
-                              createVNode(_sfc_main$a, {
+                            vueExports.renderSlot(_ctx.$slots, "last", {}, () => [
+                              vueExports.createVNode(_sfc_main$a, {
                                 color: __props.color,
                                 variant: __props.variant,
                                 size: __props.size,
@@ -294,15 +711,15 @@ const _sfc_main = {
                   }
                 } else {
                   return [
-                    __props.showControls || !!slots.first ? (openBlock(), createBlock(unref(PaginationFirst), {
+                    __props.showControls || !!slots.first ? (vueExports.openBlock(), vueExports.createBlock(vueExports.unref(PaginationFirst_default), {
                       key: 0,
                       "as-child": "",
                       "data-slot": "first",
-                      class: ui.value.first({ class: unref(uiProp)?.first })
+                      class: ui.value.first({ class: vueExports.unref(uiProp)?.first })
                     }, {
-                      default: withCtx(() => [
-                        renderSlot(_ctx.$slots, "first", {}, () => [
-                          createVNode(_sfc_main$a, {
+                      default: vueExports.withCtx(() => [
+                        vueExports.renderSlot(_ctx.$slots, "first", {}, () => [
+                          vueExports.createVNode(_sfc_main$a, {
                             color: __props.color,
                             variant: __props.variant,
                             size: __props.size,
@@ -312,16 +729,16 @@ const _sfc_main = {
                         ])
                       ]),
                       _: 3
-                    }, 8, ["class"])) : createCommentVNode("", true),
-                    __props.showControls || !!slots.prev ? (openBlock(), createBlock(unref(PaginationPrev), {
+                    }, 8, ["class"])) : vueExports.createCommentVNode("", true),
+                    __props.showControls || !!slots.prev ? (vueExports.openBlock(), vueExports.createBlock(vueExports.unref(PaginationPrev_default), {
                       key: 1,
                       "as-child": "",
                       "data-slot": "prev",
-                      class: ui.value.prev({ class: unref(uiProp)?.prev })
+                      class: ui.value.prev({ class: vueExports.unref(uiProp)?.prev })
                     }, {
-                      default: withCtx(() => [
-                        renderSlot(_ctx.$slots, "prev", {}, () => [
-                          createVNode(_sfc_main$a, {
+                      default: vueExports.withCtx(() => [
+                        vueExports.renderSlot(_ctx.$slots, "prev", {}, () => [
+                          vueExports.createVNode(_sfc_main$a, {
                             color: __props.color,
                             variant: __props.variant,
                             size: __props.size,
@@ -331,19 +748,19 @@ const _sfc_main = {
                         ])
                       ]),
                       _: 2
-                    }, 1032, ["class"])) : createCommentVNode("", true),
-                    (openBlock(true), createBlock(Fragment, null, renderList(items, (item, index) => {
-                      return openBlock(), createBlock(Fragment, { key: index }, [
-                        item.type === "page" ? (openBlock(), createBlock(unref(PaginationListItem), {
+                    }, 1032, ["class"])) : vueExports.createCommentVNode("", true),
+                    (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(items, (item, index) => {
+                      return vueExports.openBlock(), vueExports.createBlock(vueExports.Fragment, { key: index }, [
+                        item.type === "page" ? (vueExports.openBlock(), vueExports.createBlock(vueExports.unref(PaginationListItem_default), {
                           key: 0,
                           "as-child": "",
                           value: item.value,
                           "data-slot": "item",
-                          class: ui.value.item({ class: unref(uiProp)?.item })
+                          class: ui.value.item({ class: vueExports.unref(uiProp)?.item })
                         }, {
-                          default: withCtx(() => [
-                            renderSlot(_ctx.$slots, "item", mergeProps({ ref_for: true }, { item, index, page, pageCount }), () => [
-                              createVNode(_sfc_main$a, {
+                          default: vueExports.withCtx(() => [
+                            vueExports.renderSlot(_ctx.$slots, "item", vueExports.mergeProps({ ref_for: true }, { item, index, page, pageCount }), () => [
+                              vueExports.createVNode(_sfc_main$a, {
                                 color: page === item.value ? __props.activeColor : __props.color,
                                 variant: page === item.value ? __props.activeVariant : __props.variant,
                                 size: __props.size,
@@ -355,20 +772,20 @@ const _sfc_main = {
                             ])
                           ]),
                           _: 2
-                        }, 1032, ["value", "class"])) : (openBlock(), createBlock(unref(PaginationEllipsis), {
+                        }, 1032, ["value", "class"])) : (vueExports.openBlock(), vueExports.createBlock(vueExports.unref(PaginationEllipsis_default), {
                           key: 1,
                           "as-child": "",
                           "data-slot": "ellipsis",
-                          class: ui.value.ellipsis({ class: unref(uiProp)?.ellipsis })
+                          class: ui.value.ellipsis({ class: vueExports.unref(uiProp)?.ellipsis })
                         }, {
-                          default: withCtx(() => [
-                            renderSlot(_ctx.$slots, "ellipsis", { ui: ui.value }, () => [
-                              createVNode(_sfc_main$a, {
+                          default: vueExports.withCtx(() => [
+                            vueExports.renderSlot(_ctx.$slots, "ellipsis", { ui: ui.value }, () => [
+                              vueExports.createVNode(_sfc_main$a, {
                                 as: "div",
                                 color: __props.color,
                                 variant: __props.variant,
                                 size: __props.size,
-                                icon: __props.ellipsisIcon || unref(appConfig).ui.icons.ellipsis
+                                icon: __props.ellipsisIcon || vueExports.unref(appConfig).ui.icons.ellipsis
                               }, null, 8, ["color", "variant", "size", "icon"])
                             ])
                           ]),
@@ -376,15 +793,15 @@ const _sfc_main = {
                         }, 8, ["class"]))
                       ], 64);
                     }), 128)),
-                    __props.showControls || !!slots.next ? (openBlock(), createBlock(unref(PaginationNext), {
+                    __props.showControls || !!slots.next ? (vueExports.openBlock(), vueExports.createBlock(vueExports.unref(PaginationNext_default), {
                       key: 2,
                       "as-child": "",
                       "data-slot": "next",
-                      class: ui.value.next({ class: unref(uiProp)?.next })
+                      class: ui.value.next({ class: vueExports.unref(uiProp)?.next })
                     }, {
-                      default: withCtx(() => [
-                        renderSlot(_ctx.$slots, "next", {}, () => [
-                          createVNode(_sfc_main$a, {
+                      default: vueExports.withCtx(() => [
+                        vueExports.renderSlot(_ctx.$slots, "next", {}, () => [
+                          vueExports.createVNode(_sfc_main$a, {
                             color: __props.color,
                             variant: __props.variant,
                             size: __props.size,
@@ -394,16 +811,16 @@ const _sfc_main = {
                         ])
                       ]),
                       _: 2
-                    }, 1032, ["class"])) : createCommentVNode("", true),
-                    __props.showControls || !!slots.last ? (openBlock(), createBlock(unref(PaginationLast), {
+                    }, 1032, ["class"])) : vueExports.createCommentVNode("", true),
+                    __props.showControls || !!slots.last ? (vueExports.openBlock(), vueExports.createBlock(vueExports.unref(PaginationLast_default), {
                       key: 3,
                       "as-child": "",
                       "data-slot": "last",
-                      class: ui.value.last({ class: unref(uiProp)?.last })
+                      class: ui.value.last({ class: vueExports.unref(uiProp)?.last })
                     }, {
-                      default: withCtx(() => [
-                        renderSlot(_ctx.$slots, "last", {}, () => [
-                          createVNode(_sfc_main$a, {
+                      default: vueExports.withCtx(() => [
+                        vueExports.renderSlot(_ctx.$slots, "last", {}, () => [
+                          vueExports.createVNode(_sfc_main$a, {
                             color: __props.color,
                             variant: __props.variant,
                             size: __props.size,
@@ -413,7 +830,7 @@ const _sfc_main = {
                         ])
                       ]),
                       _: 2
-                    }, 1032, ["class"])) : createCommentVNode("", true)
+                    }, 1032, ["class"])) : vueExports.createCommentVNode("", true)
                   ];
                 }
               }),
@@ -421,20 +838,20 @@ const _sfc_main = {
             }, _parent2, _scopeId));
           } else {
             return [
-              createVNode(unref(PaginationList), {
+              vueExports.createVNode(vueExports.unref(PaginationList_default), {
                 "data-slot": "list",
-                class: ui.value.list({ class: unref(uiProp)?.list })
+                class: ui.value.list({ class: vueExports.unref(uiProp)?.list })
               }, {
-                default: withCtx(({ items }) => [
-                  __props.showControls || !!slots.first ? (openBlock(), createBlock(unref(PaginationFirst), {
+                default: vueExports.withCtx(({ items }) => [
+                  __props.showControls || !!slots.first ? (vueExports.openBlock(), vueExports.createBlock(vueExports.unref(PaginationFirst_default), {
                     key: 0,
                     "as-child": "",
                     "data-slot": "first",
-                    class: ui.value.first({ class: unref(uiProp)?.first })
+                    class: ui.value.first({ class: vueExports.unref(uiProp)?.first })
                   }, {
-                    default: withCtx(() => [
-                      renderSlot(_ctx.$slots, "first", {}, () => [
-                        createVNode(_sfc_main$a, {
+                    default: vueExports.withCtx(() => [
+                      vueExports.renderSlot(_ctx.$slots, "first", {}, () => [
+                        vueExports.createVNode(_sfc_main$a, {
                           color: __props.color,
                           variant: __props.variant,
                           size: __props.size,
@@ -444,16 +861,16 @@ const _sfc_main = {
                       ])
                     ]),
                     _: 3
-                  }, 8, ["class"])) : createCommentVNode("", true),
-                  __props.showControls || !!slots.prev ? (openBlock(), createBlock(unref(PaginationPrev), {
+                  }, 8, ["class"])) : vueExports.createCommentVNode("", true),
+                  __props.showControls || !!slots.prev ? (vueExports.openBlock(), vueExports.createBlock(vueExports.unref(PaginationPrev_default), {
                     key: 1,
                     "as-child": "",
                     "data-slot": "prev",
-                    class: ui.value.prev({ class: unref(uiProp)?.prev })
+                    class: ui.value.prev({ class: vueExports.unref(uiProp)?.prev })
                   }, {
-                    default: withCtx(() => [
-                      renderSlot(_ctx.$slots, "prev", {}, () => [
-                        createVNode(_sfc_main$a, {
+                    default: vueExports.withCtx(() => [
+                      vueExports.renderSlot(_ctx.$slots, "prev", {}, () => [
+                        vueExports.createVNode(_sfc_main$a, {
                           color: __props.color,
                           variant: __props.variant,
                           size: __props.size,
@@ -463,19 +880,19 @@ const _sfc_main = {
                       ])
                     ]),
                     _: 2
-                  }, 1032, ["class"])) : createCommentVNode("", true),
-                  (openBlock(true), createBlock(Fragment, null, renderList(items, (item, index) => {
-                    return openBlock(), createBlock(Fragment, { key: index }, [
-                      item.type === "page" ? (openBlock(), createBlock(unref(PaginationListItem), {
+                  }, 1032, ["class"])) : vueExports.createCommentVNode("", true),
+                  (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(items, (item, index) => {
+                    return vueExports.openBlock(), vueExports.createBlock(vueExports.Fragment, { key: index }, [
+                      item.type === "page" ? (vueExports.openBlock(), vueExports.createBlock(vueExports.unref(PaginationListItem_default), {
                         key: 0,
                         "as-child": "",
                         value: item.value,
                         "data-slot": "item",
-                        class: ui.value.item({ class: unref(uiProp)?.item })
+                        class: ui.value.item({ class: vueExports.unref(uiProp)?.item })
                       }, {
-                        default: withCtx(() => [
-                          renderSlot(_ctx.$slots, "item", mergeProps({ ref_for: true }, { item, index, page, pageCount }), () => [
-                            createVNode(_sfc_main$a, {
+                        default: vueExports.withCtx(() => [
+                          vueExports.renderSlot(_ctx.$slots, "item", vueExports.mergeProps({ ref_for: true }, { item, index, page, pageCount }), () => [
+                            vueExports.createVNode(_sfc_main$a, {
                               color: page === item.value ? __props.activeColor : __props.color,
                               variant: page === item.value ? __props.activeVariant : __props.variant,
                               size: __props.size,
@@ -487,20 +904,20 @@ const _sfc_main = {
                           ])
                         ]),
                         _: 2
-                      }, 1032, ["value", "class"])) : (openBlock(), createBlock(unref(PaginationEllipsis), {
+                      }, 1032, ["value", "class"])) : (vueExports.openBlock(), vueExports.createBlock(vueExports.unref(PaginationEllipsis_default), {
                         key: 1,
                         "as-child": "",
                         "data-slot": "ellipsis",
-                        class: ui.value.ellipsis({ class: unref(uiProp)?.ellipsis })
+                        class: ui.value.ellipsis({ class: vueExports.unref(uiProp)?.ellipsis })
                       }, {
-                        default: withCtx(() => [
-                          renderSlot(_ctx.$slots, "ellipsis", { ui: ui.value }, () => [
-                            createVNode(_sfc_main$a, {
+                        default: vueExports.withCtx(() => [
+                          vueExports.renderSlot(_ctx.$slots, "ellipsis", { ui: ui.value }, () => [
+                            vueExports.createVNode(_sfc_main$a, {
                               as: "div",
                               color: __props.color,
                               variant: __props.variant,
                               size: __props.size,
-                              icon: __props.ellipsisIcon || unref(appConfig).ui.icons.ellipsis
+                              icon: __props.ellipsisIcon || vueExports.unref(appConfig).ui.icons.ellipsis
                             }, null, 8, ["color", "variant", "size", "icon"])
                           ])
                         ]),
@@ -508,15 +925,15 @@ const _sfc_main = {
                       }, 8, ["class"]))
                     ], 64);
                   }), 128)),
-                  __props.showControls || !!slots.next ? (openBlock(), createBlock(unref(PaginationNext), {
+                  __props.showControls || !!slots.next ? (vueExports.openBlock(), vueExports.createBlock(vueExports.unref(PaginationNext_default), {
                     key: 2,
                     "as-child": "",
                     "data-slot": "next",
-                    class: ui.value.next({ class: unref(uiProp)?.next })
+                    class: ui.value.next({ class: vueExports.unref(uiProp)?.next })
                   }, {
-                    default: withCtx(() => [
-                      renderSlot(_ctx.$slots, "next", {}, () => [
-                        createVNode(_sfc_main$a, {
+                    default: vueExports.withCtx(() => [
+                      vueExports.renderSlot(_ctx.$slots, "next", {}, () => [
+                        vueExports.createVNode(_sfc_main$a, {
                           color: __props.color,
                           variant: __props.variant,
                           size: __props.size,
@@ -526,16 +943,16 @@ const _sfc_main = {
                       ])
                     ]),
                     _: 2
-                  }, 1032, ["class"])) : createCommentVNode("", true),
-                  __props.showControls || !!slots.last ? (openBlock(), createBlock(unref(PaginationLast), {
+                  }, 1032, ["class"])) : vueExports.createCommentVNode("", true),
+                  __props.showControls || !!slots.last ? (vueExports.openBlock(), vueExports.createBlock(vueExports.unref(PaginationLast_default), {
                     key: 3,
                     "as-child": "",
                     "data-slot": "last",
-                    class: ui.value.last({ class: unref(uiProp)?.last })
+                    class: ui.value.last({ class: vueExports.unref(uiProp)?.last })
                   }, {
-                    default: withCtx(() => [
-                      renderSlot(_ctx.$slots, "last", {}, () => [
-                        createVNode(_sfc_main$a, {
+                    default: vueExports.withCtx(() => [
+                      vueExports.renderSlot(_ctx.$slots, "last", {}, () => [
+                        vueExports.createVNode(_sfc_main$a, {
                           color: __props.color,
                           variant: __props.variant,
                           size: __props.size,
@@ -545,7 +962,7 @@ const _sfc_main = {
                       ])
                     ]),
                     _: 2
-                  }, 1032, ["class"])) : createCommentVNode("", true)
+                  }, 1032, ["class"])) : vueExports.createCommentVNode("", true)
                 ]),
                 _: 2
               }, 1032, ["class"])
@@ -559,7 +976,7 @@ const _sfc_main = {
 };
 const _sfc_setup = _sfc_main.setup;
 _sfc_main.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
+  const ssrContext = vueExports.useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("../node_modules/.pnpm/@nuxt+ui@4.5.1_@tiptap+exte_d0faa0730db27155126639674f551f9c/node_modules/@nuxt/ui/dist/runtime/components/Pagination.vue");
   return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
 };

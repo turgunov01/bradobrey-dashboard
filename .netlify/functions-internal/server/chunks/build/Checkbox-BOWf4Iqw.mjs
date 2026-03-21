@@ -1,7 +1,210 @@
-globalThis.__timing__.logStart('Load chunks/build/Checkbox-BOWf4Iqw');import { useSlots, useModel, useId, useAttrs, computed, unref, mergeProps, withCtx, openBlock, createBlock, createVNode, resolveDynamicComponent, renderSlot, createTextVNode, toDisplayString, createCommentVNode, mergeModels, useSSRContext } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/index.mjs';
-import { ssrRenderComponent, ssrRenderClass, ssrRenderVNode, ssrRenderSlot, ssrInterpolate } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/server-renderer/index.mjs';
-import { useForwardProps, Primitive, Label, CheckboxRoot, CheckboxIndicator } from 'file://D:/projects/bradobrey-dashboard/node_modules/reka-ui/dist/index.js';
-import { h as useAppConfig, i as useComponentUI, y as reactivePick, q as useFormField, t as tv, j as _sfc_main$f } from './server.mjs';
+globalThis.__timing__.logStart('Load chunks/build/Checkbox-BOWf4Iqw');import { F as createContext, m as useForwardExpose, E as useVModel, av as isNullish, P as Primitive, K as Presence_default, h as useAppConfig, i as useComponentUI, k as useForwardProps, L as reactivePick, v as useFormField, t as tv, j as _sfc_main$f } from './server.mjs';
+import { i as isValueEqualOrExist } from '../_/isValueEqualOrExist.mjs';
+import { u as useFormControl, V as VisuallyHiddenInput_default } from '../_/VisuallyHiddenInput.mjs';
+import { R as RovingFocusItem_default } from '../_/RovingFocusItem.mjs';
+import { v as vueExports, s as ssrRenderComponent_1, b as ssrRenderClass_1, e as ssrRenderVNode, a as ssrRenderSlot_1, c as ssrInterpolate_1 } from '../routes/renderer.mjs';
+import { I as isEqual } from '../_/nitro.mjs';
+import { L as Label_default } from './FormField-CfjXEpv-.mjs';
+
+//#region src/Checkbox/CheckboxGroupRoot.vue?vue&type=script&setup=true&lang.ts
+const [injectCheckboxGroupRootContext] = createContext("CheckboxGroupRoot");
+
+//#region src/Checkbox/utils.ts
+function isIndeterminate(checked) {
+	return checked === "indeterminate";
+}
+function getState(checked) {
+	return isIndeterminate(checked) ? "indeterminate" : checked ? "checked" : "unchecked";
+}
+
+//#region src/Checkbox/CheckboxRoot.vue?vue&type=script&setup=true&lang.ts
+const [injectCheckboxRootContext, provideCheckboxRootContext] = createContext("CheckboxRoot");
+var CheckboxRoot_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ vueExports.defineComponent({
+	inheritAttrs: false,
+	__name: "CheckboxRoot",
+	props: {
+		defaultValue: {
+			type: [Boolean, String],
+			required: false
+		},
+		modelValue: {
+			type: [
+				Boolean,
+				String,
+				null
+			],
+			required: false,
+			default: void 0
+		},
+		disabled: {
+			type: Boolean,
+			required: false
+		},
+		value: {
+			type: null,
+			required: false,
+			default: "on"
+		},
+		id: {
+			type: String,
+			required: false
+		},
+		asChild: {
+			type: Boolean,
+			required: false
+		},
+		as: {
+			type: null,
+			required: false,
+			default: "button"
+		},
+		name: {
+			type: String,
+			required: false
+		},
+		required: {
+			type: Boolean,
+			required: false
+		}
+	},
+	emits: ["update:modelValue"],
+	setup(__props, { emit: __emit }) {
+		const props = __props;
+		const emits = __emit;
+		const { forwardRef, currentElement } = useForwardExpose();
+		const checkboxGroupContext = injectCheckboxGroupRootContext(null);
+		const modelValue = useVModel(props, "modelValue", emits, {
+			defaultValue: props.defaultValue,
+			passive: props.modelValue === void 0
+		});
+		const disabled = vueExports.computed(() => checkboxGroupContext?.disabled.value || props.disabled);
+		const checkboxState = vueExports.computed(() => {
+			if (!isNullish(checkboxGroupContext?.modelValue.value)) return isValueEqualOrExist(checkboxGroupContext.modelValue.value, props.value);
+			else return modelValue.value === "indeterminate" ? "indeterminate" : modelValue.value;
+		});
+		function handleClick() {
+			if (!isNullish(checkboxGroupContext?.modelValue.value)) {
+				const modelValueArray = [...checkboxGroupContext.modelValue.value || []];
+				if (isValueEqualOrExist(modelValueArray, props.value)) {
+					const index = modelValueArray.findIndex((i) => isEqual(i, props.value));
+					modelValueArray.splice(index, 1);
+				} else modelValueArray.push(props.value);
+				checkboxGroupContext.modelValue.value = modelValueArray;
+			} else modelValue.value = isIndeterminate(modelValue.value) ? true : !modelValue.value;
+		}
+		const isFormControl = useFormControl(currentElement);
+		const ariaLabel = vueExports.computed(() => props.id && currentElement.value ? document.querySelector(`[for="${props.id}"]`)?.innerText : void 0);
+		provideCheckboxRootContext({
+			disabled,
+			state: checkboxState
+		});
+		return (_ctx, _cache) => {
+			return vueExports.openBlock(), vueExports.createBlock(vueExports.resolveDynamicComponent(vueExports.unref(checkboxGroupContext)?.rovingFocus.value ? vueExports.unref(RovingFocusItem_default) : vueExports.unref(Primitive)), vueExports.mergeProps(_ctx.$attrs, {
+				id: _ctx.id,
+				ref: vueExports.unref(forwardRef),
+				role: "checkbox",
+				"as-child": _ctx.asChild,
+				as: _ctx.as,
+				type: _ctx.as === "button" ? "button" : void 0,
+				"aria-checked": vueExports.unref(isIndeterminate)(checkboxState.value) ? "mixed" : checkboxState.value,
+				"aria-required": _ctx.required,
+				"aria-label": _ctx.$attrs["aria-label"] || ariaLabel.value,
+				"data-state": vueExports.unref(getState)(checkboxState.value),
+				"data-disabled": disabled.value ? "" : void 0,
+				disabled: disabled.value,
+				focusable: vueExports.unref(checkboxGroupContext)?.rovingFocus.value ? !disabled.value : void 0,
+				onKeydown: vueExports.withKeys(vueExports.withModifiers(() => {}, ["prevent"]), ["enter"]),
+				onClick: handleClick
+			}), {
+				default: vueExports.withCtx(() => [vueExports.renderSlot(_ctx.$slots, "default", {
+					modelValue: vueExports.unref(modelValue),
+					state: checkboxState.value
+				}), vueExports.unref(isFormControl) && _ctx.name && !vueExports.unref(checkboxGroupContext) ? (vueExports.openBlock(), vueExports.createBlock(vueExports.unref(VisuallyHiddenInput_default), {
+					key: 0,
+					type: "checkbox",
+					checked: !!checkboxState.value,
+					name: _ctx.name,
+					value: _ctx.value,
+					disabled: disabled.value,
+					required: _ctx.required
+				}, null, 8, [
+					"checked",
+					"name",
+					"value",
+					"disabled",
+					"required"
+				])) : vueExports.createCommentVNode("v-if", true)]),
+				_: 3
+			}, 16, [
+				"id",
+				"as-child",
+				"as",
+				"type",
+				"aria-checked",
+				"aria-required",
+				"aria-label",
+				"data-state",
+				"data-disabled",
+				"disabled",
+				"focusable",
+				"onKeydown"
+			]);
+		};
+	}
+});
+
+//#endregion
+//#region src/Checkbox/CheckboxRoot.vue
+var CheckboxRoot_default = CheckboxRoot_vue_vue_type_script_setup_true_lang_default;
+
+//#region src/Checkbox/CheckboxIndicator.vue?vue&type=script&setup=true&lang.ts
+var CheckboxIndicator_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ vueExports.defineComponent({
+	__name: "CheckboxIndicator",
+	props: {
+		forceMount: {
+			type: Boolean,
+			required: false
+		},
+		asChild: {
+			type: Boolean,
+			required: false
+		},
+		as: {
+			type: null,
+			required: false,
+			default: "span"
+		}
+	},
+	setup(__props) {
+		const { forwardRef } = useForwardExpose();
+		const rootContext = injectCheckboxRootContext();
+		return (_ctx, _cache) => {
+			return vueExports.openBlock(), vueExports.createBlock(vueExports.unref(Presence_default), { present: _ctx.forceMount || vueExports.unref(isIndeterminate)(vueExports.unref(rootContext).state.value) || vueExports.unref(rootContext).state.value === true }, {
+				default: vueExports.withCtx(() => [vueExports.createVNode(vueExports.unref(Primitive), vueExports.mergeProps({
+					ref: vueExports.unref(forwardRef),
+					"data-state": vueExports.unref(getState)(vueExports.unref(rootContext).state.value),
+					"data-disabled": vueExports.unref(rootContext).disabled.value ? "" : void 0,
+					style: { pointerEvents: "none" },
+					"as-child": _ctx.asChild,
+					as: _ctx.as
+				}, _ctx.$attrs), {
+					default: vueExports.withCtx(() => [vueExports.renderSlot(_ctx.$slots, "default")]),
+					_: 3
+				}, 16, [
+					"data-state",
+					"data-disabled",
+					"as-child",
+					"as"
+				])]),
+				_: 3
+			}, 8, ["present"]);
+		};
+	}
+});
+
+//#endregion
+//#region src/Checkbox/CheckboxIndicator.vue
+var CheckboxIndicator_default = CheckboxIndicator_vue_vue_type_script_setup_true_lang_default;
 
 const theme = {
   "slots": {
@@ -214,7 +417,7 @@ const theme = {
 const _sfc_main = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
   __name: "UCheckbox",
   __ssrInlineRender: true,
-  props: /* @__PURE__ */ mergeModels({
+  props: /* @__PURE__ */ vueExports.mergeModels({
     as: { type: null, required: false },
     label: { type: String, required: false },
     description: { type: String, required: false },
@@ -236,23 +439,23 @@ const _sfc_main = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
     "modelValue": { type: [Boolean, String], ...{ default: void 0 } },
     "modelModifiers": {}
   }),
-  emits: /* @__PURE__ */ mergeModels(["change"], ["update:modelValue"]),
+  emits: /* @__PURE__ */ vueExports.mergeModels(["change"], ["update:modelValue"]),
   setup(__props, { emit: __emit }) {
     const props = __props;
-    const slots = useSlots();
+    const slots = vueExports.useSlots();
     const emits = __emit;
-    const modelValue = useModel(__props, "modelValue", { type: [Boolean, String], ...{ default: void 0 } });
+    const modelValue = vueExports.useModel(__props, "modelValue", { type: [Boolean, String], ...{ default: void 0 } });
     const appConfig = useAppConfig();
     const uiProp = useComponentUI("checkbox", props);
     const rootProps = useForwardProps(reactivePick(props, "required", "value", "defaultValue"));
     const { id: _id, emitFormChange, emitFormInput, size, color, name, disabled, ariaAttrs } = useFormField(props);
-    const id = _id.value ?? useId();
-    const attrs = useAttrs();
-    const forwardedAttrs = computed(() => {
+    const id = _id.value ?? vueExports.useId();
+    const attrs = vueExports.useAttrs();
+    const forwardedAttrs = vueExports.computed(() => {
       const { "data-state": _, ...rest } = attrs;
       return rest;
     });
-    const ui = computed(() => tv({ extend: tv(theme), ...appConfig.ui?.checkbox || {} })({
+    const ui = vueExports.computed(() => tv({ extend: tv(theme), ...appConfig.ui?.checkbox || {} })({
       size: size.value,
       color: color.value,
       variant: props.variant,
@@ -267,55 +470,55 @@ const _sfc_main = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
       emitFormInput();
     }
     return (_ctx, _push, _parent, _attrs) => {
-      _push(ssrRenderComponent(unref(Primitive), mergeProps({
-        as: !__props.variant || __props.variant === "list" ? __props.as : unref(Label),
+      _push(ssrRenderComponent_1(vueExports.unref(Primitive), vueExports.mergeProps({
+        as: !__props.variant || __props.variant === "list" ? __props.as : vueExports.unref(Label_default),
         "data-slot": "root",
-        class: ui.value.root({ class: [unref(uiProp)?.root, props.class] })
+        class: ui.value.root({ class: [vueExports.unref(uiProp)?.root, props.class] })
       }, _attrs), {
-        default: withCtx((_, _push2, _parent2, _scopeId) => {
+        default: vueExports.withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
-            _push2(`<div data-slot="container" class="${ssrRenderClass(ui.value.container({ class: unref(uiProp)?.container }))}"${_scopeId}>`);
-            _push2(ssrRenderComponent(unref(CheckboxRoot), mergeProps({ id: unref(id) }, { ...unref(rootProps), ...forwardedAttrs.value, ...unref(ariaAttrs) }, {
+            _push2(`<div data-slot="container" class="${ssrRenderClass_1(ui.value.container({ class: vueExports.unref(uiProp)?.container }))}"${_scopeId}>`);
+            _push2(ssrRenderComponent_1(vueExports.unref(CheckboxRoot_default), vueExports.mergeProps({ id: vueExports.unref(id) }, { ...vueExports.unref(rootProps), ...forwardedAttrs.value, ...vueExports.unref(ariaAttrs) }, {
               modelValue: modelValue.value,
               "onUpdate:modelValue": [($event) => modelValue.value = $event, onUpdate],
-              name: unref(name),
-              disabled: unref(disabled),
+              name: vueExports.unref(name),
+              disabled: vueExports.unref(disabled),
               "data-slot": "base",
-              class: ui.value.base({ class: unref(uiProp)?.base })
+              class: ui.value.base({ class: vueExports.unref(uiProp)?.base })
             }), {
-              default: withCtx(({ modelValue: modelValue2 }, _push3, _parent3, _scopeId2) => {
+              default: vueExports.withCtx(({ modelValue: modelValue2 }, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
-                  _push3(ssrRenderComponent(unref(CheckboxIndicator), {
+                  _push3(ssrRenderComponent_1(vueExports.unref(CheckboxIndicator_default), {
                     "data-slot": "indicator",
-                    class: ui.value.indicator({ class: unref(uiProp)?.indicator })
+                    class: ui.value.indicator({ class: vueExports.unref(uiProp)?.indicator })
                   }, {
-                    default: withCtx((_2, _push4, _parent4, _scopeId3) => {
+                    default: vueExports.withCtx((_2, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
                         if (modelValue2 === "indeterminate") {
-                          _push4(ssrRenderComponent(_sfc_main$f, {
-                            name: __props.indeterminateIcon || unref(appConfig).ui.icons.minus,
+                          _push4(ssrRenderComponent_1(_sfc_main$f, {
+                            name: __props.indeterminateIcon || vueExports.unref(appConfig).ui.icons.minus,
                             "data-slot": "icon",
-                            class: ui.value.icon({ class: unref(uiProp)?.icon })
+                            class: ui.value.icon({ class: vueExports.unref(uiProp)?.icon })
                           }, null, _parent4, _scopeId3));
                         } else {
-                          _push4(ssrRenderComponent(_sfc_main$f, {
-                            name: __props.icon || unref(appConfig).ui.icons.check,
+                          _push4(ssrRenderComponent_1(_sfc_main$f, {
+                            name: __props.icon || vueExports.unref(appConfig).ui.icons.check,
                             "data-slot": "icon",
-                            class: ui.value.icon({ class: unref(uiProp)?.icon })
+                            class: ui.value.icon({ class: vueExports.unref(uiProp)?.icon })
                           }, null, _parent4, _scopeId3));
                         }
                       } else {
                         return [
-                          modelValue2 === "indeterminate" ? (openBlock(), createBlock(_sfc_main$f, {
+                          modelValue2 === "indeterminate" ? (vueExports.openBlock(), vueExports.createBlock(_sfc_main$f, {
                             key: 0,
-                            name: __props.indeterminateIcon || unref(appConfig).ui.icons.minus,
+                            name: __props.indeterminateIcon || vueExports.unref(appConfig).ui.icons.minus,
                             "data-slot": "icon",
-                            class: ui.value.icon({ class: unref(uiProp)?.icon })
-                          }, null, 8, ["name", "class"])) : (openBlock(), createBlock(_sfc_main$f, {
+                            class: ui.value.icon({ class: vueExports.unref(uiProp)?.icon })
+                          }, null, 8, ["name", "class"])) : (vueExports.openBlock(), vueExports.createBlock(_sfc_main$f, {
                             key: 1,
-                            name: __props.icon || unref(appConfig).ui.icons.check,
+                            name: __props.icon || vueExports.unref(appConfig).ui.icons.check,
                             "data-slot": "icon",
-                            class: ui.value.icon({ class: unref(uiProp)?.icon })
+                            class: ui.value.icon({ class: vueExports.unref(uiProp)?.icon })
                           }, null, 8, ["name", "class"]))
                         ];
                       }
@@ -324,21 +527,21 @@ const _sfc_main = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
                   }, _parent3, _scopeId2));
                 } else {
                   return [
-                    createVNode(unref(CheckboxIndicator), {
+                    vueExports.createVNode(vueExports.unref(CheckboxIndicator_default), {
                       "data-slot": "indicator",
-                      class: ui.value.indicator({ class: unref(uiProp)?.indicator })
+                      class: ui.value.indicator({ class: vueExports.unref(uiProp)?.indicator })
                     }, {
-                      default: withCtx(() => [
-                        modelValue2 === "indeterminate" ? (openBlock(), createBlock(_sfc_main$f, {
+                      default: vueExports.withCtx(() => [
+                        modelValue2 === "indeterminate" ? (vueExports.openBlock(), vueExports.createBlock(_sfc_main$f, {
                           key: 0,
-                          name: __props.indeterminateIcon || unref(appConfig).ui.icons.minus,
+                          name: __props.indeterminateIcon || vueExports.unref(appConfig).ui.icons.minus,
                           "data-slot": "icon",
-                          class: ui.value.icon({ class: unref(uiProp)?.icon })
-                        }, null, 8, ["name", "class"])) : (openBlock(), createBlock(_sfc_main$f, {
+                          class: ui.value.icon({ class: vueExports.unref(uiProp)?.icon })
+                        }, null, 8, ["name", "class"])) : (vueExports.openBlock(), vueExports.createBlock(_sfc_main$f, {
                           key: 1,
-                          name: __props.icon || unref(appConfig).ui.icons.check,
+                          name: __props.icon || vueExports.unref(appConfig).ui.icons.check,
                           "data-slot": "icon",
-                          class: ui.value.icon({ class: unref(uiProp)?.icon })
+                          class: ui.value.icon({ class: vueExports.unref(uiProp)?.icon })
                         }, null, 8, ["name", "class"]))
                       ]),
                       _: 2
@@ -350,22 +553,22 @@ const _sfc_main = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
             }, _parent2, _scopeId));
             _push2(`</div>`);
             if (__props.label || !!slots.label || (__props.description || !!slots.description)) {
-              _push2(`<div data-slot="wrapper" class="${ssrRenderClass(ui.value.wrapper({ class: unref(uiProp)?.wrapper }))}"${_scopeId}>`);
+              _push2(`<div data-slot="wrapper" class="${ssrRenderClass_1(ui.value.wrapper({ class: vueExports.unref(uiProp)?.wrapper }))}"${_scopeId}>`);
               if (__props.label || !!slots.label) {
-                ssrRenderVNode(_push2, createVNode(resolveDynamicComponent(!__props.variant || __props.variant === "list" ? unref(Label) : "p"), {
-                  for: unref(id),
+                ssrRenderVNode(_push2, vueExports.createVNode(vueExports.resolveDynamicComponent(!__props.variant || __props.variant === "list" ? vueExports.unref(Label_default) : "p"), {
+                  for: vueExports.unref(id),
                   "data-slot": "label",
-                  class: ui.value.label({ class: unref(uiProp)?.label })
+                  class: ui.value.label({ class: vueExports.unref(uiProp)?.label })
                 }, {
-                  default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                  default: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                     if (_push3) {
-                      ssrRenderSlot(_ctx.$slots, "label", { label: __props.label }, () => {
-                        _push3(`${ssrInterpolate(__props.label)}`);
+                      ssrRenderSlot_1(_ctx.$slots, "label", { label: __props.label }, () => {
+                        _push3(`${ssrInterpolate_1(__props.label)}`);
                       }, _push3, _parent3, _scopeId2);
                     } else {
                       return [
-                        renderSlot(_ctx.$slots, "label", { label: __props.label }, () => [
-                          createTextVNode(toDisplayString(__props.label), 1)
+                        vueExports.renderSlot(_ctx.$slots, "label", { label: __props.label }, () => [
+                          vueExports.createTextVNode(vueExports.toDisplayString(__props.label), 1)
                         ])
                       ];
                     }
@@ -376,9 +579,9 @@ const _sfc_main = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
                 _push2(`<!---->`);
               }
               if (__props.description || !!slots.description) {
-                _push2(`<p data-slot="description" class="${ssrRenderClass(ui.value.description({ class: unref(uiProp)?.description }))}"${_scopeId}>`);
-                ssrRenderSlot(_ctx.$slots, "description", { description: __props.description }, () => {
-                  _push2(`${ssrInterpolate(__props.description)}`);
+                _push2(`<p data-slot="description" class="${ssrRenderClass_1(ui.value.description({ class: vueExports.unref(uiProp)?.description }))}"${_scopeId}>`);
+                ssrRenderSlot_1(_ctx.$slots, "description", { description: __props.description }, () => {
+                  _push2(`${ssrInterpolate_1(__props.description)}`);
                 }, _push2, _parent2, _scopeId);
                 _push2(`</p>`);
               } else {
@@ -390,34 +593,34 @@ const _sfc_main = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
             }
           } else {
             return [
-              createVNode("div", {
+              vueExports.createVNode("div", {
                 "data-slot": "container",
-                class: ui.value.container({ class: unref(uiProp)?.container })
+                class: ui.value.container({ class: vueExports.unref(uiProp)?.container })
               }, [
-                createVNode(unref(CheckboxRoot), mergeProps({ id: unref(id) }, { ...unref(rootProps), ...forwardedAttrs.value, ...unref(ariaAttrs) }, {
+                vueExports.createVNode(vueExports.unref(CheckboxRoot_default), vueExports.mergeProps({ id: vueExports.unref(id) }, { ...vueExports.unref(rootProps), ...forwardedAttrs.value, ...vueExports.unref(ariaAttrs) }, {
                   modelValue: modelValue.value,
                   "onUpdate:modelValue": [($event) => modelValue.value = $event, onUpdate],
-                  name: unref(name),
-                  disabled: unref(disabled),
+                  name: vueExports.unref(name),
+                  disabled: vueExports.unref(disabled),
                   "data-slot": "base",
-                  class: ui.value.base({ class: unref(uiProp)?.base })
+                  class: ui.value.base({ class: vueExports.unref(uiProp)?.base })
                 }), {
-                  default: withCtx(({ modelValue: modelValue2 }) => [
-                    createVNode(unref(CheckboxIndicator), {
+                  default: vueExports.withCtx(({ modelValue: modelValue2 }) => [
+                    vueExports.createVNode(vueExports.unref(CheckboxIndicator_default), {
                       "data-slot": "indicator",
-                      class: ui.value.indicator({ class: unref(uiProp)?.indicator })
+                      class: ui.value.indicator({ class: vueExports.unref(uiProp)?.indicator })
                     }, {
-                      default: withCtx(() => [
-                        modelValue2 === "indeterminate" ? (openBlock(), createBlock(_sfc_main$f, {
+                      default: vueExports.withCtx(() => [
+                        modelValue2 === "indeterminate" ? (vueExports.openBlock(), vueExports.createBlock(_sfc_main$f, {
                           key: 0,
-                          name: __props.indeterminateIcon || unref(appConfig).ui.icons.minus,
+                          name: __props.indeterminateIcon || vueExports.unref(appConfig).ui.icons.minus,
                           "data-slot": "icon",
-                          class: ui.value.icon({ class: unref(uiProp)?.icon })
-                        }, null, 8, ["name", "class"])) : (openBlock(), createBlock(_sfc_main$f, {
+                          class: ui.value.icon({ class: vueExports.unref(uiProp)?.icon })
+                        }, null, 8, ["name", "class"])) : (vueExports.openBlock(), vueExports.createBlock(_sfc_main$f, {
                           key: 1,
-                          name: __props.icon || unref(appConfig).ui.icons.check,
+                          name: __props.icon || vueExports.unref(appConfig).ui.icons.check,
                           "data-slot": "icon",
-                          class: ui.value.icon({ class: unref(uiProp)?.icon })
+                          class: ui.value.icon({ class: vueExports.unref(uiProp)?.icon })
                         }, null, 8, ["name", "class"]))
                       ]),
                       _: 2
@@ -426,34 +629,34 @@ const _sfc_main = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
                   _: 1
                 }, 16, ["id", "modelValue", "onUpdate:modelValue", "name", "disabled", "class"])
               ], 2),
-              __props.label || !!slots.label || (__props.description || !!slots.description) ? (openBlock(), createBlock("div", {
+              __props.label || !!slots.label || (__props.description || !!slots.description) ? (vueExports.openBlock(), vueExports.createBlock("div", {
                 key: 0,
                 "data-slot": "wrapper",
-                class: ui.value.wrapper({ class: unref(uiProp)?.wrapper })
+                class: ui.value.wrapper({ class: vueExports.unref(uiProp)?.wrapper })
               }, [
-                __props.label || !!slots.label ? (openBlock(), createBlock(resolveDynamicComponent(!__props.variant || __props.variant === "list" ? unref(Label) : "p"), {
+                __props.label || !!slots.label ? (vueExports.openBlock(), vueExports.createBlock(vueExports.resolveDynamicComponent(!__props.variant || __props.variant === "list" ? vueExports.unref(Label_default) : "p"), {
                   key: 0,
-                  for: unref(id),
+                  for: vueExports.unref(id),
                   "data-slot": "label",
-                  class: ui.value.label({ class: unref(uiProp)?.label })
+                  class: ui.value.label({ class: vueExports.unref(uiProp)?.label })
                 }, {
-                  default: withCtx(() => [
-                    renderSlot(_ctx.$slots, "label", { label: __props.label }, () => [
-                      createTextVNode(toDisplayString(__props.label), 1)
+                  default: vueExports.withCtx(() => [
+                    vueExports.renderSlot(_ctx.$slots, "label", { label: __props.label }, () => [
+                      vueExports.createTextVNode(vueExports.toDisplayString(__props.label), 1)
                     ])
                   ]),
                   _: 3
-                }, 8, ["for", "class"])) : createCommentVNode("", true),
-                __props.description || !!slots.description ? (openBlock(), createBlock("p", {
+                }, 8, ["for", "class"])) : vueExports.createCommentVNode("", true),
+                __props.description || !!slots.description ? (vueExports.openBlock(), vueExports.createBlock("p", {
                   key: 1,
                   "data-slot": "description",
-                  class: ui.value.description({ class: unref(uiProp)?.description })
+                  class: ui.value.description({ class: vueExports.unref(uiProp)?.description })
                 }, [
-                  renderSlot(_ctx.$slots, "description", { description: __props.description }, () => [
-                    createTextVNode(toDisplayString(__props.description), 1)
+                  vueExports.renderSlot(_ctx.$slots, "description", { description: __props.description }, () => [
+                    vueExports.createTextVNode(vueExports.toDisplayString(__props.description), 1)
                   ])
-                ], 2)) : createCommentVNode("", true)
-              ], 2)) : createCommentVNode("", true)
+                ], 2)) : vueExports.createCommentVNode("", true)
+              ], 2)) : vueExports.createCommentVNode("", true)
             ];
           }
         }),
@@ -464,7 +667,7 @@ const _sfc_main = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
 });
 const _sfc_setup = _sfc_main.setup;
 _sfc_main.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
+  const ssrContext = vueExports.useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("../node_modules/.pnpm/@nuxt+ui@4.5.1_@tiptap+exte_d0faa0730db27155126639674f551f9c/node_modules/@nuxt/ui/dist/runtime/components/Checkbox.vue");
   return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
 };

@@ -2840,10 +2840,10 @@ function createNodeFetch() {
     return l$1(input, { ...nodeFetchOptions, ...init });
   };
 }
-const fetch = globalThis.fetch ? (...args) => globalThis.fetch(...args) : createNodeFetch();
+const fetch$1 = globalThis.fetch ? (...args) => globalThis.fetch(...args) : createNodeFetch();
 const Headers$1 = globalThis.Headers || s$2;
 const AbortController = globalThis.AbortController || i$1;
-const ofetch = createFetch({ fetch, Headers: Headers$1, AbortController });
+const ofetch = createFetch({ fetch: fetch$1, Headers: Headers$1, AbortController });
 const $fetch$1 = ofetch;
 
 function wrapToPromise(value) {
@@ -4660,7 +4660,7 @@ function _expandFromEnv(value) {
 const _inlineRuntimeConfig = {
   "app": {
     "baseURL": "/",
-    "buildId": "677c8fa9-d07c-4f87-85f1-f7dbb38d47e0",
+    "buildId": "08bac6e7-c148-44af-b204-fa3217669a41",
     "buildAssetsDir": "/_nuxt/",
     "cdnURL": ""
   },
@@ -12170,7 +12170,7 @@ const _lazy_B1Ju_X = () => import('../routes/api/services/_id_.mjs');
 const _lazy_2UnKno = () => import('../routes/api/index2.mjs');
 const _lazy_mF2wy7 = () => import('../routes/api/statistics/_...slug_.mjs');
 const _lazy_EC7gQN = () => import('../routes/api/index.get3.mjs');
-const _lazy_jDyhaD = () => import('../routes/renderer.mjs');
+const _lazy_jDyhaD = () => import('../routes/renderer.mjs').then(function (n) { return n.k; });
 
 const handlers = [
   { route: '/api/barbers/**:slug', handler: _lazy_b1TSfD, lazy: true, middleware: false, method: undefined },
@@ -12339,5 +12339,5 @@ function useNitroApp() {
 }
 runNitroPlugins(nitroApp);
 
-export { $fetch$1 as $, defineRenderHandler as A, publicAssetsURL as B, getQuery as C, destr as D, getRouteRules as E, joinURL as F, serialize$1 as G, isEqual as H, defuFn as I, getIconCSS as J, baseURL as K, defu$1 as L, executeAsync as M, object as N, union as O, string as P, number as Q, boolean as R, array as S, record as T, any as U, ZodIssueCode as Z, ensureAdminNetworkAccess as a, clearBarberToken as b, createError$1 as c, defineEventHandler as d, ensureDashboardAccess as e, findSupabaseUserByLogin as f, getRouteRulesForPath as g, clearAdminSession as h, backendRequest as i, joinHeaders as j, setBarberToken as k, listSupabaseUsers as l, getBarberToken as m, normalizeCookieHeader as n, getAdminSession as o, proxyBackend as p, setResponseStatus as q, readBody as r, setAdminSession as s, toDashboardUser as t, useNitroApp as u, readIncomingBody as v, buildAssetsURL as w, useRuntimeConfig as x, getResponseStatusText as y, getResponseStatus as z };;globalThis.__timing__.logEnd('Load chunks/_/nitro');
+export { $fetch$1 as $, getResponseStatus as A, defineRenderHandler as B, publicAssetsURL as C, getQuery as D, destr as E, getRouteRules as F, joinURL as G, serialize$1 as H, isEqual as I, defuFn as J, getIconCSS as K, baseURL as L, defu$1 as M, executeAsync as N, object as O, union as P, string as Q, number as R, boolean as S, array as T, record as U, any as V, ZodIssueCode as Z, ensureAdminNetworkAccess as a, clearBarberToken as b, createError$1 as c, defineEventHandler as d, ensureDashboardAccess as e, findSupabaseUserByLogin as f, getRouteRulesForPath as g, clearAdminSession as h, backendRequest as i, joinHeaders as j, setBarberToken as k, listSupabaseUsers as l, getBarberToken as m, normalizeCookieHeader as n, getAdminSession as o, proxyBackend as p, setResponseStatus as q, readBody as r, setAdminSession as s, toDashboardUser as t, useNitroApp as u, readIncomingBody as v, withLeadingSlash as w, useRuntimeConfig as x, buildAssetsURL as y, getResponseStatusText as z };;globalThis.__timing__.logEnd('Load chunks/_/nitro');
 //# sourceMappingURL=nitro.mjs.map

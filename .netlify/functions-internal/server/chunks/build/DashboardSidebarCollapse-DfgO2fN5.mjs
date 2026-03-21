@@ -1,9 +1,7 @@
-globalThis.__timing__.logStart('Load chunks/build/DashboardSidebarCollapse-DfgO2fN5');import { useId, toRef, computed, mergeProps, unref, useSlots, withCtx, renderSlot, openBlock, createBlock, createCommentVNode, createVNode, createTextVNode, toDisplayString, ref, useSSRContext } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/index.mjs';
-import { ssrRenderAttrs, ssrRenderSlot, ssrRenderClass, ssrRenderComponent, ssrInterpolate } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/server-renderer/index.mjs';
-import { h as useAppConfig, i as useComponentUI, t as tv, j as _sfc_main$f, r as reactiveOmit, k as useLocale, d as _sfc_main$a } from './server.mjs';
+globalThis.__timing__.logStart('Load chunks/build/DashboardSidebarCollapse-DfgO2fN5');import { h as useAppConfig, i as useComponentUI, t as tv, P as Primitive, j as _sfc_main$f, k as useForwardProps, r as reactiveOmit, l as useLocale, d as _sfc_main$a } from './server.mjs';
 import { u as useDashboard, a as useResizable, b as _sfc_main$2$1, c as _sfc_main$1$1 } from './Badge-CHxj5N7w.mjs';
-import { Primitive, useForwardProps } from 'file://D:/projects/bradobrey-dashboard/node_modules/reka-ui/dist/index.js';
 import { c as createReusableTemplate } from './index-qsfWWCYt.mjs';
+import { v as vueExports, h as ssrRenderAttrs_1, a as ssrRenderSlot_1, b as ssrRenderClass_1, s as ssrRenderComponent_1, c as ssrInterpolate_1 } from '../routes/renderer.mjs';
 
 const theme$2 = {
   "slots": {
@@ -39,43 +37,43 @@ const _sfc_main$2 = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
     const appConfig = useAppConfig();
     const uiProp = useComponentUI("dashboardPanel", props);
     const dashboardContext = useDashboard({ storageKey: "dashboard", unit: "%" });
-    const id = `${dashboardContext.storageKey}-panel-${props.id || useId()}`;
-    const { el, size, isDragging, onMouseDown, onTouchStart, onDoubleClick } = useResizable(id, toRef(() => ({ ...dashboardContext, ...props })));
-    const ui = computed(() => tv({ extend: tv(theme$2), ...appConfig.ui?.dashboardPanel || {} })({
+    const id = `${dashboardContext.storageKey}-panel-${props.id || vueExports.useId()}`;
+    const { el, size, isDragging, onMouseDown, onTouchStart, onDoubleClick } = useResizable(id, vueExports.toRef(() => ({ ...dashboardContext, ...props })));
+    const ui = vueExports.computed(() => tv({ extend: tv(theme$2), ...appConfig.ui?.dashboardPanel || {} })({
       size: !!size.value
     }));
     return (_ctx, _push, _parent, _attrs) => {
-      _push(`<!--[--><div${ssrRenderAttrs(mergeProps({
+      _push(`<!--[--><div${ssrRenderAttrs_1(vueExports.mergeProps({
         id,
         ref_key: "el",
         ref: el
       }, _ctx.$attrs, {
-        "data-dragging": unref(isDragging),
+        "data-dragging": vueExports.unref(isDragging),
         "data-slot": "root",
-        class: ui.value.root({ class: [unref(uiProp)?.root, props.class] }),
-        style: [unref(size) ? { "--width": `${unref(size)}${unref(dashboardContext).unit}` } : void 0]
+        class: ui.value.root({ class: [vueExports.unref(uiProp)?.root, props.class] }),
+        style: [vueExports.unref(size) ? { "--width": `${vueExports.unref(size)}${vueExports.unref(dashboardContext).unit}` } : void 0]
       }))}>`);
-      ssrRenderSlot(_ctx.$slots, "default", {}, () => {
-        ssrRenderSlot(_ctx.$slots, "header", {}, null, _push, _parent);
-        _push(`<div data-slot="body" class="${ssrRenderClass(ui.value.body({ class: unref(uiProp)?.body }))}">`);
-        ssrRenderSlot(_ctx.$slots, "body", {}, null, _push, _parent);
+      ssrRenderSlot_1(_ctx.$slots, "default", {}, () => {
+        ssrRenderSlot_1(_ctx.$slots, "header", {}, null, _push, _parent);
+        _push(`<div data-slot="body" class="${ssrRenderClass_1(ui.value.body({ class: vueExports.unref(uiProp)?.body }))}">`);
+        ssrRenderSlot_1(_ctx.$slots, "body", {}, null, _push, _parent);
         _push(`</div>`);
-        ssrRenderSlot(_ctx.$slots, "footer", {}, null, _push, _parent);
+        ssrRenderSlot_1(_ctx.$slots, "footer", {}, null, _push, _parent);
       }, _push, _parent);
       _push(`</div>`);
-      ssrRenderSlot(_ctx.$slots, "resize-handle", {
-        onMouseDown: unref(onMouseDown),
-        onTouchStart: unref(onTouchStart),
-        onDoubleClick: unref(onDoubleClick)
+      ssrRenderSlot_1(_ctx.$slots, "resize-handle", {
+        onMouseDown: vueExports.unref(onMouseDown),
+        onTouchStart: vueExports.unref(onTouchStart),
+        onDoubleClick: vueExports.unref(onDoubleClick)
       }, () => {
         if (__props.resizable) {
-          _push(ssrRenderComponent(_sfc_main$2$1, {
+          _push(ssrRenderComponent_1(_sfc_main$2$1, {
             "aria-controls": id,
             "data-slot": "handle",
-            class: ui.value.handle({ class: unref(uiProp)?.handle }),
-            onMousedown: unref(onMouseDown),
-            onTouchstart: unref(onTouchStart),
-            onDblclick: unref(onDoubleClick)
+            class: ui.value.handle({ class: vueExports.unref(uiProp)?.handle }),
+            onMousedown: vueExports.unref(onMouseDown),
+            onTouchstart: vueExports.unref(onTouchStart),
+            onDblclick: vueExports.unref(onDoubleClick)
           }, null, _parent));
         } else {
           _push(`<!---->`);
@@ -87,7 +85,7 @@ const _sfc_main$2 = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
 });
 const _sfc_setup$2 = _sfc_main$2.setup;
 _sfc_main$2.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
+  const ssrContext = vueExports.useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("../node_modules/.pnpm/@nuxt+ui@4.5.1_@tiptap+exte_d0faa0730db27155126639674f551f9c/node_modules/@nuxt/ui/dist/runtime/components/DashboardPanel.vue");
   return _sfc_setup$2 ? _sfc_setup$2(props, ctx) : void 0;
 };
@@ -126,23 +124,23 @@ const _sfc_main$1 = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
   },
   setup(__props) {
     const props = __props;
-    const slots = useSlots();
+    const slots = vueExports.useSlots();
     const appConfig = useAppConfig();
     const uiProp = useComponentUI("dashboardNavbar", props);
     const dashboardContext = useDashboard({});
     const [DefineToggleTemplate, ReuseToggleTemplate] = createReusableTemplate();
-    const ui = computed(() => tv({ extend: tv(theme$1), ...appConfig.ui?.dashboardNavbar || {} })());
+    const ui = vueExports.computed(() => tv({ extend: tv(theme$1), ...appConfig.ui?.dashboardNavbar || {} })());
     return (_ctx, _push, _parent, _attrs) => {
       _push(`<!--[-->`);
-      _push(ssrRenderComponent(unref(DefineToggleTemplate), null, {
-        default: withCtx((_, _push2, _parent2, _scopeId) => {
+      _push(ssrRenderComponent_1(vueExports.unref(DefineToggleTemplate), null, {
+        default: vueExports.withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
-            ssrRenderSlot(_ctx.$slots, "toggle", { ...unref(dashboardContext), ui: ui.value }, () => {
+            ssrRenderSlot_1(_ctx.$slots, "toggle", { ...vueExports.unref(dashboardContext), ui: ui.value }, () => {
               if (__props.toggle) {
-                _push2(ssrRenderComponent(_sfc_main$1$1, mergeProps(typeof __props.toggle === "object" ? __props.toggle : {}, {
+                _push2(ssrRenderComponent_1(_sfc_main$1$1, vueExports.mergeProps(typeof __props.toggle === "object" ? __props.toggle : {}, {
                   side: __props.toggleSide,
                   "data-slot": "toggle",
-                  class: ui.value.toggle({ class: unref(uiProp)?.toggle, toggleSide: __props.toggleSide })
+                  class: ui.value.toggle({ class: vueExports.unref(uiProp)?.toggle, toggleSide: __props.toggleSide })
                 }), null, _parent2, _scopeId));
               } else {
                 _push2(`<!---->`);
@@ -150,105 +148,105 @@ const _sfc_main$1 = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
             }, _push2, _parent2, _scopeId);
           } else {
             return [
-              renderSlot(_ctx.$slots, "toggle", { ...unref(dashboardContext), ui: ui.value }, () => [
-                __props.toggle ? (openBlock(), createBlock(_sfc_main$1$1, mergeProps({ key: 0 }, typeof __props.toggle === "object" ? __props.toggle : {}, {
+              vueExports.renderSlot(_ctx.$slots, "toggle", { ...vueExports.unref(dashboardContext), ui: ui.value }, () => [
+                __props.toggle ? (vueExports.openBlock(), vueExports.createBlock(_sfc_main$1$1, vueExports.mergeProps({ key: 0 }, typeof __props.toggle === "object" ? __props.toggle : {}, {
                   side: __props.toggleSide,
                   "data-slot": "toggle",
-                  class: ui.value.toggle({ class: unref(uiProp)?.toggle, toggleSide: __props.toggleSide })
-                }), null, 16, ["side", "class"])) : createCommentVNode("", true)
+                  class: ui.value.toggle({ class: vueExports.unref(uiProp)?.toggle, toggleSide: __props.toggleSide })
+                }), null, 16, ["side", "class"])) : vueExports.createCommentVNode("", true)
               ])
             ];
           }
         }),
         _: 3
       }, _parent));
-      _push(ssrRenderComponent(unref(Primitive), mergeProps({ as: __props.as }, _ctx.$attrs, {
+      _push(ssrRenderComponent_1(vueExports.unref(Primitive), vueExports.mergeProps({ as: __props.as }, _ctx.$attrs, {
         "data-slot": "root",
-        class: ui.value.root({ class: [unref(uiProp)?.root, props.class] })
+        class: ui.value.root({ class: [vueExports.unref(uiProp)?.root, props.class] })
       }), {
-        default: withCtx((_, _push2, _parent2, _scopeId) => {
+        default: vueExports.withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
-            _push2(`<div data-slot="left" class="${ssrRenderClass(ui.value.left({ class: unref(uiProp)?.left }))}"${_scopeId}>`);
+            _push2(`<div data-slot="left" class="${ssrRenderClass_1(ui.value.left({ class: vueExports.unref(uiProp)?.left }))}"${_scopeId}>`);
             if (__props.toggleSide === "left") {
-              _push2(ssrRenderComponent(unref(ReuseToggleTemplate), null, null, _parent2, _scopeId));
+              _push2(ssrRenderComponent_1(vueExports.unref(ReuseToggleTemplate), null, null, _parent2, _scopeId));
             } else {
               _push2(`<!---->`);
             }
-            ssrRenderSlot(_ctx.$slots, "left", unref(dashboardContext), () => {
-              ssrRenderSlot(_ctx.$slots, "leading", { ...unref(dashboardContext), ui: ui.value }, () => {
+            ssrRenderSlot_1(_ctx.$slots, "left", vueExports.unref(dashboardContext), () => {
+              ssrRenderSlot_1(_ctx.$slots, "leading", { ...vueExports.unref(dashboardContext), ui: ui.value }, () => {
                 if (__props.icon) {
-                  _push2(ssrRenderComponent(_sfc_main$f, {
+                  _push2(ssrRenderComponent_1(_sfc_main$f, {
                     name: __props.icon,
                     "data-slot": "icon",
-                    class: ui.value.icon({ class: unref(uiProp)?.icon })
+                    class: ui.value.icon({ class: vueExports.unref(uiProp)?.icon })
                   }, null, _parent2, _scopeId));
                 } else {
                   _push2(`<!---->`);
                 }
               }, _push2, _parent2, _scopeId);
-              _push2(`<h1 data-slot="title" class="${ssrRenderClass(ui.value.title({ class: unref(uiProp)?.title }))}"${_scopeId}>`);
-              ssrRenderSlot(_ctx.$slots, "title", {}, () => {
-                _push2(`${ssrInterpolate(__props.title)}`);
+              _push2(`<h1 data-slot="title" class="${ssrRenderClass_1(ui.value.title({ class: vueExports.unref(uiProp)?.title }))}"${_scopeId}>`);
+              ssrRenderSlot_1(_ctx.$slots, "title", {}, () => {
+                _push2(`${ssrInterpolate_1(__props.title)}`);
               }, _push2, _parent2, _scopeId);
               _push2(`</h1>`);
-              ssrRenderSlot(_ctx.$slots, "trailing", { ...unref(dashboardContext), ui: ui.value }, null, _push2, _parent2, _scopeId);
+              ssrRenderSlot_1(_ctx.$slots, "trailing", { ...vueExports.unref(dashboardContext), ui: ui.value }, null, _push2, _parent2, _scopeId);
             }, _push2, _parent2, _scopeId);
             _push2(`</div>`);
             if (!!slots.default) {
-              _push2(`<div data-slot="center" class="${ssrRenderClass(ui.value.center({ class: unref(uiProp)?.center }))}"${_scopeId}>`);
-              ssrRenderSlot(_ctx.$slots, "default", unref(dashboardContext), null, _push2, _parent2, _scopeId);
+              _push2(`<div data-slot="center" class="${ssrRenderClass_1(ui.value.center({ class: vueExports.unref(uiProp)?.center }))}"${_scopeId}>`);
+              ssrRenderSlot_1(_ctx.$slots, "default", vueExports.unref(dashboardContext), null, _push2, _parent2, _scopeId);
               _push2(`</div>`);
             } else {
               _push2(`<!---->`);
             }
-            _push2(`<div data-slot="right" class="${ssrRenderClass(ui.value.right({ class: unref(uiProp)?.right }))}"${_scopeId}>`);
-            ssrRenderSlot(_ctx.$slots, "right", unref(dashboardContext), null, _push2, _parent2, _scopeId);
+            _push2(`<div data-slot="right" class="${ssrRenderClass_1(ui.value.right({ class: vueExports.unref(uiProp)?.right }))}"${_scopeId}>`);
+            ssrRenderSlot_1(_ctx.$slots, "right", vueExports.unref(dashboardContext), null, _push2, _parent2, _scopeId);
             if (__props.toggleSide === "right") {
-              _push2(ssrRenderComponent(unref(ReuseToggleTemplate), null, null, _parent2, _scopeId));
+              _push2(ssrRenderComponent_1(vueExports.unref(ReuseToggleTemplate), null, null, _parent2, _scopeId));
             } else {
               _push2(`<!---->`);
             }
             _push2(`</div>`);
           } else {
             return [
-              createVNode("div", {
+              vueExports.createVNode("div", {
                 "data-slot": "left",
-                class: ui.value.left({ class: unref(uiProp)?.left })
+                class: ui.value.left({ class: vueExports.unref(uiProp)?.left })
               }, [
-                __props.toggleSide === "left" ? (openBlock(), createBlock(unref(ReuseToggleTemplate), { key: 0 })) : createCommentVNode("", true),
-                renderSlot(_ctx.$slots, "left", unref(dashboardContext), () => [
-                  renderSlot(_ctx.$slots, "leading", { ...unref(dashboardContext), ui: ui.value }, () => [
-                    __props.icon ? (openBlock(), createBlock(_sfc_main$f, {
+                __props.toggleSide === "left" ? (vueExports.openBlock(), vueExports.createBlock(vueExports.unref(ReuseToggleTemplate), { key: 0 })) : vueExports.createCommentVNode("", true),
+                vueExports.renderSlot(_ctx.$slots, "left", vueExports.unref(dashboardContext), () => [
+                  vueExports.renderSlot(_ctx.$slots, "leading", { ...vueExports.unref(dashboardContext), ui: ui.value }, () => [
+                    __props.icon ? (vueExports.openBlock(), vueExports.createBlock(_sfc_main$f, {
                       key: 0,
                       name: __props.icon,
                       "data-slot": "icon",
-                      class: ui.value.icon({ class: unref(uiProp)?.icon })
-                    }, null, 8, ["name", "class"])) : createCommentVNode("", true)
+                      class: ui.value.icon({ class: vueExports.unref(uiProp)?.icon })
+                    }, null, 8, ["name", "class"])) : vueExports.createCommentVNode("", true)
                   ]),
-                  createVNode("h1", {
+                  vueExports.createVNode("h1", {
                     "data-slot": "title",
-                    class: ui.value.title({ class: unref(uiProp)?.title })
+                    class: ui.value.title({ class: vueExports.unref(uiProp)?.title })
                   }, [
-                    renderSlot(_ctx.$slots, "title", {}, () => [
-                      createTextVNode(toDisplayString(__props.title), 1)
+                    vueExports.renderSlot(_ctx.$slots, "title", {}, () => [
+                      vueExports.createTextVNode(vueExports.toDisplayString(__props.title), 1)
                     ])
                   ], 2),
-                  renderSlot(_ctx.$slots, "trailing", { ...unref(dashboardContext), ui: ui.value })
+                  vueExports.renderSlot(_ctx.$slots, "trailing", { ...vueExports.unref(dashboardContext), ui: ui.value })
                 ])
               ], 2),
-              !!slots.default ? (openBlock(), createBlock("div", {
+              !!slots.default ? (vueExports.openBlock(), vueExports.createBlock("div", {
                 key: 0,
                 "data-slot": "center",
-                class: ui.value.center({ class: unref(uiProp)?.center })
+                class: ui.value.center({ class: vueExports.unref(uiProp)?.center })
               }, [
-                renderSlot(_ctx.$slots, "default", unref(dashboardContext))
-              ], 2)) : createCommentVNode("", true),
-              createVNode("div", {
+                vueExports.renderSlot(_ctx.$slots, "default", vueExports.unref(dashboardContext))
+              ], 2)) : vueExports.createCommentVNode("", true),
+              vueExports.createVNode("div", {
                 "data-slot": "right",
-                class: ui.value.right({ class: unref(uiProp)?.right })
+                class: ui.value.right({ class: vueExports.unref(uiProp)?.right })
               }, [
-                renderSlot(_ctx.$slots, "right", unref(dashboardContext)),
-                __props.toggleSide === "right" ? (openBlock(), createBlock(unref(ReuseToggleTemplate), { key: 0 })) : createCommentVNode("", true)
+                vueExports.renderSlot(_ctx.$slots, "right", vueExports.unref(dashboardContext)),
+                __props.toggleSide === "right" ? (vueExports.openBlock(), vueExports.createBlock(vueExports.unref(ReuseToggleTemplate), { key: 0 })) : vueExports.createCommentVNode("", true)
               ], 2)
             ];
           }
@@ -261,7 +259,7 @@ const _sfc_main$1 = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
 });
 const _sfc_setup$1 = _sfc_main$1.setup;
 _sfc_main$1.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
+  const ssrContext = vueExports.useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("../node_modules/.pnpm/@nuxt+ui@4.5.1_@tiptap+exte_d0faa0730db27155126639674f551f9c/node_modules/@nuxt/ui/dist/runtime/components/DashboardNavbar.vue");
   return _sfc_setup$1 ? _sfc_setup$1(props, ctx) : void 0;
 };
@@ -311,25 +309,25 @@ const _sfc_main = {
     const { t } = useLocale();
     const appConfig = useAppConfig();
     const uiProp = useComponentUI("dashboardSidebarCollapse", props);
-    const { sidebarCollapsed, collapseSidebar } = useDashboard({ sidebarCollapsed: ref(false), collapseSidebar: () => {
+    const { sidebarCollapsed, collapseSidebar } = useDashboard({ sidebarCollapsed: vueExports.ref(false), collapseSidebar: () => {
     } });
-    const ui = computed(() => tv({ extend: tv(theme), ...appConfig.ui?.dashboardSidebarCollapse || {} }));
+    const ui = vueExports.computed(() => tv({ extend: tv(theme), ...appConfig.ui?.dashboardSidebarCollapse || {} }));
     return (_ctx, _push, _parent, _attrs) => {
-      _push(ssrRenderComponent(_sfc_main$a, mergeProps({
-        ...unref(buttonProps),
-        "icon": props.icon || (unref(sidebarCollapsed) ? unref(appConfig).ui.icons.panelOpen : unref(appConfig).ui.icons.panelClose),
-        "aria-label": unref(sidebarCollapsed) ? unref(t)("dashboardSidebarCollapse.expand") : unref(t)("dashboardSidebarCollapse.collapse"),
+      _push(ssrRenderComponent_1(_sfc_main$a, vueExports.mergeProps({
+        ...vueExports.unref(buttonProps),
+        "icon": props.icon || (vueExports.unref(sidebarCollapsed) ? vueExports.unref(appConfig).ui.icons.panelOpen : vueExports.unref(appConfig).ui.icons.panelClose),
+        "aria-label": vueExports.unref(sidebarCollapsed) ? vueExports.unref(t)("dashboardSidebarCollapse.expand") : vueExports.unref(t)("dashboardSidebarCollapse.collapse"),
         ..._ctx.$attrs
       }, {
-        class: ui.value({ class: [unref(uiProp)?.base, props.class], side: props.side }),
-        onClick: ($event) => unref(collapseSidebar)?.(!unref(sidebarCollapsed))
+        class: ui.value({ class: [vueExports.unref(uiProp)?.base, props.class], side: props.side }),
+        onClick: ($event) => vueExports.unref(collapseSidebar)?.(!vueExports.unref(sidebarCollapsed))
       }, _attrs), null, _parent));
     };
   }
 };
 const _sfc_setup = _sfc_main.setup;
 _sfc_main.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
+  const ssrContext = vueExports.useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("../node_modules/.pnpm/@nuxt+ui@4.5.1_@tiptap+exte_d0faa0730db27155126639674f551f9c/node_modules/@nuxt/ui/dist/runtime/components/DashboardSidebarCollapse.vue");
   return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
 };

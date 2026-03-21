@@ -1,7 +1,41 @@
-globalThis.__timing__.logStart('Load chunks/build/FormField-CfjXEpv-');import { useSlots, computed, inject, ref, useId, watch, provide, unref, mergeProps, withCtx, renderSlot, createTextVNode, toDisplayString, createVNode, openBlock, createBlock, createCommentVNode, useSSRContext } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/index.mjs';
-import { ssrRenderComponent, ssrRenderClass, ssrRenderSlot, ssrInterpolate, ssrRenderAttr } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/server-renderer/index.mjs';
-import { Primitive, Label } from 'file://D:/projects/bradobrey-dashboard/node_modules/reka-ui/dist/index.js';
-import { h as useAppConfig, i as useComponentUI, t as tv, l as formErrorsInjectionKey, m as formInputsInjectionKey, o as inputIdInjectionKey, p as formFieldInjectionKey } from './server.mjs';
+globalThis.__timing__.logStart('Load chunks/build/FormField-CfjXEpv-');import { m as useForwardExpose, P as Primitive, h as useAppConfig, i as useComponentUI, t as tv, o as formErrorsInjectionKey, p as formInputsInjectionKey, q as inputIdInjectionKey, s as formFieldInjectionKey } from './server.mjs';
+import { v as vueExports, s as ssrRenderComponent_1, b as ssrRenderClass_1, a as ssrRenderSlot_1, c as ssrInterpolate_1, i as ssrRenderAttr_1 } from '../routes/renderer.mjs';
+
+//#region src/Label/Label.vue?vue&type=script&setup=true&lang.ts
+var Label_vue_vue_type_script_setup_true_lang_default = /* @__PURE__ */ vueExports.defineComponent({
+	__name: "Label",
+	props: {
+		for: {
+			type: String,
+			required: false
+		},
+		asChild: {
+			type: Boolean,
+			required: false
+		},
+		as: {
+			type: null,
+			required: false,
+			default: "label"
+		}
+	},
+	setup(__props) {
+		const props = __props;
+		useForwardExpose();
+		return (_ctx, _cache) => {
+			return vueExports.openBlock(), vueExports.createBlock(vueExports.unref(Primitive), vueExports.mergeProps(props, { onMousedown: _cache[0] || (_cache[0] = (event) => {
+				if (!event.defaultPrevented && event.detail > 1) event.preventDefault();
+			}) }), {
+				default: vueExports.withCtx(() => [vueExports.renderSlot(_ctx.$slots, "default")]),
+				_: 3
+			}, 16);
+		};
+	}
+});
+
+//#endregion
+//#region src/Label/Label.vue
+var Label_default = Label_vue_vue_type_script_setup_true_lang_default;
 
 const theme = {
   "slots": {
@@ -74,26 +108,26 @@ const _sfc_main = {
   },
   setup(__props) {
     const props = __props;
-    const slots = useSlots();
+    const slots = vueExports.useSlots();
     const appConfig = useAppConfig();
     const uiProp = useComponentUI("formField", props);
-    const ui = computed(() => tv({ extend: tv(theme), ...appConfig.ui?.formField || {} })({
+    const ui = vueExports.computed(() => tv({ extend: tv(theme), ...appConfig.ui?.formField || {} })({
       size: props.size,
       required: props.required,
       orientation: props.orientation
     }));
-    const formErrors = inject(formErrorsInjectionKey, null);
-    const error = computed(() => props.error || formErrors?.value?.find((error2) => error2.name === props.name || props.errorPattern && error2.name?.match(props.errorPattern))?.message);
-    const id = ref(useId());
+    const formErrors = vueExports.inject(formErrorsInjectionKey, null);
+    const error = vueExports.computed(() => props.error || formErrors?.value?.find((error2) => error2.name === props.name || props.errorPattern && error2.name?.match(props.errorPattern))?.message);
+    const id = vueExports.ref(vueExports.useId());
     const ariaId = id.value;
-    const formInputs = inject(formInputsInjectionKey, void 0);
-    watch(id, () => {
+    const formInputs = vueExports.inject(formInputsInjectionKey, void 0);
+    vueExports.watch(id, () => {
       if (formInputs && props.name) {
         formInputs.value[props.name] = { id: id.value, pattern: props.errorPattern };
       }
     }, { immediate: true });
-    provide(inputIdInjectionKey, id);
-    provide(formFieldInjectionKey, computed(() => ({
+    vueExports.provide(inputIdInjectionKey, id);
+    vueExports.provide(formFieldInjectionKey, vueExports.computed(() => ({
       error: error.value,
       name: props.name,
       size: props.size,
@@ -106,31 +140,31 @@ const _sfc_main = {
       ariaId
     })));
     return (_ctx, _push, _parent, _attrs) => {
-      _push(ssrRenderComponent(unref(Primitive), mergeProps({
+      _push(ssrRenderComponent_1(vueExports.unref(Primitive), vueExports.mergeProps({
         as: __props.as,
         "data-orientation": __props.orientation,
         "data-slot": "root",
-        class: ui.value.root({ class: [unref(uiProp)?.root, props.class] })
+        class: ui.value.root({ class: [vueExports.unref(uiProp)?.root, props.class] })
       }, _attrs), {
-        default: withCtx((_, _push2, _parent2, _scopeId) => {
+        default: vueExports.withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
-            _push2(`<div data-slot="wrapper" class="${ssrRenderClass(ui.value.wrapper({ class: unref(uiProp)?.wrapper }))}"${_scopeId}>`);
+            _push2(`<div data-slot="wrapper" class="${ssrRenderClass_1(ui.value.wrapper({ class: vueExports.unref(uiProp)?.wrapper }))}"${_scopeId}>`);
             if (__props.label || !!slots.label) {
-              _push2(`<div data-slot="labelWrapper" class="${ssrRenderClass(ui.value.labelWrapper({ class: unref(uiProp)?.labelWrapper }))}"${_scopeId}>`);
-              _push2(ssrRenderComponent(unref(Label), {
+              _push2(`<div data-slot="labelWrapper" class="${ssrRenderClass_1(ui.value.labelWrapper({ class: vueExports.unref(uiProp)?.labelWrapper }))}"${_scopeId}>`);
+              _push2(ssrRenderComponent_1(vueExports.unref(Label_default), {
                 for: id.value,
                 "data-slot": "label",
-                class: ui.value.label({ class: unref(uiProp)?.label })
+                class: ui.value.label({ class: vueExports.unref(uiProp)?.label })
               }, {
-                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                default: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                   if (_push3) {
-                    ssrRenderSlot(_ctx.$slots, "label", { label: __props.label }, () => {
-                      _push3(`${ssrInterpolate(__props.label)}`);
+                    ssrRenderSlot_1(_ctx.$slots, "label", { label: __props.label }, () => {
+                      _push3(`${ssrInterpolate_1(__props.label)}`);
                     }, _push3, _parent3, _scopeId2);
                   } else {
                     return [
-                      renderSlot(_ctx.$slots, "label", { label: __props.label }, () => [
-                        createTextVNode(toDisplayString(__props.label), 1)
+                      vueExports.renderSlot(_ctx.$slots, "label", { label: __props.label }, () => [
+                        vueExports.createTextVNode(vueExports.toDisplayString(__props.label), 1)
                       ])
                     ];
                   }
@@ -138,9 +172,9 @@ const _sfc_main = {
                 _: 3
               }, _parent2, _scopeId));
               if (__props.hint || !!slots.hint) {
-                _push2(`<span${ssrRenderAttr("id", `${unref(ariaId)}-hint`)} data-slot="hint" class="${ssrRenderClass(ui.value.hint({ class: unref(uiProp)?.hint }))}"${_scopeId}>`);
-                ssrRenderSlot(_ctx.$slots, "hint", { hint: __props.hint }, () => {
-                  _push2(`${ssrInterpolate(__props.hint)}`);
+                _push2(`<span${ssrRenderAttr_1("id", `${vueExports.unref(ariaId)}-hint`)} data-slot="hint" class="${ssrRenderClass_1(ui.value.hint({ class: vueExports.unref(uiProp)?.hint }))}"${_scopeId}>`);
+                ssrRenderSlot_1(_ctx.$slots, "hint", { hint: __props.hint }, () => {
+                  _push2(`${ssrInterpolate_1(__props.hint)}`);
                 }, _push2, _parent2, _scopeId);
                 _push2(`</span>`);
               } else {
@@ -151,26 +185,26 @@ const _sfc_main = {
               _push2(`<!---->`);
             }
             if (__props.description || !!slots.description) {
-              _push2(`<p${ssrRenderAttr("id", `${unref(ariaId)}-description`)} data-slot="description" class="${ssrRenderClass(ui.value.description({ class: unref(uiProp)?.description }))}"${_scopeId}>`);
-              ssrRenderSlot(_ctx.$slots, "description", { description: __props.description }, () => {
-                _push2(`${ssrInterpolate(__props.description)}`);
+              _push2(`<p${ssrRenderAttr_1("id", `${vueExports.unref(ariaId)}-description`)} data-slot="description" class="${ssrRenderClass_1(ui.value.description({ class: vueExports.unref(uiProp)?.description }))}"${_scopeId}>`);
+              ssrRenderSlot_1(_ctx.$slots, "description", { description: __props.description }, () => {
+                _push2(`${ssrInterpolate_1(__props.description)}`);
               }, _push2, _parent2, _scopeId);
               _push2(`</p>`);
             } else {
               _push2(`<!---->`);
             }
-            _push2(`</div><div class="${ssrRenderClass([(__props.label || !!slots.label || __props.description || !!slots.description) && ui.value.container({ class: unref(uiProp)?.container })])}"${_scopeId}>`);
-            ssrRenderSlot(_ctx.$slots, "default", { error: error.value }, null, _push2, _parent2, _scopeId);
+            _push2(`</div><div class="${ssrRenderClass_1([(__props.label || !!slots.label || __props.description || !!slots.description) && ui.value.container({ class: vueExports.unref(uiProp)?.container })])}"${_scopeId}>`);
+            ssrRenderSlot_1(_ctx.$slots, "default", { error: error.value }, null, _push2, _parent2, _scopeId);
             if (props.error !== false && (typeof error.value === "string" && error.value || !!slots.error)) {
-              _push2(`<div${ssrRenderAttr("id", `${unref(ariaId)}-error`)} data-slot="error" class="${ssrRenderClass(ui.value.error({ class: unref(uiProp)?.error }))}"${_scopeId}>`);
-              ssrRenderSlot(_ctx.$slots, "error", { error: error.value }, () => {
-                _push2(`${ssrInterpolate(error.value)}`);
+              _push2(`<div${ssrRenderAttr_1("id", `${vueExports.unref(ariaId)}-error`)} data-slot="error" class="${ssrRenderClass_1(ui.value.error({ class: vueExports.unref(uiProp)?.error }))}"${_scopeId}>`);
+              ssrRenderSlot_1(_ctx.$slots, "error", { error: error.value }, () => {
+                _push2(`${ssrInterpolate_1(error.value)}`);
               }, _push2, _parent2, _scopeId);
               _push2(`</div>`);
             } else if (__props.help || !!slots.help) {
-              _push2(`<div${ssrRenderAttr("id", `${unref(ariaId)}-help`)} data-slot="help" class="${ssrRenderClass(ui.value.help({ class: unref(uiProp)?.help }))}"${_scopeId}>`);
-              ssrRenderSlot(_ctx.$slots, "help", { help: __props.help }, () => {
-                _push2(`${ssrInterpolate(__props.help)}`);
+              _push2(`<div${ssrRenderAttr_1("id", `${vueExports.unref(ariaId)}-help`)} data-slot="help" class="${ssrRenderClass_1(ui.value.help({ class: vueExports.unref(uiProp)?.help }))}"${_scopeId}>`);
+              ssrRenderSlot_1(_ctx.$slots, "help", { help: __props.help }, () => {
+                _push2(`${ssrInterpolate_1(__props.help)}`);
               }, _push2, _parent2, _scopeId);
               _push2(`</div>`);
             } else {
@@ -179,72 +213,72 @@ const _sfc_main = {
             _push2(`</div>`);
           } else {
             return [
-              createVNode("div", {
+              vueExports.createVNode("div", {
                 "data-slot": "wrapper",
-                class: ui.value.wrapper({ class: unref(uiProp)?.wrapper })
+                class: ui.value.wrapper({ class: vueExports.unref(uiProp)?.wrapper })
               }, [
-                __props.label || !!slots.label ? (openBlock(), createBlock("div", {
+                __props.label || !!slots.label ? (vueExports.openBlock(), vueExports.createBlock("div", {
                   key: 0,
                   "data-slot": "labelWrapper",
-                  class: ui.value.labelWrapper({ class: unref(uiProp)?.labelWrapper })
+                  class: ui.value.labelWrapper({ class: vueExports.unref(uiProp)?.labelWrapper })
                 }, [
-                  createVNode(unref(Label), {
+                  vueExports.createVNode(vueExports.unref(Label_default), {
                     for: id.value,
                     "data-slot": "label",
-                    class: ui.value.label({ class: unref(uiProp)?.label })
+                    class: ui.value.label({ class: vueExports.unref(uiProp)?.label })
                   }, {
-                    default: withCtx(() => [
-                      renderSlot(_ctx.$slots, "label", { label: __props.label }, () => [
-                        createTextVNode(toDisplayString(__props.label), 1)
+                    default: vueExports.withCtx(() => [
+                      vueExports.renderSlot(_ctx.$slots, "label", { label: __props.label }, () => [
+                        vueExports.createTextVNode(vueExports.toDisplayString(__props.label), 1)
                       ])
                     ]),
                     _: 3
                   }, 8, ["for", "class"]),
-                  __props.hint || !!slots.hint ? (openBlock(), createBlock("span", {
+                  __props.hint || !!slots.hint ? (vueExports.openBlock(), vueExports.createBlock("span", {
                     key: 0,
-                    id: `${unref(ariaId)}-hint`,
+                    id: `${vueExports.unref(ariaId)}-hint`,
                     "data-slot": "hint",
-                    class: ui.value.hint({ class: unref(uiProp)?.hint })
+                    class: ui.value.hint({ class: vueExports.unref(uiProp)?.hint })
                   }, [
-                    renderSlot(_ctx.$slots, "hint", { hint: __props.hint }, () => [
-                      createTextVNode(toDisplayString(__props.hint), 1)
+                    vueExports.renderSlot(_ctx.$slots, "hint", { hint: __props.hint }, () => [
+                      vueExports.createTextVNode(vueExports.toDisplayString(__props.hint), 1)
                     ])
-                  ], 10, ["id"])) : createCommentVNode("", true)
-                ], 2)) : createCommentVNode("", true),
-                __props.description || !!slots.description ? (openBlock(), createBlock("p", {
+                  ], 10, ["id"])) : vueExports.createCommentVNode("", true)
+                ], 2)) : vueExports.createCommentVNode("", true),
+                __props.description || !!slots.description ? (vueExports.openBlock(), vueExports.createBlock("p", {
                   key: 1,
-                  id: `${unref(ariaId)}-description`,
+                  id: `${vueExports.unref(ariaId)}-description`,
                   "data-slot": "description",
-                  class: ui.value.description({ class: unref(uiProp)?.description })
+                  class: ui.value.description({ class: vueExports.unref(uiProp)?.description })
                 }, [
-                  renderSlot(_ctx.$slots, "description", { description: __props.description }, () => [
-                    createTextVNode(toDisplayString(__props.description), 1)
+                  vueExports.renderSlot(_ctx.$slots, "description", { description: __props.description }, () => [
+                    vueExports.createTextVNode(vueExports.toDisplayString(__props.description), 1)
                   ])
-                ], 10, ["id"])) : createCommentVNode("", true)
+                ], 10, ["id"])) : vueExports.createCommentVNode("", true)
               ], 2),
-              createVNode("div", {
-                class: [(__props.label || !!slots.label || __props.description || !!slots.description) && ui.value.container({ class: unref(uiProp)?.container })]
+              vueExports.createVNode("div", {
+                class: [(__props.label || !!slots.label || __props.description || !!slots.description) && ui.value.container({ class: vueExports.unref(uiProp)?.container })]
               }, [
-                renderSlot(_ctx.$slots, "default", { error: error.value }),
-                props.error !== false && (typeof error.value === "string" && error.value || !!slots.error) ? (openBlock(), createBlock("div", {
+                vueExports.renderSlot(_ctx.$slots, "default", { error: error.value }),
+                props.error !== false && (typeof error.value === "string" && error.value || !!slots.error) ? (vueExports.openBlock(), vueExports.createBlock("div", {
                   key: 0,
-                  id: `${unref(ariaId)}-error`,
+                  id: `${vueExports.unref(ariaId)}-error`,
                   "data-slot": "error",
-                  class: ui.value.error({ class: unref(uiProp)?.error })
+                  class: ui.value.error({ class: vueExports.unref(uiProp)?.error })
                 }, [
-                  renderSlot(_ctx.$slots, "error", { error: error.value }, () => [
-                    createTextVNode(toDisplayString(error.value), 1)
+                  vueExports.renderSlot(_ctx.$slots, "error", { error: error.value }, () => [
+                    vueExports.createTextVNode(vueExports.toDisplayString(error.value), 1)
                   ])
-                ], 10, ["id"])) : __props.help || !!slots.help ? (openBlock(), createBlock("div", {
+                ], 10, ["id"])) : __props.help || !!slots.help ? (vueExports.openBlock(), vueExports.createBlock("div", {
                   key: 1,
-                  id: `${unref(ariaId)}-help`,
+                  id: `${vueExports.unref(ariaId)}-help`,
                   "data-slot": "help",
-                  class: ui.value.help({ class: unref(uiProp)?.help })
+                  class: ui.value.help({ class: vueExports.unref(uiProp)?.help })
                 }, [
-                  renderSlot(_ctx.$slots, "help", { help: __props.help }, () => [
-                    createTextVNode(toDisplayString(__props.help), 1)
+                  vueExports.renderSlot(_ctx.$slots, "help", { help: __props.help }, () => [
+                    vueExports.createTextVNode(vueExports.toDisplayString(__props.help), 1)
                   ])
-                ], 10, ["id"])) : createCommentVNode("", true)
+                ], 10, ["id"])) : vueExports.createCommentVNode("", true)
               ], 2)
             ];
           }
@@ -256,10 +290,10 @@ const _sfc_main = {
 };
 const _sfc_setup = _sfc_main.setup;
 _sfc_main.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
+  const ssrContext = vueExports.useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("../node_modules/.pnpm/@nuxt+ui@4.5.1_@tiptap+exte_d0faa0730db27155126639674f551f9c/node_modules/@nuxt/ui/dist/runtime/components/FormField.vue");
   return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
 };
 
-export { _sfc_main as _ };;globalThis.__timing__.logEnd('Load chunks/build/FormField-CfjXEpv-');
+export { Label_default as L, _sfc_main as _ };;globalThis.__timing__.logEnd('Load chunks/build/FormField-CfjXEpv-');
 //# sourceMappingURL=FormField-CfjXEpv-.mjs.map

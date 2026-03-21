@@ -1,8 +1,6 @@
-globalThis.__timing__.logStart('Load chunks/build/Badge-CHxj5N7w');import { ref, computed, isRef, unref, watch, mergeProps, withCtx, renderSlot, useSlots, openBlock, createBlock, createCommentVNode, toDisplayString, customRef, useSSRContext } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/index.mjs';
-import { a as useStorage } from './index-qsfWWCYt.mjs';
-import { k as useLocale, r as reactiveOmit, h as useAppConfig, i as useComponentUI, t as tv, d as _sfc_main$a, s as useFieldGroup, v as useComponentIcons, j as _sfc_main$f, w as _sfc_main$d, G as klona, H as useNuxtApp, I as getRequestHeader, J as useRequestEvent, K as isEqual, L as setCookie, M as getCookie, N as deleteCookie } from './server.mjs';
-import { ssrRenderComponent, ssrRenderSlot, ssrRenderClass, ssrInterpolate } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/server-renderer/index.mjs';
-import { createContext, useForwardProps, Primitive } from 'file://D:/projects/bradobrey-dashboard/node_modules/reka-ui/dist/index.js';
+globalThis.__timing__.logStart('Load chunks/build/Badge-CHxj5N7w');import { a as useStorage } from './index-qsfWWCYt.mjs';
+import { F as createContext, l as useLocale, k as useForwardProps, r as reactiveOmit, h as useAppConfig, i as useComponentUI, t as tv, d as _sfc_main$a, P as Primitive, w as useFieldGroup, x as useComponentIcons, j as _sfc_main$f, y as _sfc_main$d, V as klona, W as useNuxtApp, X as getRequestHeader, Y as useRequestEvent, Z as isEqual, $ as setCookie, a0 as getCookie, a1 as deleteCookie } from './server.mjs';
+import { v as vueExports, s as ssrRenderComponent_1, a as ssrRenderSlot_1, b as ssrRenderClass_1, c as ssrInterpolate_1 } from '../routes/renderer.mjs';
 
 function parse(str, options) {
   if (typeof str !== "string") {
@@ -140,9 +138,9 @@ function writeServerCookie(event, name, value, opts = {}) {
   }
 }
 function cookieServerRef(name, value) {
-  const internalRef = ref(value);
+  const internalRef = vueExports.ref(value);
   const nuxtApp = useNuxtApp();
-  return customRef((track, trigger) => {
+  return vueExports.customRef((track, trigger) => {
     return {
       get() {
         track();
@@ -157,9 +155,9 @@ function cookieServerRef(name, value) {
     };
   });
 }
-function useResizable(key, options = {}, { collapsed = ref(false) } = {}) {
-  const el = ref(null);
-  const opts = computed(() => ({
+function useResizable(key, options = {}, { collapsed = vueExports.ref(false) } = {}) {
+  const el = vueExports.ref(null);
+  const opts = vueExports.computed(() => ({
     side: "left",
     minSize: 0,
     maxSize: 100,
@@ -170,35 +168,35 @@ function useResizable(key, options = {}, { collapsed = ref(false) } = {}) {
     collapsedSize: 0,
     resizable: true,
     unit: "%",
-    ...isRef(options) ? options.value : options
+    ...vueExports.isRef(options) ? options.value : options
   }));
   const { dir } = useLocale();
   const defaultStorageValue = {
     size: opts.value.defaultSize,
-    collapsed: unref(collapsed) ?? false
+    collapsed: vueExports.unref(collapsed) ?? false
   };
-  const storageData = opts.value.persistent && (opts.value.resizable || opts.value.collapsible) ? opts.value.storage === "cookie" ? useCookie(key, { default: () => defaultStorageValue }) : useStorage(key, defaultStorageValue) : ref(defaultStorageValue);
-  const isCollapsed = computed({
+  const storageData = opts.value.persistent && (opts.value.resizable || opts.value.collapsible) ? opts.value.storage === "cookie" ? useCookie(key, { default: () => defaultStorageValue }) : useStorage(key, defaultStorageValue) : vueExports.ref(defaultStorageValue);
+  const isCollapsed = vueExports.computed({
     get: () => storageData.value.collapsed,
     set: (value) => {
       if (!opts.value.collapsible) {
         return;
       }
-      if (isRef(collapsed)) {
+      if (vueExports.isRef(collapsed)) {
         collapsed.value = value;
       }
       storageData.value.collapsed = value;
     }
   });
-  const previousSize = ref(opts.value.defaultSize);
-  const size = computed({
+  const previousSize = vueExports.ref(opts.value.defaultSize);
+  const size = vueExports.computed({
     get: () => storageData.value.size,
     set: (value) => {
       storageData.value.size = value;
     }
   });
-  const currentSize = computed(() => isCollapsed.value ? opts.value.collapsedSize : size.value);
-  const isDragging = ref(false);
+  const currentSize = vueExports.computed(() => isCollapsed.value ? opts.value.collapsedSize : size.value);
+  const isDragging = vueExports.ref(false);
   const onMouseMove = (e, initialPos, initialSize) => {
     if (!el.value || !opts.value.resizable) {
       return;
@@ -332,11 +330,11 @@ function useResizable(key, options = {}, { collapsed = ref(false) } = {}) {
     }
     isCollapsed.value = newCollapsed;
   };
-  if (isRef(collapsed) && storageData.value.collapsed) {
+  if (vueExports.isRef(collapsed) && storageData.value.collapsed) {
     collapsed.value = storageData.value.collapsed;
   }
-  if (isRef(collapsed)) {
-    watch(collapsed, (value) => {
+  if (vueExports.isRef(collapsed)) {
+    vueExports.watch(collapsed, (value) => {
       if (!opts.value.collapsible) {
         return;
       }
@@ -372,19 +370,19 @@ const _sfc_main$2 = {
     const props = __props;
     const appConfig = useAppConfig();
     const uiProp = useComponentUI("dashboardResizeHandle", props);
-    const ui = computed(() => tv({ extend: tv(theme$2), ...appConfig.ui?.dashboardResizeHandle || {} }));
+    const ui = vueExports.computed(() => tv({ extend: tv(theme$2), ...appConfig.ui?.dashboardResizeHandle || {} }));
     return (_ctx, _push, _parent, _attrs) => {
-      _push(ssrRenderComponent(unref(Primitive), mergeProps({
+      _push(ssrRenderComponent_1(vueExports.unref(Primitive), vueExports.mergeProps({
         as: __props.as,
         role: "separator",
-        class: ui.value({ class: [unref(uiProp)?.base, props.class] })
+        class: ui.value({ class: [vueExports.unref(uiProp)?.base, props.class] })
       }, _attrs), {
-        default: withCtx((_, _push2, _parent2, _scopeId) => {
+        default: vueExports.withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
-            ssrRenderSlot(_ctx.$slots, "default", {}, null, _push2, _parent2, _scopeId);
+            ssrRenderSlot_1(_ctx.$slots, "default", {}, null, _push2, _parent2, _scopeId);
           } else {
             return [
-              renderSlot(_ctx.$slots, "default")
+              vueExports.renderSlot(_ctx.$slots, "default")
             ];
           }
         }),
@@ -395,7 +393,7 @@ const _sfc_main$2 = {
 };
 const _sfc_setup$2 = _sfc_main$2.setup;
 _sfc_main$2.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
+  const ssrContext = vueExports.useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("../node_modules/.pnpm/@nuxt+ui@4.5.1_@tiptap+exte_d0faa0730db27155126639674f551f9c/node_modules/@nuxt/ui/dist/runtime/components/DashboardResizeHandle.vue");
   return _sfc_setup$2 ? _sfc_setup$2(props, ctx) : void 0;
 };
@@ -445,25 +443,25 @@ const _sfc_main$1 = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
     const { t } = useLocale();
     const appConfig = useAppConfig();
     const uiProp = useComponentUI("dashboardSidebarToggle", props);
-    const { sidebarOpen, toggleSidebar } = useDashboard({ sidebarOpen: ref(false), toggleSidebar: () => {
+    const { sidebarOpen, toggleSidebar } = useDashboard({ sidebarOpen: vueExports.ref(false), toggleSidebar: () => {
     } });
-    const ui = computed(() => tv({ extend: tv(theme$1), ...appConfig.ui?.dashboardSidebarToggle || {} }));
+    const ui = vueExports.computed(() => tv({ extend: tv(theme$1), ...appConfig.ui?.dashboardSidebarToggle || {} }));
     return (_ctx, _push, _parent, _attrs) => {
-      _push(ssrRenderComponent(_sfc_main$a, mergeProps({
-        ...unref(buttonProps),
-        "icon": props.icon || (unref(sidebarOpen) ? unref(appConfig).ui.icons.close : unref(appConfig).ui.icons.menu),
-        "aria-label": unref(sidebarOpen) ? unref(t)("dashboardSidebarToggle.close") : unref(t)("dashboardSidebarToggle.open"),
+      _push(ssrRenderComponent_1(_sfc_main$a, vueExports.mergeProps({
+        ...vueExports.unref(buttonProps),
+        "icon": props.icon || (vueExports.unref(sidebarOpen) ? vueExports.unref(appConfig).ui.icons.close : vueExports.unref(appConfig).ui.icons.menu),
+        "aria-label": vueExports.unref(sidebarOpen) ? vueExports.unref(t)("dashboardSidebarToggle.close") : vueExports.unref(t)("dashboardSidebarToggle.open"),
         ..._ctx.$attrs
       }, {
-        class: ui.value({ class: [unref(uiProp)?.base, props.class], side: props.side }),
-        onClick: unref(toggleSidebar)
+        class: ui.value({ class: [vueExports.unref(uiProp)?.base, props.class], side: props.side }),
+        onClick: vueExports.unref(toggleSidebar)
       }, _attrs), null, _parent));
     };
   }
 });
 const _sfc_setup$1 = _sfc_main$1.setup;
 _sfc_main$1.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
+  const ssrContext = vueExports.useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("../node_modules/.pnpm/@nuxt+ui@4.5.1_@tiptap+exte_d0faa0730db27155126639674f551f9c/node_modules/@nuxt/ui/dist/runtime/components/DashboardSidebarToggle.vue");
   return _sfc_setup$1 ? _sfc_setup$1(props, ctx) : void 0;
 };
@@ -726,12 +724,12 @@ const _sfc_main = {
   },
   setup(__props) {
     const props = __props;
-    const slots = useSlots();
+    const slots = vueExports.useSlots();
     const appConfig = useAppConfig();
     const uiProp = useComponentUI("badge", props);
     const { orientation, size: fieldGroupSize } = useFieldGroup(props);
     const { isLeading, isTrailing, leadingIconName, trailingIconName } = useComponentIcons(props);
-    const ui = computed(() => tv({ extend: tv(theme), ...appConfig.ui?.badge || {} })({
+    const ui = vueExports.computed(() => tv({ extend: tv(theme), ...appConfig.ui?.badge || {} })({
       color: props.color,
       variant: props.variant,
       size: fieldGroupSize.value || props.size,
@@ -739,44 +737,44 @@ const _sfc_main = {
       fieldGroup: orientation.value
     }));
     return (_ctx, _push, _parent, _attrs) => {
-      _push(ssrRenderComponent(unref(Primitive), mergeProps({
+      _push(ssrRenderComponent_1(vueExports.unref(Primitive), vueExports.mergeProps({
         as: __props.as,
         "data-slot": "base",
-        class: ui.value.base({ class: [unref(uiProp)?.base, props.class] })
+        class: ui.value.base({ class: [vueExports.unref(uiProp)?.base, props.class] })
       }, _attrs), {
-        default: withCtx((_, _push2, _parent2, _scopeId) => {
+        default: vueExports.withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
-            ssrRenderSlot(_ctx.$slots, "leading", { ui: ui.value }, () => {
-              if (unref(isLeading) && unref(leadingIconName)) {
-                _push2(ssrRenderComponent(_sfc_main$f, {
-                  name: unref(leadingIconName),
+            ssrRenderSlot_1(_ctx.$slots, "leading", { ui: ui.value }, () => {
+              if (vueExports.unref(isLeading) && vueExports.unref(leadingIconName)) {
+                _push2(ssrRenderComponent_1(_sfc_main$f, {
+                  name: vueExports.unref(leadingIconName),
                   "data-slot": "leadingIcon",
-                  class: ui.value.leadingIcon({ class: unref(uiProp)?.leadingIcon })
+                  class: ui.value.leadingIcon({ class: vueExports.unref(uiProp)?.leadingIcon })
                 }, null, _parent2, _scopeId));
               } else if (!!__props.avatar) {
-                _push2(ssrRenderComponent(_sfc_main$d, mergeProps({
-                  size: unref(uiProp)?.leadingAvatarSize || ui.value.leadingAvatarSize()
+                _push2(ssrRenderComponent_1(_sfc_main$d, vueExports.mergeProps({
+                  size: vueExports.unref(uiProp)?.leadingAvatarSize || ui.value.leadingAvatarSize()
                 }, __props.avatar, {
                   "data-slot": "leadingAvatar",
-                  class: ui.value.leadingAvatar({ class: unref(uiProp)?.leadingAvatar })
+                  class: ui.value.leadingAvatar({ class: vueExports.unref(uiProp)?.leadingAvatar })
                 }), null, _parent2, _scopeId));
               } else {
                 _push2(`<!---->`);
               }
             }, _push2, _parent2, _scopeId);
-            ssrRenderSlot(_ctx.$slots, "default", { ui: ui.value }, () => {
+            ssrRenderSlot_1(_ctx.$slots, "default", { ui: ui.value }, () => {
               if (__props.label !== void 0 && __props.label !== null) {
-                _push2(`<span data-slot="label" class="${ssrRenderClass(ui.value.label({ class: unref(uiProp)?.label }))}"${_scopeId}>${ssrInterpolate(__props.label)}</span>`);
+                _push2(`<span data-slot="label" class="${ssrRenderClass_1(ui.value.label({ class: vueExports.unref(uiProp)?.label }))}"${_scopeId}>${ssrInterpolate_1(__props.label)}</span>`);
               } else {
                 _push2(`<!---->`);
               }
             }, _push2, _parent2, _scopeId);
-            ssrRenderSlot(_ctx.$slots, "trailing", { ui: ui.value }, () => {
-              if (unref(isTrailing) && unref(trailingIconName)) {
-                _push2(ssrRenderComponent(_sfc_main$f, {
-                  name: unref(trailingIconName),
+            ssrRenderSlot_1(_ctx.$slots, "trailing", { ui: ui.value }, () => {
+              if (vueExports.unref(isTrailing) && vueExports.unref(trailingIconName)) {
+                _push2(ssrRenderComponent_1(_sfc_main$f, {
+                  name: vueExports.unref(trailingIconName),
                   "data-slot": "trailingIcon",
-                  class: ui.value.trailingIcon({ class: unref(uiProp)?.trailingIcon })
+                  class: ui.value.trailingIcon({ class: vueExports.unref(uiProp)?.trailingIcon })
                 }, null, _parent2, _scopeId));
               } else {
                 _push2(`<!---->`);
@@ -784,34 +782,34 @@ const _sfc_main = {
             }, _push2, _parent2, _scopeId);
           } else {
             return [
-              renderSlot(_ctx.$slots, "leading", { ui: ui.value }, () => [
-                unref(isLeading) && unref(leadingIconName) ? (openBlock(), createBlock(_sfc_main$f, {
+              vueExports.renderSlot(_ctx.$slots, "leading", { ui: ui.value }, () => [
+                vueExports.unref(isLeading) && vueExports.unref(leadingIconName) ? (vueExports.openBlock(), vueExports.createBlock(_sfc_main$f, {
                   key: 0,
-                  name: unref(leadingIconName),
+                  name: vueExports.unref(leadingIconName),
                   "data-slot": "leadingIcon",
-                  class: ui.value.leadingIcon({ class: unref(uiProp)?.leadingIcon })
-                }, null, 8, ["name", "class"])) : !!__props.avatar ? (openBlock(), createBlock(_sfc_main$d, mergeProps({
+                  class: ui.value.leadingIcon({ class: vueExports.unref(uiProp)?.leadingIcon })
+                }, null, 8, ["name", "class"])) : !!__props.avatar ? (vueExports.openBlock(), vueExports.createBlock(_sfc_main$d, vueExports.mergeProps({
                   key: 1,
-                  size: unref(uiProp)?.leadingAvatarSize || ui.value.leadingAvatarSize()
+                  size: vueExports.unref(uiProp)?.leadingAvatarSize || ui.value.leadingAvatarSize()
                 }, __props.avatar, {
                   "data-slot": "leadingAvatar",
-                  class: ui.value.leadingAvatar({ class: unref(uiProp)?.leadingAvatar })
-                }), null, 16, ["size", "class"])) : createCommentVNode("", true)
+                  class: ui.value.leadingAvatar({ class: vueExports.unref(uiProp)?.leadingAvatar })
+                }), null, 16, ["size", "class"])) : vueExports.createCommentVNode("", true)
               ]),
-              renderSlot(_ctx.$slots, "default", { ui: ui.value }, () => [
-                __props.label !== void 0 && __props.label !== null ? (openBlock(), createBlock("span", {
+              vueExports.renderSlot(_ctx.$slots, "default", { ui: ui.value }, () => [
+                __props.label !== void 0 && __props.label !== null ? (vueExports.openBlock(), vueExports.createBlock("span", {
                   key: 0,
                   "data-slot": "label",
-                  class: ui.value.label({ class: unref(uiProp)?.label })
-                }, toDisplayString(__props.label), 3)) : createCommentVNode("", true)
+                  class: ui.value.label({ class: vueExports.unref(uiProp)?.label })
+                }, vueExports.toDisplayString(__props.label), 3)) : vueExports.createCommentVNode("", true)
               ]),
-              renderSlot(_ctx.$slots, "trailing", { ui: ui.value }, () => [
-                unref(isTrailing) && unref(trailingIconName) ? (openBlock(), createBlock(_sfc_main$f, {
+              vueExports.renderSlot(_ctx.$slots, "trailing", { ui: ui.value }, () => [
+                vueExports.unref(isTrailing) && vueExports.unref(trailingIconName) ? (vueExports.openBlock(), vueExports.createBlock(_sfc_main$f, {
                   key: 0,
-                  name: unref(trailingIconName),
+                  name: vueExports.unref(trailingIconName),
                   "data-slot": "trailingIcon",
-                  class: ui.value.trailingIcon({ class: unref(uiProp)?.trailingIcon })
-                }, null, 8, ["name", "class"])) : createCommentVNode("", true)
+                  class: ui.value.trailingIcon({ class: vueExports.unref(uiProp)?.trailingIcon })
+                }, null, 8, ["name", "class"])) : vueExports.createCommentVNode("", true)
               ])
             ];
           }
@@ -823,7 +821,7 @@ const _sfc_main = {
 };
 const _sfc_setup = _sfc_main.setup;
 _sfc_main.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
+  const ssrContext = vueExports.useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("../node_modules/.pnpm/@nuxt+ui@4.5.1_@tiptap+exte_d0faa0730db27155126639674f551f9c/node_modules/@nuxt/ui/dist/runtime/components/Badge.vue");
   return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
 };

@@ -1,8 +1,6 @@
-globalThis.__timing__.logStart('Load chunks/build/Textarea-DeTQfUen');import { useSlots, computed, useTemplateRef, watch, nextTick, unref, mergeProps, withCtx, createVNode, renderSlot, openBlock, createBlock, createCommentVNode, useSSRContext } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/index.mjs';
-import { ssrRenderComponent, ssrRenderAttrs, ssrInterpolate, ssrRenderSlot, ssrRenderClass } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/server-renderer/index.mjs';
-import { Primitive } from 'file://D:/projects/bradobrey-dashboard/node_modules/reka-ui/dist/index.js';
+globalThis.__timing__.logStart('Load chunks/build/Textarea-DeTQfUen');import { h as useAppConfig, i as useComponentUI, v as useFormField, x as useComponentIcons, t as tv, P as Primitive, j as _sfc_main$f, y as _sfc_main$d, z as looseToNumber } from './server.mjs';
 import { u as useVModel } from './index-qsfWWCYt.mjs';
-import { h as useAppConfig, i as useComponentUI, q as useFormField, v as useComponentIcons, t as tv, j as _sfc_main$f, w as _sfc_main$d, x as looseToNumber } from './server.mjs';
+import { v as vueExports, s as ssrRenderComponent_1, h as ssrRenderAttrs_1, c as ssrInterpolate_1, a as ssrRenderSlot_1, b as ssrRenderClass_1 } from '../routes/renderer.mjs';
 
 const theme = {
   "slots": {
@@ -334,13 +332,13 @@ const _sfc_main = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
   setup(__props, { expose: __expose, emit: __emit }) {
     const props = __props;
     const emits = __emit;
-    const slots = useSlots();
+    const slots = vueExports.useSlots();
     const modelValue = useVModel(props, "modelValue", emits, { defaultValue: props.defaultValue });
     const appConfig = useAppConfig();
     const uiProp = useComponentUI("textarea", props);
     const { emitFormFocus, emitFormBlur, emitFormInput, emitFormChange, size, color, id, name, highlight, disabled, ariaAttrs } = useFormField(props, { deferInputValidation: true });
     const { isLeading, isTrailing, leadingIconName, trailingIconName } = useComponentIcons(props);
-    const ui = computed(() => tv({ extend: tv(theme), ...appConfig.ui?.textarea || {} })({
+    const ui = vueExports.computed(() => tv({ extend: tv(theme), ...appConfig.ui?.textarea || {} })({
       color: color.value,
       variant: props.variant,
       size: size?.value,
@@ -351,7 +349,7 @@ const _sfc_main = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
       leading: isLeading.value || !!props.avatar || !!slots.leading,
       trailing: isTrailing.value || !!slots.trailing
     }));
-    const textareaRef = useTemplateRef("textareaRef");
+    const textareaRef = vueExports.useTemplateRef("textareaRef");
     function updateInput(value) {
       if (props.modelModifiers?.trim && (typeof value === "string" || value === null || value === void 0)) {
         value = value?.trim() ?? null;
@@ -407,50 +405,50 @@ const _sfc_main = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
         textareaRef.value.style.overflow = overflow;
       }
     }
-    watch(modelValue, () => {
-      nextTick(autoResize);
+    vueExports.watch(modelValue, () => {
+      vueExports.nextTick(autoResize);
     });
     __expose({
       textareaRef
     });
     return (_ctx, _push, _parent, _attrs) => {
       let _temp0;
-      _push(ssrRenderComponent(unref(Primitive), mergeProps({
+      _push(ssrRenderComponent_1(vueExports.unref(Primitive), vueExports.mergeProps({
         as: __props.as,
         "data-slot": "root",
-        class: ui.value.root({ class: [unref(uiProp)?.root, props.class] })
+        class: ui.value.root({ class: [vueExports.unref(uiProp)?.root, props.class] })
       }, _attrs), {
-        default: withCtx((_, _push2, _parent2, _scopeId) => {
+        default: vueExports.withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
-            _push2(`<textarea${ssrRenderAttrs(_temp0 = mergeProps({
-              id: unref(id),
+            _push2(`<textarea${ssrRenderAttrs_1(_temp0 = vueExports.mergeProps({
+              id: vueExports.unref(id),
               ref_key: "textareaRef",
               ref: textareaRef,
-              value: unref(modelValue),
-              name: unref(name),
+              value: vueExports.unref(modelValue),
+              name: vueExports.unref(name),
               rows: __props.rows,
               placeholder: __props.placeholder,
               "data-slot": "base",
-              class: ui.value.base({ class: unref(uiProp)?.base }),
-              disabled: unref(disabled),
+              class: ui.value.base({ class: vueExports.unref(uiProp)?.base }),
+              disabled: vueExports.unref(disabled),
               required: __props.required
-            }, { ..._ctx.$attrs, ...unref(ariaAttrs) }), "textarea")}${_scopeId}>${ssrInterpolate("value" in _temp0 ? _temp0.value : "")}</textarea>`);
-            ssrRenderSlot(_ctx.$slots, "default", { ui: ui.value }, null, _push2, _parent2, _scopeId);
-            if (unref(isLeading) || !!__props.avatar || !!slots.leading) {
-              _push2(`<span data-slot="leading" class="${ssrRenderClass(ui.value.leading({ class: unref(uiProp)?.leading }))}"${_scopeId}>`);
-              ssrRenderSlot(_ctx.$slots, "leading", { ui: ui.value }, () => {
-                if (unref(isLeading) && unref(leadingIconName)) {
-                  _push2(ssrRenderComponent(_sfc_main$f, {
-                    name: unref(leadingIconName),
+            }, { ..._ctx.$attrs, ...vueExports.unref(ariaAttrs) }), "textarea")}${_scopeId}>${ssrInterpolate_1("value" in _temp0 ? _temp0.value : "")}</textarea>`);
+            ssrRenderSlot_1(_ctx.$slots, "default", { ui: ui.value }, null, _push2, _parent2, _scopeId);
+            if (vueExports.unref(isLeading) || !!__props.avatar || !!slots.leading) {
+              _push2(`<span data-slot="leading" class="${ssrRenderClass_1(ui.value.leading({ class: vueExports.unref(uiProp)?.leading }))}"${_scopeId}>`);
+              ssrRenderSlot_1(_ctx.$slots, "leading", { ui: ui.value }, () => {
+                if (vueExports.unref(isLeading) && vueExports.unref(leadingIconName)) {
+                  _push2(ssrRenderComponent_1(_sfc_main$f, {
+                    name: vueExports.unref(leadingIconName),
                     "data-slot": "leadingIcon",
-                    class: ui.value.leadingIcon({ class: unref(uiProp)?.leadingIcon })
+                    class: ui.value.leadingIcon({ class: vueExports.unref(uiProp)?.leadingIcon })
                   }, null, _parent2, _scopeId));
                 } else if (!!__props.avatar) {
-                  _push2(ssrRenderComponent(_sfc_main$d, mergeProps({
-                    size: unref(uiProp)?.leadingAvatarSize || ui.value.leadingAvatarSize()
+                  _push2(ssrRenderComponent_1(_sfc_main$d, vueExports.mergeProps({
+                    size: vueExports.unref(uiProp)?.leadingAvatarSize || ui.value.leadingAvatarSize()
                   }, __props.avatar, {
                     "data-slot": "leadingAvatar",
-                    class: ui.value.leadingAvatar({ class: unref(uiProp)?.leadingAvatar })
+                    class: ui.value.leadingAvatar({ class: vueExports.unref(uiProp)?.leadingAvatar })
                   }), null, _parent2, _scopeId));
                 } else {
                   _push2(`<!---->`);
@@ -460,14 +458,14 @@ const _sfc_main = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
             } else {
               _push2(`<!---->`);
             }
-            if (unref(isTrailing) || !!slots.trailing) {
-              _push2(`<span data-slot="trailing" class="${ssrRenderClass(ui.value.trailing({ class: unref(uiProp)?.trailing }))}"${_scopeId}>`);
-              ssrRenderSlot(_ctx.$slots, "trailing", { ui: ui.value }, () => {
-                if (unref(trailingIconName)) {
-                  _push2(ssrRenderComponent(_sfc_main$f, {
-                    name: unref(trailingIconName),
+            if (vueExports.unref(isTrailing) || !!slots.trailing) {
+              _push2(`<span data-slot="trailing" class="${ssrRenderClass_1(ui.value.trailing({ class: vueExports.unref(uiProp)?.trailing }))}"${_scopeId}>`);
+              ssrRenderSlot_1(_ctx.$slots, "trailing", { ui: ui.value }, () => {
+                if (vueExports.unref(trailingIconName)) {
+                  _push2(ssrRenderComponent_1(_sfc_main$f, {
+                    name: vueExports.unref(trailingIconName),
                     "data-slot": "trailingIcon",
-                    class: ui.value.trailingIcon({ class: unref(uiProp)?.trailingIcon })
+                    class: ui.value.trailingIcon({ class: vueExports.unref(uiProp)?.trailingIcon })
                   }, null, _parent2, _scopeId));
                 } else {
                   _push2(`<!---->`);
@@ -479,59 +477,59 @@ const _sfc_main = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
             }
           } else {
             return [
-              createVNode("textarea", mergeProps({
-                id: unref(id),
+              vueExports.createVNode("textarea", vueExports.mergeProps({
+                id: vueExports.unref(id),
                 ref_key: "textareaRef",
                 ref: textareaRef,
-                value: unref(modelValue),
-                name: unref(name),
+                value: vueExports.unref(modelValue),
+                name: vueExports.unref(name),
                 rows: __props.rows,
                 placeholder: __props.placeholder,
                 "data-slot": "base",
-                class: ui.value.base({ class: unref(uiProp)?.base }),
-                disabled: unref(disabled),
+                class: ui.value.base({ class: vueExports.unref(uiProp)?.base }),
+                disabled: vueExports.unref(disabled),
                 required: __props.required
-              }, { ..._ctx.$attrs, ...unref(ariaAttrs) }, {
+              }, { ..._ctx.$attrs, ...vueExports.unref(ariaAttrs) }, {
                 onInput,
                 onBlur,
                 onChange,
-                onFocus: unref(emitFormFocus)
+                onFocus: vueExports.unref(emitFormFocus)
               }), null, 16, ["id", "value", "name", "rows", "placeholder", "disabled", "required", "onFocus"]),
-              renderSlot(_ctx.$slots, "default", { ui: ui.value }),
-              unref(isLeading) || !!__props.avatar || !!slots.leading ? (openBlock(), createBlock("span", {
+              vueExports.renderSlot(_ctx.$slots, "default", { ui: ui.value }),
+              vueExports.unref(isLeading) || !!__props.avatar || !!slots.leading ? (vueExports.openBlock(), vueExports.createBlock("span", {
                 key: 0,
                 "data-slot": "leading",
-                class: ui.value.leading({ class: unref(uiProp)?.leading })
+                class: ui.value.leading({ class: vueExports.unref(uiProp)?.leading })
               }, [
-                renderSlot(_ctx.$slots, "leading", { ui: ui.value }, () => [
-                  unref(isLeading) && unref(leadingIconName) ? (openBlock(), createBlock(_sfc_main$f, {
+                vueExports.renderSlot(_ctx.$slots, "leading", { ui: ui.value }, () => [
+                  vueExports.unref(isLeading) && vueExports.unref(leadingIconName) ? (vueExports.openBlock(), vueExports.createBlock(_sfc_main$f, {
                     key: 0,
-                    name: unref(leadingIconName),
+                    name: vueExports.unref(leadingIconName),
                     "data-slot": "leadingIcon",
-                    class: ui.value.leadingIcon({ class: unref(uiProp)?.leadingIcon })
-                  }, null, 8, ["name", "class"])) : !!__props.avatar ? (openBlock(), createBlock(_sfc_main$d, mergeProps({
+                    class: ui.value.leadingIcon({ class: vueExports.unref(uiProp)?.leadingIcon })
+                  }, null, 8, ["name", "class"])) : !!__props.avatar ? (vueExports.openBlock(), vueExports.createBlock(_sfc_main$d, vueExports.mergeProps({
                     key: 1,
-                    size: unref(uiProp)?.leadingAvatarSize || ui.value.leadingAvatarSize()
+                    size: vueExports.unref(uiProp)?.leadingAvatarSize || ui.value.leadingAvatarSize()
                   }, __props.avatar, {
                     "data-slot": "leadingAvatar",
-                    class: ui.value.leadingAvatar({ class: unref(uiProp)?.leadingAvatar })
-                  }), null, 16, ["size", "class"])) : createCommentVNode("", true)
+                    class: ui.value.leadingAvatar({ class: vueExports.unref(uiProp)?.leadingAvatar })
+                  }), null, 16, ["size", "class"])) : vueExports.createCommentVNode("", true)
                 ])
-              ], 2)) : createCommentVNode("", true),
-              unref(isTrailing) || !!slots.trailing ? (openBlock(), createBlock("span", {
+              ], 2)) : vueExports.createCommentVNode("", true),
+              vueExports.unref(isTrailing) || !!slots.trailing ? (vueExports.openBlock(), vueExports.createBlock("span", {
                 key: 1,
                 "data-slot": "trailing",
-                class: ui.value.trailing({ class: unref(uiProp)?.trailing })
+                class: ui.value.trailing({ class: vueExports.unref(uiProp)?.trailing })
               }, [
-                renderSlot(_ctx.$slots, "trailing", { ui: ui.value }, () => [
-                  unref(trailingIconName) ? (openBlock(), createBlock(_sfc_main$f, {
+                vueExports.renderSlot(_ctx.$slots, "trailing", { ui: ui.value }, () => [
+                  vueExports.unref(trailingIconName) ? (vueExports.openBlock(), vueExports.createBlock(_sfc_main$f, {
                     key: 0,
-                    name: unref(trailingIconName),
+                    name: vueExports.unref(trailingIconName),
                     "data-slot": "trailingIcon",
-                    class: ui.value.trailingIcon({ class: unref(uiProp)?.trailingIcon })
-                  }, null, 8, ["name", "class"])) : createCommentVNode("", true)
+                    class: ui.value.trailingIcon({ class: vueExports.unref(uiProp)?.trailingIcon })
+                  }, null, 8, ["name", "class"])) : vueExports.createCommentVNode("", true)
                 ])
-              ], 2)) : createCommentVNode("", true)
+              ], 2)) : vueExports.createCommentVNode("", true)
             ];
           }
         }),
@@ -542,7 +540,7 @@ const _sfc_main = /* @__PURE__ */ Object.assign({ inheritAttrs: false }, {
 });
 const _sfc_setup = _sfc_main.setup;
 _sfc_main.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
+  const ssrContext = vueExports.useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("../node_modules/.pnpm/@nuxt+ui@4.5.1_@tiptap+exte_d0faa0730db27155126639674f551f9c/node_modules/@nuxt/ui/dist/runtime/components/Textarea.vue");
   return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
 };

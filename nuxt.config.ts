@@ -113,11 +113,52 @@ export default defineNuxtConfig({
     preset: nitroPreset || undefined,
     externals: {
       trace: false,
+      // Inline all SSR/runtime deps so Netlify functions don't emit absolute file://node_modules paths
       inline: [
-        // Inline deps to avoid absolute file://node_modules paths in Netlify functions
         'zod',
         '@iconify/utils',
-        'consola'
+        'consola',
+        // Vue & rendering
+        'vue',
+        'vue/server-renderer',
+        'vue-bundle-renderer',
+        'pinia',
+        'vue-router',
+        // Head & devalue
+        'unhead',
+        'devalue',
+        // UI libs
+        '@nuxt/ui',
+        'reka-ui',
+        'tailwindcss',
+        'tailwind-variants',
+        '@iconify/vue',
+        '@tanstack/vue-table',
+        '@tanstack/vue-virtual',
+        '@tanstack/table-core',
+        '@tanstack/virtual-core',
+        'vaul-vue',
+        // Utils
+        '@vue/shared',
+        '@vue/runtime-dom',
+        '@vue/compiler-dom',
+        '@vue/server-renderer',
+        'perfect-debounce',
+        '@vueuse/integrations',
+        'bcryptjs',
+        'tailwind-merge',
+        'aria-hidden',
+        '@floating-ui/vue',
+        '@floating-ui/dom',
+        '@floating-ui/utils',
+        '@floating-ui/core',
+        'fuse.js',
+        'entities',
+        'estree-walker',
+        'source-map-js',
+        '@vue/runtime-core',
+        '@vue/compiler-ssr',
+        '@vue/reactivity'
       ]
     }
   },

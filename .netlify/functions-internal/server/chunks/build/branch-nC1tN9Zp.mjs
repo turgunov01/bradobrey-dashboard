@@ -1,4 +1,4 @@
-globalThis.__timing__.logStart('Load chunks/build/branch-nC1tN9Zp');import { defineStore } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/pinia@3.0.4_typescript@5.9.3_vue@3.5.30_typescript@5.9.3_/node_modules/pinia/dist/pinia.prod.cjs';
+globalThis.__timing__.logStart('Load chunks/build/branch-nC1tN9Zp');import { at as pinia_prod } from './server.mjs';
 import { c as branchSchema } from '../_/index.mjs';
 import { u as useKioskApi } from './useKioskApi-l3XfHmhL.mjs';
 
@@ -35,7 +35,7 @@ function extractBranchItems(response) {
   }
   return [];
 }
-const useBranchStore = defineStore("branch", {
+const useBranchStore = pinia_prod.defineStore("branch", {
   actions: {
     async ensureLoaded() {
       if (this.loaded) {

@@ -6,15 +6,13 @@ import { _ as _sfc_main$4 } from './Input-DcPP1NGC.mjs';
 import { _ as _sfc_main$5 } from './SelectMenu-9fuPONhl.mjs';
 import { _ as __nuxt_component_9 } from './EmptyState-Db7zOMDl.mjs';
 import { _ as __nuxt_component_5 } from './MetricCard-CDSLylAv.mjs';
-import { defineComponent, ref, withAsyncContext, computed, watch, mergeProps, withCtx, unref, createVNode, isRef, openBlock, createBlock, createCommentVNode, createTextVNode, toDisplayString, Fragment, renderList, useSSRContext } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/index.mjs';
-import { ssrRenderComponent, ssrInterpolate, ssrRenderList, ssrRenderAttr, ssrRenderStyle } from 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/vue@3.5.30_typescript@5.9.3/node_modules/vue/server-renderer/index.mjs';
 import { b as formatCount, a as formatMoney, c as formatPercent } from './format-DDcTL-sj.mjs';
 import { f as formatPaymentMethod, b as formatScopeLabel } from './display-CyQec-Wd.mjs';
 import { f as flattenServicesPayload } from './services-D0S0WuHG.mjs';
 import { u as useBranchStore } from './branch-nC1tN9Zp.mjs';
 import { u as useHistoryApi } from './useHistoryApi-XZUYGosn.mjs';
 import { u as useKioskApi } from './useKioskApi-l3XfHmhL.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/reka-ui/dist/index.js';
+import { v as vueExports, s as ssrRenderComponent_1, c as ssrInterpolate_1, d as ssrRenderList_1, i as ssrRenderAttr_1, g as ssrRenderStyle_1 } from '../routes/renderer.mjs';
 import './index-qsfWWCYt.mjs';
 import '../_/nitro.mjs';
 import 'node:crypto';
@@ -27,18 +25,18 @@ import 'node:path';
 import 'node:process';
 import 'node:tty';
 import 'node:fs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/pinia@3.0.4_typescript@5.9.3_vue@3.5.30_typescript@5.9.3_/node_modules/pinia/dist/pinia.prod.cjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/vue-router/vue-router.node.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/perfect-debounce@2.1.0/node_modules/perfect-debounce/dist/index.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/@vue/shared/dist/shared.cjs.prod.js';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/tailwindcss@4.2.1/node_modules/tailwindcss/dist/colors.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/@iconify/vue/dist/iconify.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/tailwind-variants/dist/index.js';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/unhead@2.1.12/node_modules/unhead/dist/plugins.mjs';
-import 'file://D:/projects/bradobrey-dashboard/node_modules/.pnpm/unhead@2.1.12/node_modules/unhead/dist/utils.mjs';
+import '../_/shared.cjs.prod.mjs';
+import '../virtual/_commonjsHelpers.mjs';
+import '../_/FocusScope.mjs';
+import '../_/PopperArrow.mjs';
+import '../_/utils.mjs';
+import '../_/VisuallyHiddenInput.mjs';
+import '../_/useId.mjs';
+import '../_/index2.mjs';
 import '../_/index.mjs';
+import 'node:stream';
 
-const _sfc_main = /* @__PURE__ */ defineComponent({
+const _sfc_main = /* @__PURE__ */ vueExports.defineComponent({
   __name: "statistics",
   __ssrInlineRender: true,
   async setup(__props) {
@@ -174,10 +172,10 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     const historyApi = useHistoryApi();
     const kioskApi = useKioskApi();
     const uiStore = useUiStore();
-    const scope = ref("global");
-    const selectedBarberId = ref("");
-    [__temp, __restore] = withAsyncContext(() => branchStore.ensureLoaded()), await __temp, __restore();
-    const { data, pending, refresh } = ([__temp, __restore] = withAsyncContext(async () => useAsyncData("statistics-dashboard-rich", async () => {
+    const scope = vueExports.ref("global");
+    const selectedBarberId = vueExports.ref("");
+    [__temp, __restore] = vueExports.withAsyncContext(() => branchStore.ensureLoaded()), await __temp, __restore();
+    const { data, pending, refresh } = ([__temp, __restore] = vueExports.withAsyncContext(async () => useAsyncData("statistics-dashboard-rich", async () => {
       const [historyResult, servicesResult, barbersResult] = await Promise.allSettled([
         historyApi.list(),
         kioskApi.services({ active: true, grouped: true }),
@@ -189,17 +187,17 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         services: servicesResult.status === "fulfilled" ? flattenServicesPayload(servicesResult.value) : []
       };
     })), __temp = await __temp, __restore(), __temp);
-    const serviceMap = computed(
+    const serviceMap = vueExports.computed(
       () => new Map(
         (data.value?.services || []).map((service) => [String(service.id), service])
       )
     );
-    const branchMap = computed(
+    const branchMap = vueExports.computed(
       () => new Map(
         branchStore.branches.map((branch) => [branch.id, branch])
       )
     );
-    const normalizedHistory = computed(
+    const normalizedHistory = vueExports.computed(
       () => (data.value?.historyItems || []).map((item, index) => {
         const createdAt = normalizeText(item.created_at || item.createdAt);
         const finishedAt = normalizeText(item.finished_at || item.completed_at || item.finishedAt || item.completedAt);
@@ -254,7 +252,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         };
       }).filter((item) => Boolean(item.id))
     );
-    const barberOptions = computed(() => {
+    const barberOptions = vueExports.computed(() => {
       const options = /* @__PURE__ */ new Map();
       for (const account of data.value?.barberAccounts || []) {
         const branchId = normalizeText(account.branch_id);
@@ -285,7 +283,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       }
       return [...options.values()].sort((left, right) => left.label.localeCompare(right.label, "ru"));
     });
-    watch(
+    vueExports.watch(
       () => barberOptions.value.map((option) => option.value),
       (ids) => {
         if (!ids.length) {
@@ -298,10 +296,10 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       },
       { immediate: true }
     );
-    const selectedBarber = computed(
+    const selectedBarber = vueExports.computed(
       () => barberOptions.value.find((option) => option.value === selectedBarberId.value) || null
     );
-    const selectedRange = computed(() => {
+    const selectedRange = vueExports.computed(() => {
       const start = parseRangeDate(uiStore.statisticsRange.start);
       const end = parseRangeDate(uiStore.statisticsRange.end);
       if (!start || !end) {
@@ -318,19 +316,19 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         start: end.getTime()
       };
     });
-    const selectedPeriodDays = computed(() => {
+    const selectedPeriodDays = vueExports.computed(() => {
       if (!selectedRange.value) {
         return 0;
       }
       return Math.max(1, Math.round((selectedRange.value.end - selectedRange.value.start) / 864e5));
     });
-    const needsBranchSelection = computed(
+    const needsBranchSelection = vueExports.computed(
       () => scope.value === "branch" && !branchStore.activeBranchId
     );
-    const needsBarberSelection = computed(
+    const needsBarberSelection = vueExports.computed(
       () => scope.value === "barber" && !selectedBarberId.value
     );
-    const scopeHistory = computed(() => {
+    const scopeHistory = vueExports.computed(() => {
       return normalizedHistory.value.filter((item) => {
         if (scope.value === "branch") {
           return Boolean(branchStore.activeBranchId) && item.branchId === branchStore.activeBranchId;
@@ -341,7 +339,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         return true;
       });
     });
-    const filteredHistory = computed(() => {
+    const filteredHistory = vueExports.computed(() => {
       if (!selectedRange.value) {
         return [];
       }
@@ -352,10 +350,10 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         return item.primaryTimestamp >= selectedRange.value.start && item.primaryTimestamp <= selectedRange.value.end;
       }).sort((left, right) => (left.primaryTimestamp || 0) - (right.primaryTimestamp || 0));
     });
-    const completedHistory = computed(
+    const completedHistory = vueExports.computed(
       () => filteredHistory.value.filter((item) => item.isCompleted)
     );
-    const mainMetrics = computed(() => {
+    const mainMetrics = vueExports.computed(() => {
       const revenue = completedHistory.value.reduce((sum, item) => sum + item.estimatedRevenue, 0);
       const orders = filteredHistory.value.length;
       const completed = completedHistory.value.length;
@@ -367,7 +365,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         revenue
       };
     });
-    const clientMetrics = computed(() => {
+    const clientMetrics = vueExports.computed(() => {
       const firstSeenByPhone = /* @__PURE__ */ new Map();
       for (const item of scopeHistory.value) {
         if (!item.clientPhone || item.primaryTimestamp === null) {
@@ -407,7 +405,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         uniqueClients
       };
     });
-    const operationsMetrics = computed(() => {
+    const operationsMetrics = vueExports.computed(() => {
       const cancelled = filteredHistory.value.filter((item) => item.isCancelled).length;
       const noShow = filteredHistory.value.filter((item) => item.status === "no_show").length;
       const serviceMinutes = completedHistory.value.map((item) => {
@@ -429,7 +427,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         noShow
       };
     });
-    const timelineRows = computed(() => {
+    const timelineRows = vueExports.computed(() => {
       if (!selectedRange.value) {
         return [];
       }
@@ -469,13 +467,13 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         label: shortDayFormatter.format(/* @__PURE__ */ new Date(`${dateKey}T00:00:00`))
       }));
     });
-    const timelineScaleMax = computed(
+    const timelineScaleMax = vueExports.computed(
       () => Math.max(
         ...timelineRows.value.flatMap((point) => [point.completed, point.cancelled]),
         4
       )
     );
-    const timelineAxisTicks = computed(() => {
+    const timelineAxisTicks = vueExports.computed(() => {
       const steps = 4;
       return Array.from({ length: steps + 1 }, (_, index) => {
         const ratio = (steps - index) / steps;
@@ -486,7 +484,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         };
       });
     });
-    const branchBreakdown = computed(() => {
+    const branchBreakdown = vueExports.computed(() => {
       const rows = /* @__PURE__ */ new Map();
       for (const item of filteredHistory.value) {
         const id = item.branchId || "unknown";
@@ -524,7 +522,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         uniqueClients: row.phones.size
       })).sort((left, right) => right.revenue - left.revenue || right.count - left.count);
     });
-    const barberBreakdown = computed(() => {
+    const barberBreakdown = vueExports.computed(() => {
       const rows = /* @__PURE__ */ new Map();
       for (const item of filteredHistory.value) {
         const id = item.barberId || "unknown";
@@ -562,7 +560,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         uniqueClients: row.phones.size
       })).sort((left, right) => right.revenue - left.revenue || right.count - left.count);
     });
-    const serviceBreakdown = computed(() => {
+    const serviceBreakdown = vueExports.computed(() => {
       const rows = /* @__PURE__ */ new Map();
       for (const item of filteredHistory.value) {
         for (const serviceId of item.serviceIds) {
@@ -589,7 +587,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         avgPrice: row.completed ? row.revenue / row.completed : row.revenue / Math.max(row.count, 1)
       })).sort((left, right) => right.count - left.count || right.revenue - left.revenue);
     });
-    const paymentBreakdown = computed(() => {
+    const paymentBreakdown = vueExports.computed(() => {
       const rows = /* @__PURE__ */ new Map();
       for (const item of filteredHistory.value) {
         const key = normalizeText(item.paymentMethod) || "pending";
@@ -611,10 +609,10 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         percent: filteredHistory.value.length ? row.count / filteredHistory.value.length * 100 : 0
       })).sort((left, right) => right.count - left.count || right.revenue - left.revenue);
     });
-    const topBranches = computed(() => branchBreakdown.value.slice(0, 3));
-    const topBarbers = computed(() => barberBreakdown.value.slice(0, 3));
-    const topServices = computed(() => serviceBreakdown.value.slice(0, 3));
-    const primaryKpiCards = computed(() => [
+    const topBranches = vueExports.computed(() => branchBreakdown.value.slice(0, 3));
+    const topBarbers = vueExports.computed(() => barberBreakdown.value.slice(0, 3));
+    const topServices = vueExports.computed(() => serviceBreakdown.value.slice(0, 3));
+    const primaryKpiCards = vueExports.computed(() => [
       {
         description: "Оценка по стоимости услуг в завершённых записях.",
         icon: "i-lucide-wallet",
@@ -640,7 +638,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         value: formatMoney(mainMetrics.value.averageCheck)
       }
     ]);
-    const supportingKpiCards = computed(() => [
+    const supportingKpiCards = vueExports.computed(() => [
       {
         description: "Уникальные номера телефона в выбранном периоде.",
         icon: "i-lucide-users-round",
@@ -660,7 +658,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         value: formatPercent(clientMetrics.value.completionRate)
       }
     ]);
-    const operationsCards = computed(() => [
+    const operationsCards = vueExports.computed(() => [
       {
         description: "Статусы cancelled, no_show и not_in_time.",
         icon: "i-lucide-ban",
@@ -686,7 +684,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         value: formatMinutes(operationsMetrics.value.averageServiceMinutes)
       }
     ]);
-    const scopeContextLabel = computed(() => {
+    const scopeContextLabel = vueExports.computed(() => {
       if (scope.value === "branch") {
         return branchStore.activeBranch?.name || "Филиал не выбран";
       }
@@ -707,37 +705,37 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       const _component_USelectMenu = _sfc_main$5;
       const _component_SharedEmptyState = __nuxt_component_9;
       const _component_DashboardMetricCard = __nuxt_component_5;
-      _push(ssrRenderComponent(_component_UDashboardPanel, mergeProps({ id: "statistics" }, _attrs), {
-        header: withCtx((_, _push2, _parent2, _scopeId) => {
+      _push(ssrRenderComponent_1(_component_UDashboardPanel, vueExports.mergeProps({ id: "statistics" }, _attrs), {
+        header: vueExports.withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
-            _push2(ssrRenderComponent(_component_UDashboardNavbar, {
+            _push2(ssrRenderComponent_1(_component_UDashboardNavbar, {
               title: "Статистика",
               ui: { right: "gap-3" }
             }, {
-              leading: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              leading: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
-                  _push3(ssrRenderComponent(_component_UDashboardSidebarCollapse, null, null, _parent3, _scopeId2));
+                  _push3(ssrRenderComponent_1(_component_UDashboardSidebarCollapse, null, null, _parent3, _scopeId2));
                 } else {
                   return [
-                    createVNode(_component_UDashboardSidebarCollapse)
+                    vueExports.createVNode(_component_UDashboardSidebarCollapse)
                   ];
                 }
               }),
-              right: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              right: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
-                  _push3(ssrRenderComponent(_component_UButton, {
+                  _push3(ssrRenderComponent_1(_component_UButton, {
                     color: "neutral",
                     icon: "i-lucide-refresh-cw",
-                    loading: unref(pending),
+                    loading: vueExports.unref(pending),
                     variant: "outline",
-                    onClick: ($event) => unref(refresh)()
+                    onClick: ($event) => vueExports.unref(refresh)()
                   }, {
-                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                    default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
                         _push4(` Обновить `);
                       } else {
                         return [
-                          createTextVNode(" Обновить ")
+                          vueExports.createTextVNode(" Обновить ")
                         ];
                       }
                     }),
@@ -745,15 +743,15 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   }, _parent3, _scopeId2));
                 } else {
                   return [
-                    createVNode(_component_UButton, {
+                    vueExports.createVNode(_component_UButton, {
                       color: "neutral",
                       icon: "i-lucide-refresh-cw",
-                      loading: unref(pending),
+                      loading: vueExports.unref(pending),
                       variant: "outline",
-                      onClick: ($event) => unref(refresh)()
+                      onClick: ($event) => vueExports.unref(refresh)()
                     }, {
-                      default: withCtx(() => [
-                        createTextVNode(" Обновить ")
+                      default: vueExports.withCtx(() => [
+                        vueExports.createTextVNode(" Обновить ")
                       ]),
                       _: 1
                     }, 8, ["loading", "onClick"])
@@ -764,23 +762,23 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             }, _parent2, _scopeId));
           } else {
             return [
-              createVNode(_component_UDashboardNavbar, {
+              vueExports.createVNode(_component_UDashboardNavbar, {
                 title: "Статистика",
                 ui: { right: "gap-3" }
               }, {
-                leading: withCtx(() => [
-                  createVNode(_component_UDashboardSidebarCollapse)
+                leading: vueExports.withCtx(() => [
+                  vueExports.createVNode(_component_UDashboardSidebarCollapse)
                 ]),
-                right: withCtx(() => [
-                  createVNode(_component_UButton, {
+                right: vueExports.withCtx(() => [
+                  vueExports.createVNode(_component_UButton, {
                     color: "neutral",
                     icon: "i-lucide-refresh-cw",
-                    loading: unref(pending),
+                    loading: vueExports.unref(pending),
                     variant: "outline",
-                    onClick: ($event) => unref(refresh)()
+                    onClick: ($event) => vueExports.unref(refresh)()
                   }, {
-                    default: withCtx(() => [
-                      createTextVNode(" Обновить ")
+                    default: vueExports.withCtx(() => [
+                      vueExports.createTextVNode(" Обновить ")
                     ]),
                     _: 1
                   }, 8, ["loading", "onClick"])
@@ -790,54 +788,54 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             ];
           }
         }),
-        body: withCtx((_, _push2, _parent2, _scopeId) => {
+        body: vueExports.withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
             _push2(`<div class="space-y-6"${_scopeId}>`);
-            _push2(ssrRenderComponent(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-              header: withCtx((_2, _push3, _parent3, _scopeId2) => {
+            _push2(ssrRenderComponent_1(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+              header: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
                   _push3(`<div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between"${_scopeId2}><div class="space-y-2"${_scopeId2}><p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500"${_scopeId2}> Настройка среза </p><h2 class="barbershop-heading text-3xl text-charcoal-950"${_scopeId2}> Бизнес-аналитика по истории записей </h2><p class="text-sm text-charcoal-500"${_scopeId2}> Выручка и средний чек считаются по прайсу услуг в завершённых записях, так как backend не отдаёт отдельное поле revenue. </p></div><div class="flex flex-wrap items-center gap-3"${_scopeId2}>`);
-                  _push3(ssrRenderComponent(_component_UBadge, {
+                  _push3(ssrRenderComponent_1(_component_UBadge, {
                     color: "neutral",
                     size: "lg",
                     variant: "soft"
                   }, {
-                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                    default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
-                        _push4(`${ssrInterpolate(unref(formatScopeLabel)(unref(scope)))}`);
+                        _push4(`${ssrInterpolate_1(vueExports.unref(formatScopeLabel)(vueExports.unref(scope)))}`);
                       } else {
                         return [
-                          createTextVNode(toDisplayString(unref(formatScopeLabel)(unref(scope))), 1)
+                          vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(formatScopeLabel)(vueExports.unref(scope))), 1)
                         ];
                       }
                     }),
                     _: 1
                   }, _parent3, _scopeId2));
-                  _push3(ssrRenderComponent(_component_UBadge, {
+                  _push3(ssrRenderComponent_1(_component_UBadge, {
                     color: "neutral",
                     variant: "outline"
                   }, {
-                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                    default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
-                        _push4(`${ssrInterpolate(unref(scopeContextLabel))}`);
+                        _push4(`${ssrInterpolate_1(vueExports.unref(scopeContextLabel))}`);
                       } else {
                         return [
-                          createTextVNode(toDisplayString(unref(scopeContextLabel)), 1)
+                          vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(scopeContextLabel)), 1)
                         ];
                       }
                     }),
                     _: 1
                   }, _parent3, _scopeId2));
-                  _push3(ssrRenderComponent(_component_UBadge, {
+                  _push3(ssrRenderComponent_1(_component_UBadge, {
                     color: "neutral",
                     variant: "outline"
                   }, {
-                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                    default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
-                        _push4(`${ssrInterpolate(unref(formatCount)(unref(filteredHistory).length))} записей `);
+                        _push4(`${ssrInterpolate_1(vueExports.unref(formatCount)(vueExports.unref(filteredHistory).length))} записей `);
                       } else {
                         return [
-                          createTextVNode(toDisplayString(unref(formatCount)(unref(filteredHistory).length)) + " записей ", 1)
+                          vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(formatCount)(vueExports.unref(filteredHistory).length)) + " записей ", 1)
                         ];
                       }
                     }),
@@ -846,38 +844,38 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   _push3(`</div></div>`);
                 } else {
                   return [
-                    createVNode("div", { class: "flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between" }, [
-                      createVNode("div", { class: "space-y-2" }, [
-                        createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Настройка среза "),
-                        createVNode("h2", { class: "barbershop-heading text-3xl text-charcoal-950" }, " Бизнес-аналитика по истории записей "),
-                        createVNode("p", { class: "text-sm text-charcoal-500" }, " Выручка и средний чек считаются по прайсу услуг в завершённых записях, так как backend не отдаёт отдельное поле revenue. ")
+                    vueExports.createVNode("div", { class: "flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between" }, [
+                      vueExports.createVNode("div", { class: "space-y-2" }, [
+                        vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Настройка среза "),
+                        vueExports.createVNode("h2", { class: "barbershop-heading text-3xl text-charcoal-950" }, " Бизнес-аналитика по истории записей "),
+                        vueExports.createVNode("p", { class: "text-sm text-charcoal-500" }, " Выручка и средний чек считаются по прайсу услуг в завершённых записях, так как backend не отдаёт отдельное поле revenue. ")
                       ]),
-                      createVNode("div", { class: "flex flex-wrap items-center gap-3" }, [
-                        createVNode(_component_UBadge, {
+                      vueExports.createVNode("div", { class: "flex flex-wrap items-center gap-3" }, [
+                        vueExports.createVNode(_component_UBadge, {
                           color: "neutral",
                           size: "lg",
                           variant: "soft"
                         }, {
-                          default: withCtx(() => [
-                            createTextVNode(toDisplayString(unref(formatScopeLabel)(unref(scope))), 1)
+                          default: vueExports.withCtx(() => [
+                            vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(formatScopeLabel)(vueExports.unref(scope))), 1)
                           ]),
                           _: 1
                         }),
-                        createVNode(_component_UBadge, {
+                        vueExports.createVNode(_component_UBadge, {
                           color: "neutral",
                           variant: "outline"
                         }, {
-                          default: withCtx(() => [
-                            createTextVNode(toDisplayString(unref(scopeContextLabel)), 1)
+                          default: vueExports.withCtx(() => [
+                            vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(scopeContextLabel)), 1)
                           ]),
                           _: 1
                         }),
-                        createVNode(_component_UBadge, {
+                        vueExports.createVNode(_component_UBadge, {
                           color: "neutral",
                           variant: "outline"
                         }, {
-                          default: withCtx(() => [
-                            createTextVNode(toDisplayString(unref(formatCount)(unref(filteredHistory).length)) + " записей ", 1)
+                          default: vueExports.withCtx(() => [
+                            vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(formatCount)(vueExports.unref(filteredHistory).length)) + " записей ", 1)
                           ]),
                           _: 1
                         })
@@ -886,22 +884,22 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   ];
                 }
               }),
-              default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              default: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
                   _push3(`<div class="grid gap-4 xl:grid-cols-[0.26fr_0.26fr_0.18fr_0.3fr]"${_scopeId2}>`);
-                  _push3(ssrRenderComponent(_component_UFormField, { label: "Дата начала" }, {
-                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                  _push3(ssrRenderComponent_1(_component_UFormField, { label: "Дата начала" }, {
+                    default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
-                        _push4(ssrRenderComponent(_component_UInput, {
-                          modelValue: unref(uiStore).statisticsRange.start,
-                          "onUpdate:modelValue": ($event) => unref(uiStore).statisticsRange.start = $event,
+                        _push4(ssrRenderComponent_1(_component_UInput, {
+                          modelValue: vueExports.unref(uiStore).statisticsRange.start,
+                          "onUpdate:modelValue": ($event) => vueExports.unref(uiStore).statisticsRange.start = $event,
                           type: "date"
                         }, null, _parent4, _scopeId3));
                       } else {
                         return [
-                          createVNode(_component_UInput, {
-                            modelValue: unref(uiStore).statisticsRange.start,
-                            "onUpdate:modelValue": ($event) => unref(uiStore).statisticsRange.start = $event,
+                          vueExports.createVNode(_component_UInput, {
+                            modelValue: vueExports.unref(uiStore).statisticsRange.start,
+                            "onUpdate:modelValue": ($event) => vueExports.unref(uiStore).statisticsRange.start = $event,
                             type: "date"
                           }, null, 8, ["modelValue", "onUpdate:modelValue"])
                         ];
@@ -909,19 +907,19 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     }),
                     _: 1
                   }, _parent3, _scopeId2));
-                  _push3(ssrRenderComponent(_component_UFormField, { label: "Дата окончания" }, {
-                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                  _push3(ssrRenderComponent_1(_component_UFormField, { label: "Дата окончания" }, {
+                    default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
-                        _push4(ssrRenderComponent(_component_UInput, {
-                          modelValue: unref(uiStore).statisticsRange.end,
-                          "onUpdate:modelValue": ($event) => unref(uiStore).statisticsRange.end = $event,
+                        _push4(ssrRenderComponent_1(_component_UInput, {
+                          modelValue: vueExports.unref(uiStore).statisticsRange.end,
+                          "onUpdate:modelValue": ($event) => vueExports.unref(uiStore).statisticsRange.end = $event,
                           type: "date"
                         }, null, _parent4, _scopeId3));
                       } else {
                         return [
-                          createVNode(_component_UInput, {
-                            modelValue: unref(uiStore).statisticsRange.end,
-                            "onUpdate:modelValue": ($event) => unref(uiStore).statisticsRange.end = $event,
+                          vueExports.createVNode(_component_UInput, {
+                            modelValue: vueExports.unref(uiStore).statisticsRange.end,
+                            "onUpdate:modelValue": ($event) => vueExports.unref(uiStore).statisticsRange.end = $event,
                             type: "date"
                           }, null, 8, ["modelValue", "onUpdate:modelValue"])
                         ];
@@ -929,12 +927,12 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     }),
                     _: 1
                   }, _parent3, _scopeId2));
-                  _push3(ssrRenderComponent(_component_UFormField, { label: "Область" }, {
-                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                  _push3(ssrRenderComponent_1(_component_UFormField, { label: "Область" }, {
+                    default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
-                        _push4(ssrRenderComponent(_component_USelectMenu, {
-                          modelValue: unref(scope),
-                          "onUpdate:modelValue": ($event) => isRef(scope) ? scope.value = $event : null,
+                        _push4(ssrRenderComponent_1(_component_USelectMenu, {
+                          modelValue: vueExports.unref(scope),
+                          "onUpdate:modelValue": ($event) => vueExports.isRef(scope) ? scope.value = $event : null,
                           items: [
                             { label: "Общая", value: "global" },
                             { label: "Филиал", value: "branch" },
@@ -944,9 +942,9 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                         }, null, _parent4, _scopeId3));
                       } else {
                         return [
-                          createVNode(_component_USelectMenu, {
-                            modelValue: unref(scope),
-                            "onUpdate:modelValue": ($event) => isRef(scope) ? scope.value = $event : null,
+                          vueExports.createVNode(_component_USelectMenu, {
+                            modelValue: vueExports.unref(scope),
+                            "onUpdate:modelValue": ($event) => vueExports.isRef(scope) ? scope.value = $event : null,
                             items: [
                               { label: "Общая", value: "global" },
                               { label: "Филиал", value: "branch" },
@@ -959,22 +957,22 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     }),
                     _: 1
                   }, _parent3, _scopeId2));
-                  if (unref(scope) === "barber") {
-                    _push3(ssrRenderComponent(_component_UFormField, { label: "Барбер" }, {
-                      default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                  if (vueExports.unref(scope) === "barber") {
+                    _push3(ssrRenderComponent_1(_component_UFormField, { label: "Барбер" }, {
+                      default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                         if (_push4) {
-                          _push4(ssrRenderComponent(_component_USelectMenu, {
-                            modelValue: unref(selectedBarberId),
-                            "onUpdate:modelValue": ($event) => isRef(selectedBarberId) ? selectedBarberId.value = $event : null,
-                            items: unref(barberOptions),
+                          _push4(ssrRenderComponent_1(_component_USelectMenu, {
+                            modelValue: vueExports.unref(selectedBarberId),
+                            "onUpdate:modelValue": ($event) => vueExports.isRef(selectedBarberId) ? selectedBarberId.value = $event : null,
+                            items: vueExports.unref(barberOptions),
                             "value-key": "value"
                           }, null, _parent4, _scopeId3));
                         } else {
                           return [
-                            createVNode(_component_USelectMenu, {
-                              modelValue: unref(selectedBarberId),
-                              "onUpdate:modelValue": ($event) => isRef(selectedBarberId) ? selectedBarberId.value = $event : null,
-                              items: unref(barberOptions),
+                            vueExports.createVNode(_component_USelectMenu, {
+                              modelValue: vueExports.unref(selectedBarberId),
+                              "onUpdate:modelValue": ($event) => vueExports.isRef(selectedBarberId) ? selectedBarberId.value = $event : null,
+                              items: vueExports.unref(barberOptions),
                               "value-key": "value"
                             }, null, 8, ["modelValue", "onUpdate:modelValue", "items"])
                           ];
@@ -988,32 +986,32 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   _push3(`</div>`);
                 } else {
                   return [
-                    createVNode("div", { class: "grid gap-4 xl:grid-cols-[0.26fr_0.26fr_0.18fr_0.3fr]" }, [
-                      createVNode(_component_UFormField, { label: "Дата начала" }, {
-                        default: withCtx(() => [
-                          createVNode(_component_UInput, {
-                            modelValue: unref(uiStore).statisticsRange.start,
-                            "onUpdate:modelValue": ($event) => unref(uiStore).statisticsRange.start = $event,
+                    vueExports.createVNode("div", { class: "grid gap-4 xl:grid-cols-[0.26fr_0.26fr_0.18fr_0.3fr]" }, [
+                      vueExports.createVNode(_component_UFormField, { label: "Дата начала" }, {
+                        default: vueExports.withCtx(() => [
+                          vueExports.createVNode(_component_UInput, {
+                            modelValue: vueExports.unref(uiStore).statisticsRange.start,
+                            "onUpdate:modelValue": ($event) => vueExports.unref(uiStore).statisticsRange.start = $event,
                             type: "date"
                           }, null, 8, ["modelValue", "onUpdate:modelValue"])
                         ]),
                         _: 1
                       }),
-                      createVNode(_component_UFormField, { label: "Дата окончания" }, {
-                        default: withCtx(() => [
-                          createVNode(_component_UInput, {
-                            modelValue: unref(uiStore).statisticsRange.end,
-                            "onUpdate:modelValue": ($event) => unref(uiStore).statisticsRange.end = $event,
+                      vueExports.createVNode(_component_UFormField, { label: "Дата окончания" }, {
+                        default: vueExports.withCtx(() => [
+                          vueExports.createVNode(_component_UInput, {
+                            modelValue: vueExports.unref(uiStore).statisticsRange.end,
+                            "onUpdate:modelValue": ($event) => vueExports.unref(uiStore).statisticsRange.end = $event,
                             type: "date"
                           }, null, 8, ["modelValue", "onUpdate:modelValue"])
                         ]),
                         _: 1
                       }),
-                      createVNode(_component_UFormField, { label: "Область" }, {
-                        default: withCtx(() => [
-                          createVNode(_component_USelectMenu, {
-                            modelValue: unref(scope),
-                            "onUpdate:modelValue": ($event) => isRef(scope) ? scope.value = $event : null,
+                      vueExports.createVNode(_component_UFormField, { label: "Область" }, {
+                        default: vueExports.withCtx(() => [
+                          vueExports.createVNode(_component_USelectMenu, {
+                            modelValue: vueExports.unref(scope),
+                            "onUpdate:modelValue": ($event) => vueExports.isRef(scope) ? scope.value = $event : null,
                             items: [
                               { label: "Общая", value: "global" },
                               { label: "Филиал", value: "branch" },
@@ -1024,42 +1022,42 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                         ]),
                         _: 1
                       }),
-                      unref(scope) === "barber" ? (openBlock(), createBlock(_component_UFormField, {
+                      vueExports.unref(scope) === "barber" ? (vueExports.openBlock(), vueExports.createBlock(_component_UFormField, {
                         key: 0,
                         label: "Барбер"
                       }, {
-                        default: withCtx(() => [
-                          createVNode(_component_USelectMenu, {
-                            modelValue: unref(selectedBarberId),
-                            "onUpdate:modelValue": ($event) => isRef(selectedBarberId) ? selectedBarberId.value = $event : null,
-                            items: unref(barberOptions),
+                        default: vueExports.withCtx(() => [
+                          vueExports.createVNode(_component_USelectMenu, {
+                            modelValue: vueExports.unref(selectedBarberId),
+                            "onUpdate:modelValue": ($event) => vueExports.isRef(selectedBarberId) ? selectedBarberId.value = $event : null,
+                            items: vueExports.unref(barberOptions),
                             "value-key": "value"
                           }, null, 8, ["modelValue", "onUpdate:modelValue", "items"])
                         ]),
                         _: 1
-                      })) : createCommentVNode("", true)
+                      })) : vueExports.createCommentVNode("", true)
                     ])
                   ];
                 }
               }),
               _: 1
             }, _parent2, _scopeId));
-            if (unref(needsBranchSelection)) {
-              _push2(ssrRenderComponent(_component_SharedEmptyState, {
+            if (vueExports.unref(needsBranchSelection)) {
+              _push2(ssrRenderComponent_1(_component_SharedEmptyState, {
                 description: "Для режима филиала выберите branch через BranchSelector в левой панели.",
                 icon: "i-lucide-map-pinned",
                 title: "Филиал не выбран"
               }, null, _parent2, _scopeId));
-            } else if (unref(needsBarberSelection)) {
-              _push2(ssrRenderComponent(_component_SharedEmptyState, {
+            } else if (vueExports.unref(needsBarberSelection)) {
+              _push2(ssrRenderComponent_1(_component_SharedEmptyState, {
                 description: "Не найдено ни одного барбера для построения персональной статистики.",
                 icon: "i-lucide-user-round-search",
                 title: "Барбер не выбран"
               }, null, _parent2, _scopeId));
             } else {
               _push2(`<!--[--><div class="grid gap-4 xl:grid-cols-4 md:grid-cols-2"${_scopeId}><!--[-->`);
-              ssrRenderList(unref(primaryKpiCards), (card) => {
-                _push2(ssrRenderComponent(_component_DashboardMetricCard, {
+              ssrRenderList_1(vueExports.unref(primaryKpiCards), (card) => {
+                _push2(ssrRenderComponent_1(_component_DashboardMetricCard, {
                   key: card.label,
                   description: card.description,
                   icon: card.icon,
@@ -1068,8 +1066,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 }, null, _parent2, _scopeId));
               });
               _push2(`<!--]--></div><div class="grid gap-4 xl:grid-cols-3 md:grid-cols-2"${_scopeId}><!--[-->`);
-              ssrRenderList(unref(supportingKpiCards), (card) => {
-                _push2(ssrRenderComponent(_component_DashboardMetricCard, {
+              ssrRenderList_1(vueExports.unref(supportingKpiCards), (card) => {
+                _push2(ssrRenderComponent_1(_component_DashboardMetricCard, {
                   key: card.label,
                   description: card.description,
                   icon: card.icon,
@@ -1078,8 +1076,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 }, null, _parent2, _scopeId));
               });
               _push2(`<!--]--></div><div class="grid gap-4 xl:grid-cols-4 md:grid-cols-2"${_scopeId}><!--[-->`);
-              ssrRenderList(unref(operationsCards), (card) => {
-                _push2(ssrRenderComponent(_component_DashboardMetricCard, {
+              ssrRenderList_1(vueExports.unref(operationsCards), (card) => {
+                _push2(ssrRenderComponent_1(_component_DashboardMetricCard, {
                   key: card.label,
                   description: card.description,
                   icon: card.icon,
@@ -1088,20 +1086,20 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 }, null, _parent2, _scopeId));
               });
               _push2(`<!--]--></div>`);
-              _push2(ssrRenderComponent(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-                header: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              _push2(ssrRenderComponent_1(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+                header: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                   if (_push3) {
                     _push3(`<div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between"${_scopeId2}><div class="space-y-2"${_scopeId2}><p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500"${_scopeId2}> Динамика </p><h2 class="barbershop-heading text-3xl text-charcoal-950"${_scopeId2}> Завершённые заказы и отказы по дням </h2></div><div class="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.18em] text-charcoal-500"${_scopeId2}><div class="flex items-center gap-2"${_scopeId2}><span class="size-3 rounded-full bg-emerald-400"${_scopeId2}></span> Завершено </div><div class="flex items-center gap-2"${_scopeId2}><span class="size-3 rounded-full bg-amber-400"${_scopeId2}></span> Отказы </div>`);
-                    _push3(ssrRenderComponent(_component_UBadge, {
+                    _push3(ssrRenderComponent_1(_component_UBadge, {
                       color: "neutral",
                       variant: "outline"
                     }, {
-                      default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                      default: vueExports.withCtx((_3, _push4, _parent4, _scopeId3) => {
                         if (_push4) {
-                          _push4(`${ssrInterpolate(unref(formatCount)(unref(selectedPeriodDays)))} дн. `);
+                          _push4(`${ssrInterpolate_1(vueExports.unref(formatCount)(vueExports.unref(selectedPeriodDays)))} дн. `);
                         } else {
                           return [
-                            createTextVNode(toDisplayString(unref(formatCount)(unref(selectedPeriodDays))) + " дн. ", 1)
+                            vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(formatCount)(vueExports.unref(selectedPeriodDays))) + " дн. ", 1)
                           ];
                         }
                       }),
@@ -1110,26 +1108,26 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     _push3(`</div></div>`);
                   } else {
                     return [
-                      createVNode("div", { class: "flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between" }, [
-                        createVNode("div", { class: "space-y-2" }, [
-                          createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Динамика "),
-                          createVNode("h2", { class: "barbershop-heading text-3xl text-charcoal-950" }, " Завершённые заказы и отказы по дням ")
+                      vueExports.createVNode("div", { class: "flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between" }, [
+                        vueExports.createVNode("div", { class: "space-y-2" }, [
+                          vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Динамика "),
+                          vueExports.createVNode("h2", { class: "barbershop-heading text-3xl text-charcoal-950" }, " Завершённые заказы и отказы по дням ")
                         ]),
-                        createVNode("div", { class: "flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.18em] text-charcoal-500" }, [
-                          createVNode("div", { class: "flex items-center gap-2" }, [
-                            createVNode("span", { class: "size-3 rounded-full bg-emerald-400" }),
-                            createTextVNode(" Завершено ")
+                        vueExports.createVNode("div", { class: "flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.18em] text-charcoal-500" }, [
+                          vueExports.createVNode("div", { class: "flex items-center gap-2" }, [
+                            vueExports.createVNode("span", { class: "size-3 rounded-full bg-emerald-400" }),
+                            vueExports.createTextVNode(" Завершено ")
                           ]),
-                          createVNode("div", { class: "flex items-center gap-2" }, [
-                            createVNode("span", { class: "size-3 rounded-full bg-amber-400" }),
-                            createTextVNode(" Отказы ")
+                          vueExports.createVNode("div", { class: "flex items-center gap-2" }, [
+                            vueExports.createVNode("span", { class: "size-3 rounded-full bg-amber-400" }),
+                            vueExports.createTextVNode(" Отказы ")
                           ]),
-                          createVNode(_component_UBadge, {
+                          vueExports.createVNode(_component_UBadge, {
                             color: "neutral",
                             variant: "outline"
                           }, {
-                            default: withCtx(() => [
-                              createTextVNode(toDisplayString(unref(formatCount)(unref(selectedPeriodDays))) + " дн. ", 1)
+                            default: vueExports.withCtx(() => [
+                              vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(formatCount)(vueExports.unref(selectedPeriodDays))) + " дн. ", 1)
                             ]),
                             _: 1
                           })
@@ -1138,24 +1136,24 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     ];
                   }
                 }),
-                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                default: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                   if (_push3) {
-                    if (unref(timelineRows).length && unref(filteredHistory).length) {
+                    if (vueExports.unref(timelineRows).length && vueExports.unref(filteredHistory).length) {
                       _push3(`<div class="overflow-x-auto pb-2"${_scopeId2}><div class="min-w-[64rem] rounded-[2rem] bg-charcoal-950 p-4 shadow-[0_24px_60px_rgba(15,23,42,0.24)] sm:p-6"${_scopeId2}><div class="grid grid-cols-[3.75rem_minmax(0,1fr)] gap-4"${_scopeId2}><div class="flex h-[24rem] flex-col justify-between pb-12 text-right text-xs font-medium text-sand-200/70"${_scopeId2}><!--[-->`);
-                      ssrRenderList(unref(timelineAxisTicks), (tick) => {
-                        _push3(`<span${_scopeId2}>${ssrInterpolate(tick.label)}</span>`);
+                      ssrRenderList_1(vueExports.unref(timelineAxisTicks), (tick) => {
+                        _push3(`<span${_scopeId2}>${ssrInterpolate_1(tick.label)}</span>`);
                       });
                       _push3(`<!--]--></div><div class="relative"${_scopeId2}><div class="pointer-events-none absolute inset-0 flex h-[24rem] flex-col justify-between pb-12"${_scopeId2}><!--[-->`);
-                      ssrRenderList(unref(timelineAxisTicks), (tick) => {
+                      ssrRenderList_1(vueExports.unref(timelineAxisTicks), (tick) => {
                         _push3(`<div class="border-t border-dashed border-white/10"${_scopeId2}></div>`);
                       });
                       _push3(`<!--]--></div><div class="relative flex h-[24rem] min-w-max items-end gap-3 pb-12"${_scopeId2}><!--[-->`);
-                      ssrRenderList(unref(timelineRows), (point) => {
-                        _push3(`<div class="flex w-14 shrink-0 flex-col items-center gap-3"${ssrRenderAttr("title", `${point.label}: ${unref(formatCount)(point.completed)} завершено, ${unref(formatCount)(point.cancelled)} отказов`)}${_scopeId2}><div class="flex h-full w-full items-end justify-center gap-1.5 rounded-[1.5rem] px-1"${_scopeId2}><div class="w-4 rounded-t-full bg-emerald-400 shadow-[0_0_18px_rgba(74,222,128,0.35)] transition-all" style="${ssrRenderStyle({ height: `${point.completedHeight}%` })}"${_scopeId2}></div><div class="w-4 rounded-t-full bg-amber-400 shadow-[0_0_18px_rgba(251,191,36,0.28)] transition-all" style="${ssrRenderStyle({ height: `${point.cancelledHeight}%` })}"${_scopeId2}></div></div><div class="space-y-1 text-center"${_scopeId2}><p class="text-[11px] font-medium text-sand-50"${_scopeId2}>${ssrInterpolate(point.label)}</p><p class="text-[10px] text-sand-200/60"${_scopeId2}>${ssrInterpolate(unref(formatCount)(point.completed))} / ${ssrInterpolate(unref(formatCount)(point.cancelled))}</p></div></div>`);
+                      ssrRenderList_1(vueExports.unref(timelineRows), (point) => {
+                        _push3(`<div class="flex w-14 shrink-0 flex-col items-center gap-3"${ssrRenderAttr_1("title", `${point.label}: ${vueExports.unref(formatCount)(point.completed)} завершено, ${vueExports.unref(formatCount)(point.cancelled)} отказов`)}${_scopeId2}><div class="flex h-full w-full items-end justify-center gap-1.5 rounded-[1.5rem] px-1"${_scopeId2}><div class="w-4 rounded-t-full bg-emerald-400 shadow-[0_0_18px_rgba(74,222,128,0.35)] transition-all" style="${ssrRenderStyle_1({ height: `${point.completedHeight}%` })}"${_scopeId2}></div><div class="w-4 rounded-t-full bg-amber-400 shadow-[0_0_18px_rgba(251,191,36,0.28)] transition-all" style="${ssrRenderStyle_1({ height: `${point.cancelledHeight}%` })}"${_scopeId2}></div></div><div class="space-y-1 text-center"${_scopeId2}><p class="text-[11px] font-medium text-sand-50"${_scopeId2}>${ssrInterpolate_1(point.label)}</p><p class="text-[10px] text-sand-200/60"${_scopeId2}>${ssrInterpolate_1(vueExports.unref(formatCount)(point.completed))} / ${ssrInterpolate_1(vueExports.unref(formatCount)(point.cancelled))}</p></div></div>`);
                       });
                       _push3(`<!--]--></div></div></div></div></div>`);
                     } else {
-                      _push3(ssrRenderComponent(_component_SharedEmptyState, {
+                      _push3(ssrRenderComponent_1(_component_SharedEmptyState, {
                         description: "За выбранный диапазон нет записей для построения графика завершений и отказов.",
                         icon: "i-lucide-chart-no-axes-combined",
                         title: "Нет данных по периоду"
@@ -1163,48 +1161,48 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     }
                   } else {
                     return [
-                      unref(timelineRows).length && unref(filteredHistory).length ? (openBlock(), createBlock("div", {
+                      vueExports.unref(timelineRows).length && vueExports.unref(filteredHistory).length ? (vueExports.openBlock(), vueExports.createBlock("div", {
                         key: 0,
                         class: "overflow-x-auto pb-2"
                       }, [
-                        createVNode("div", { class: "min-w-[64rem] rounded-[2rem] bg-charcoal-950 p-4 shadow-[0_24px_60px_rgba(15,23,42,0.24)] sm:p-6" }, [
-                          createVNode("div", { class: "grid grid-cols-[3.75rem_minmax(0,1fr)] gap-4" }, [
-                            createVNode("div", { class: "flex h-[24rem] flex-col justify-between pb-12 text-right text-xs font-medium text-sand-200/70" }, [
-                              (openBlock(true), createBlock(Fragment, null, renderList(unref(timelineAxisTicks), (tick) => {
-                                return openBlock(), createBlock("span", {
+                        vueExports.createVNode("div", { class: "min-w-[64rem] rounded-[2rem] bg-charcoal-950 p-4 shadow-[0_24px_60px_rgba(15,23,42,0.24)] sm:p-6" }, [
+                          vueExports.createVNode("div", { class: "grid grid-cols-[3.75rem_minmax(0,1fr)] gap-4" }, [
+                            vueExports.createVNode("div", { class: "flex h-[24rem] flex-col justify-between pb-12 text-right text-xs font-medium text-sand-200/70" }, [
+                              (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(timelineAxisTicks), (tick) => {
+                                return vueExports.openBlock(), vueExports.createBlock("span", {
                                   key: `tick-${tick.value}`
-                                }, toDisplayString(tick.label), 1);
+                                }, vueExports.toDisplayString(tick.label), 1);
                               }), 128))
                             ]),
-                            createVNode("div", { class: "relative" }, [
-                              createVNode("div", { class: "pointer-events-none absolute inset-0 flex h-[24rem] flex-col justify-between pb-12" }, [
-                                (openBlock(true), createBlock(Fragment, null, renderList(unref(timelineAxisTicks), (tick) => {
-                                  return openBlock(), createBlock("div", {
+                            vueExports.createVNode("div", { class: "relative" }, [
+                              vueExports.createVNode("div", { class: "pointer-events-none absolute inset-0 flex h-[24rem] flex-col justify-between pb-12" }, [
+                                (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(timelineAxisTicks), (tick) => {
+                                  return vueExports.openBlock(), vueExports.createBlock("div", {
                                     key: `grid-${tick.value}`,
                                     class: "border-t border-dashed border-white/10"
                                   });
                                 }), 128))
                               ]),
-                              createVNode("div", { class: "relative flex h-[24rem] min-w-max items-end gap-3 pb-12" }, [
-                                (openBlock(true), createBlock(Fragment, null, renderList(unref(timelineRows), (point) => {
-                                  return openBlock(), createBlock("div", {
+                              vueExports.createVNode("div", { class: "relative flex h-[24rem] min-w-max items-end gap-3 pb-12" }, [
+                                (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(timelineRows), (point) => {
+                                  return vueExports.openBlock(), vueExports.createBlock("div", {
                                     key: point.dateKey,
                                     class: "flex w-14 shrink-0 flex-col items-center gap-3",
-                                    title: `${point.label}: ${unref(formatCount)(point.completed)} завершено, ${unref(formatCount)(point.cancelled)} отказов`
+                                    title: `${point.label}: ${vueExports.unref(formatCount)(point.completed)} завершено, ${vueExports.unref(formatCount)(point.cancelled)} отказов`
                                   }, [
-                                    createVNode("div", { class: "flex h-full w-full items-end justify-center gap-1.5 rounded-[1.5rem] px-1" }, [
-                                      createVNode("div", {
+                                    vueExports.createVNode("div", { class: "flex h-full w-full items-end justify-center gap-1.5 rounded-[1.5rem] px-1" }, [
+                                      vueExports.createVNode("div", {
                                         class: "w-4 rounded-t-full bg-emerald-400 shadow-[0_0_18px_rgba(74,222,128,0.35)] transition-all",
                                         style: { height: `${point.completedHeight}%` }
                                       }, null, 4),
-                                      createVNode("div", {
+                                      vueExports.createVNode("div", {
                                         class: "w-4 rounded-t-full bg-amber-400 shadow-[0_0_18px_rgba(251,191,36,0.28)] transition-all",
                                         style: { height: `${point.cancelledHeight}%` }
                                       }, null, 4)
                                     ]),
-                                    createVNode("div", { class: "space-y-1 text-center" }, [
-                                      createVNode("p", { class: "text-[11px] font-medium text-sand-50" }, toDisplayString(point.label), 1),
-                                      createVNode("p", { class: "text-[10px] text-sand-200/60" }, toDisplayString(unref(formatCount)(point.completed)) + " / " + toDisplayString(unref(formatCount)(point.cancelled)), 1)
+                                    vueExports.createVNode("div", { class: "space-y-1 text-center" }, [
+                                      vueExports.createVNode("p", { class: "text-[11px] font-medium text-sand-50" }, vueExports.toDisplayString(point.label), 1),
+                                      vueExports.createVNode("p", { class: "text-[10px] text-sand-200/60" }, vueExports.toDisplayString(vueExports.unref(formatCount)(point.completed)) + " / " + vueExports.toDisplayString(vueExports.unref(formatCount)(point.cancelled)), 1)
                                     ])
                                   ], 8, ["title"]);
                                 }), 128))
@@ -1212,7 +1210,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                             ])
                           ])
                         ])
-                      ])) : (openBlock(), createBlock(_component_SharedEmptyState, {
+                      ])) : (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                         key: 1,
                         description: "За выбранный диапазон нет записей для построения графика завершений и отказов.",
                         icon: "i-lucide-chart-no-axes-combined",
@@ -1224,29 +1222,29 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 _: 1
               }, _parent2, _scopeId));
               _push2(`<div class="grid gap-6 2xl:grid-cols-2"${_scopeId}>`);
-              _push2(ssrRenderComponent(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-                header: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              _push2(ssrRenderComponent_1(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+                header: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                   if (_push3) {
                     _push3(`<div class="space-y-2"${_scopeId2}><p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500"${_scopeId2}> Разбивка </p><h2 class="barbershop-heading text-2xl text-charcoal-950"${_scopeId2}> По филиалам </h2></div>`);
                   } else {
                     return [
-                      createVNode("div", { class: "space-y-2" }, [
-                        createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Разбивка "),
-                        createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " По филиалам ")
+                      vueExports.createVNode("div", { class: "space-y-2" }, [
+                        vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Разбивка "),
+                        vueExports.createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " По филиалам ")
                       ])
                     ];
                   }
                 }),
-                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                default: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                   if (_push3) {
-                    if (unref(branchBreakdown).length) {
+                    if (vueExports.unref(branchBreakdown).length) {
                       _push3(`<div class="space-y-3"${_scopeId2}><!--[-->`);
-                      ssrRenderList(unref(branchBreakdown), (row) => {
-                        _push3(`<div class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"${_scopeId2}><div class="flex items-start justify-between gap-4"${_scopeId2}><div class="space-y-1"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate(row.label)}</p><p class="text-xs uppercase tracking-[0.16em] text-charcoal-500"${_scopeId2}>${ssrInterpolate(unref(formatCount)(row.count))} записей · ${ssrInterpolate(unref(formatCount)(row.uniqueClients))} клиентов </p></div><div class="space-y-1 text-right"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate(unref(formatMoney)(row.revenue))}</p><p class="text-xs text-charcoal-500"${_scopeId2}> Completion ${ssrInterpolate(unref(formatPercent)(row.completionRate))}</p></div></div><div class="mt-3 h-2 rounded-full bg-sand-100"${_scopeId2}><div class="h-full rounded-full bg-brass-400" style="${ssrRenderStyle({ width: `${row.completionRate}%` })}"${_scopeId2}></div></div></div>`);
+                      ssrRenderList_1(vueExports.unref(branchBreakdown), (row) => {
+                        _push3(`<div class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"${_scopeId2}><div class="flex items-start justify-between gap-4"${_scopeId2}><div class="space-y-1"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate_1(row.label)}</p><p class="text-xs uppercase tracking-[0.16em] text-charcoal-500"${_scopeId2}>${ssrInterpolate_1(vueExports.unref(formatCount)(row.count))} записей · ${ssrInterpolate_1(vueExports.unref(formatCount)(row.uniqueClients))} клиентов </p></div><div class="space-y-1 text-right"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate_1(vueExports.unref(formatMoney)(row.revenue))}</p><p class="text-xs text-charcoal-500"${_scopeId2}> Completion ${ssrInterpolate_1(vueExports.unref(formatPercent)(row.completionRate))}</p></div></div><div class="mt-3 h-2 rounded-full bg-sand-100"${_scopeId2}><div class="h-full rounded-full bg-brass-400" style="${ssrRenderStyle_1({ width: `${row.completionRate}%` })}"${_scopeId2}></div></div></div>`);
                       });
                       _push3(`<!--]--></div>`);
                     } else {
-                      _push3(ssrRenderComponent(_component_SharedEmptyState, {
+                      _push3(ssrRenderComponent_1(_component_SharedEmptyState, {
                         description: "Нет записей для группировки по филиалам.",
                         icon: "i-lucide-map",
                         title: "Разбивка пуста"
@@ -1254,34 +1252,34 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     }
                   } else {
                     return [
-                      unref(branchBreakdown).length ? (openBlock(), createBlock("div", {
+                      vueExports.unref(branchBreakdown).length ? (vueExports.openBlock(), vueExports.createBlock("div", {
                         key: 0,
                         class: "space-y-3"
                       }, [
-                        (openBlock(true), createBlock(Fragment, null, renderList(unref(branchBreakdown), (row) => {
-                          return openBlock(), createBlock("div", {
+                        (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(branchBreakdown), (row) => {
+                          return vueExports.openBlock(), vueExports.createBlock("div", {
                             key: row.id,
                             class: "rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"
                           }, [
-                            createVNode("div", { class: "flex items-start justify-between gap-4" }, [
-                              createVNode("div", { class: "space-y-1" }, [
-                                createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(row.label), 1),
-                                createVNode("p", { class: "text-xs uppercase tracking-[0.16em] text-charcoal-500" }, toDisplayString(unref(formatCount)(row.count)) + " записей · " + toDisplayString(unref(formatCount)(row.uniqueClients)) + " клиентов ", 1)
+                            vueExports.createVNode("div", { class: "flex items-start justify-between gap-4" }, [
+                              vueExports.createVNode("div", { class: "space-y-1" }, [
+                                vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(row.label), 1),
+                                vueExports.createVNode("p", { class: "text-xs uppercase tracking-[0.16em] text-charcoal-500" }, vueExports.toDisplayString(vueExports.unref(formatCount)(row.count)) + " записей · " + vueExports.toDisplayString(vueExports.unref(formatCount)(row.uniqueClients)) + " клиентов ", 1)
                               ]),
-                              createVNode("div", { class: "space-y-1 text-right" }, [
-                                createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(unref(formatMoney)(row.revenue)), 1),
-                                createVNode("p", { class: "text-xs text-charcoal-500" }, " Completion " + toDisplayString(unref(formatPercent)(row.completionRate)), 1)
+                              vueExports.createVNode("div", { class: "space-y-1 text-right" }, [
+                                vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(vueExports.unref(formatMoney)(row.revenue)), 1),
+                                vueExports.createVNode("p", { class: "text-xs text-charcoal-500" }, " Completion " + vueExports.toDisplayString(vueExports.unref(formatPercent)(row.completionRate)), 1)
                               ])
                             ]),
-                            createVNode("div", { class: "mt-3 h-2 rounded-full bg-sand-100" }, [
-                              createVNode("div", {
+                            vueExports.createVNode("div", { class: "mt-3 h-2 rounded-full bg-sand-100" }, [
+                              vueExports.createVNode("div", {
                                 class: "h-full rounded-full bg-brass-400",
                                 style: { width: `${row.completionRate}%` }
                               }, null, 4)
                             ])
                           ]);
                         }), 128))
-                      ])) : (openBlock(), createBlock(_component_SharedEmptyState, {
+                      ])) : (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                         key: 1,
                         description: "Нет записей для группировки по филиалам.",
                         icon: "i-lucide-map",
@@ -1292,29 +1290,29 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 }),
                 _: 1
               }, _parent2, _scopeId));
-              _push2(ssrRenderComponent(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-                header: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              _push2(ssrRenderComponent_1(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+                header: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                   if (_push3) {
                     _push3(`<div class="space-y-2"${_scopeId2}><p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500"${_scopeId2}> Разбивка </p><h2 class="barbershop-heading text-2xl text-charcoal-950"${_scopeId2}> По барберам </h2></div>`);
                   } else {
                     return [
-                      createVNode("div", { class: "space-y-2" }, [
-                        createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Разбивка "),
-                        createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " По барберам ")
+                      vueExports.createVNode("div", { class: "space-y-2" }, [
+                        vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Разбивка "),
+                        vueExports.createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " По барберам ")
                       ])
                     ];
                   }
                 }),
-                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                default: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                   if (_push3) {
-                    if (unref(barberBreakdown).length) {
+                    if (vueExports.unref(barberBreakdown).length) {
                       _push3(`<div class="space-y-3"${_scopeId2}><!--[-->`);
-                      ssrRenderList(unref(barberBreakdown), (row) => {
-                        _push3(`<div class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"${_scopeId2}><div class="flex items-start justify-between gap-4"${_scopeId2}><div class="space-y-1"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate(row.label)}</p><p class="text-xs uppercase tracking-[0.16em] text-charcoal-500"${_scopeId2}>${ssrInterpolate(unref(formatCount)(row.count))} записей · ${ssrInterpolate(unref(formatCount)(row.uniqueClients))} клиентов </p></div><div class="space-y-1 text-right"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate(unref(formatMoney)(row.revenue))}</p><p class="text-xs text-charcoal-500"${_scopeId2}> Completion ${ssrInterpolate(unref(formatPercent)(row.completionRate))}</p></div></div><div class="mt-3 h-2 rounded-full bg-sand-100"${_scopeId2}><div class="h-full rounded-full bg-charcoal-700" style="${ssrRenderStyle({ width: `${row.completionRate}%` })}"${_scopeId2}></div></div></div>`);
+                      ssrRenderList_1(vueExports.unref(barberBreakdown), (row) => {
+                        _push3(`<div class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"${_scopeId2}><div class="flex items-start justify-between gap-4"${_scopeId2}><div class="space-y-1"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate_1(row.label)}</p><p class="text-xs uppercase tracking-[0.16em] text-charcoal-500"${_scopeId2}>${ssrInterpolate_1(vueExports.unref(formatCount)(row.count))} записей · ${ssrInterpolate_1(vueExports.unref(formatCount)(row.uniqueClients))} клиентов </p></div><div class="space-y-1 text-right"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate_1(vueExports.unref(formatMoney)(row.revenue))}</p><p class="text-xs text-charcoal-500"${_scopeId2}> Completion ${ssrInterpolate_1(vueExports.unref(formatPercent)(row.completionRate))}</p></div></div><div class="mt-3 h-2 rounded-full bg-sand-100"${_scopeId2}><div class="h-full rounded-full bg-charcoal-700" style="${ssrRenderStyle_1({ width: `${row.completionRate}%` })}"${_scopeId2}></div></div></div>`);
                       });
                       _push3(`<!--]--></div>`);
                     } else {
-                      _push3(ssrRenderComponent(_component_SharedEmptyState, {
+                      _push3(ssrRenderComponent_1(_component_SharedEmptyState, {
                         description: "Нет записей для группировки по барберам.",
                         icon: "i-lucide-scissors",
                         title: "Разбивка пуста"
@@ -1322,34 +1320,34 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     }
                   } else {
                     return [
-                      unref(barberBreakdown).length ? (openBlock(), createBlock("div", {
+                      vueExports.unref(barberBreakdown).length ? (vueExports.openBlock(), vueExports.createBlock("div", {
                         key: 0,
                         class: "space-y-3"
                       }, [
-                        (openBlock(true), createBlock(Fragment, null, renderList(unref(barberBreakdown), (row) => {
-                          return openBlock(), createBlock("div", {
+                        (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(barberBreakdown), (row) => {
+                          return vueExports.openBlock(), vueExports.createBlock("div", {
                             key: row.id,
                             class: "rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"
                           }, [
-                            createVNode("div", { class: "flex items-start justify-between gap-4" }, [
-                              createVNode("div", { class: "space-y-1" }, [
-                                createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(row.label), 1),
-                                createVNode("p", { class: "text-xs uppercase tracking-[0.16em] text-charcoal-500" }, toDisplayString(unref(formatCount)(row.count)) + " записей · " + toDisplayString(unref(formatCount)(row.uniqueClients)) + " клиентов ", 1)
+                            vueExports.createVNode("div", { class: "flex items-start justify-between gap-4" }, [
+                              vueExports.createVNode("div", { class: "space-y-1" }, [
+                                vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(row.label), 1),
+                                vueExports.createVNode("p", { class: "text-xs uppercase tracking-[0.16em] text-charcoal-500" }, vueExports.toDisplayString(vueExports.unref(formatCount)(row.count)) + " записей · " + vueExports.toDisplayString(vueExports.unref(formatCount)(row.uniqueClients)) + " клиентов ", 1)
                               ]),
-                              createVNode("div", { class: "space-y-1 text-right" }, [
-                                createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(unref(formatMoney)(row.revenue)), 1),
-                                createVNode("p", { class: "text-xs text-charcoal-500" }, " Completion " + toDisplayString(unref(formatPercent)(row.completionRate)), 1)
+                              vueExports.createVNode("div", { class: "space-y-1 text-right" }, [
+                                vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(vueExports.unref(formatMoney)(row.revenue)), 1),
+                                vueExports.createVNode("p", { class: "text-xs text-charcoal-500" }, " Completion " + vueExports.toDisplayString(vueExports.unref(formatPercent)(row.completionRate)), 1)
                               ])
                             ]),
-                            createVNode("div", { class: "mt-3 h-2 rounded-full bg-sand-100" }, [
-                              createVNode("div", {
+                            vueExports.createVNode("div", { class: "mt-3 h-2 rounded-full bg-sand-100" }, [
+                              vueExports.createVNode("div", {
                                 class: "h-full rounded-full bg-charcoal-700",
                                 style: { width: `${row.completionRate}%` }
                               }, null, 4)
                             ])
                           ]);
                         }), 128))
-                      ])) : (openBlock(), createBlock(_component_SharedEmptyState, {
+                      ])) : (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                         key: 1,
                         description: "Нет записей для группировки по барберам.",
                         icon: "i-lucide-scissors",
@@ -1360,29 +1358,29 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 }),
                 _: 1
               }, _parent2, _scopeId));
-              _push2(ssrRenderComponent(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-                header: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              _push2(ssrRenderComponent_1(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+                header: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                   if (_push3) {
                     _push3(`<div class="space-y-2"${_scopeId2}><p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500"${_scopeId2}> Разбивка </p><h2 class="barbershop-heading text-2xl text-charcoal-950"${_scopeId2}> По услугам </h2></div>`);
                   } else {
                     return [
-                      createVNode("div", { class: "space-y-2" }, [
-                        createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Разбивка "),
-                        createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " По услугам ")
+                      vueExports.createVNode("div", { class: "space-y-2" }, [
+                        vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Разбивка "),
+                        vueExports.createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " По услугам ")
                       ])
                     ];
                   }
                 }),
-                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                default: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                   if (_push3) {
-                    if (unref(serviceBreakdown).length) {
+                    if (vueExports.unref(serviceBreakdown).length) {
                       _push3(`<div class="max-h-[34rem] space-y-3 overflow-auto pr-1"${_scopeId2}><!--[-->`);
-                      ssrRenderList(unref(serviceBreakdown), (row) => {
-                        _push3(`<div class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"${_scopeId2}><div class="flex items-start justify-between gap-4"${_scopeId2}><div class="space-y-1"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate(row.label)}</p><p class="text-xs uppercase tracking-[0.16em] text-charcoal-500"${_scopeId2}>${ssrInterpolate(row.category)} · ${ssrInterpolate(unref(formatCount)(row.count))} использований </p></div><div class="space-y-1 text-right"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate(unref(formatMoney)(row.revenue))}</p><p class="text-xs text-charcoal-500"${_scopeId2}> Средняя цена ${ssrInterpolate(unref(formatMoney)(row.avgPrice))}</p></div></div></div>`);
+                      ssrRenderList_1(vueExports.unref(serviceBreakdown), (row) => {
+                        _push3(`<div class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"${_scopeId2}><div class="flex items-start justify-between gap-4"${_scopeId2}><div class="space-y-1"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate_1(row.label)}</p><p class="text-xs uppercase tracking-[0.16em] text-charcoal-500"${_scopeId2}>${ssrInterpolate_1(row.category)} · ${ssrInterpolate_1(vueExports.unref(formatCount)(row.count))} использований </p></div><div class="space-y-1 text-right"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate_1(vueExports.unref(formatMoney)(row.revenue))}</p><p class="text-xs text-charcoal-500"${_scopeId2}> Средняя цена ${ssrInterpolate_1(vueExports.unref(formatMoney)(row.avgPrice))}</p></div></div></div>`);
                       });
                       _push3(`<!--]--></div>`);
                     } else {
-                      _push3(ssrRenderComponent(_component_SharedEmptyState, {
+                      _push3(ssrRenderComponent_1(_component_SharedEmptyState, {
                         description: "В истории нет услуг для разбивки.",
                         icon: "i-lucide-badge-dollar-sign",
                         title: "Разбивка пуста"
@@ -1390,28 +1388,28 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     }
                   } else {
                     return [
-                      unref(serviceBreakdown).length ? (openBlock(), createBlock("div", {
+                      vueExports.unref(serviceBreakdown).length ? (vueExports.openBlock(), vueExports.createBlock("div", {
                         key: 0,
                         class: "max-h-[34rem] space-y-3 overflow-auto pr-1"
                       }, [
-                        (openBlock(true), createBlock(Fragment, null, renderList(unref(serviceBreakdown), (row) => {
-                          return openBlock(), createBlock("div", {
+                        (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(serviceBreakdown), (row) => {
+                          return vueExports.openBlock(), vueExports.createBlock("div", {
                             key: row.id,
                             class: "rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"
                           }, [
-                            createVNode("div", { class: "flex items-start justify-between gap-4" }, [
-                              createVNode("div", { class: "space-y-1" }, [
-                                createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(row.label), 1),
-                                createVNode("p", { class: "text-xs uppercase tracking-[0.16em] text-charcoal-500" }, toDisplayString(row.category) + " · " + toDisplayString(unref(formatCount)(row.count)) + " использований ", 1)
+                            vueExports.createVNode("div", { class: "flex items-start justify-between gap-4" }, [
+                              vueExports.createVNode("div", { class: "space-y-1" }, [
+                                vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(row.label), 1),
+                                vueExports.createVNode("p", { class: "text-xs uppercase tracking-[0.16em] text-charcoal-500" }, vueExports.toDisplayString(row.category) + " · " + vueExports.toDisplayString(vueExports.unref(formatCount)(row.count)) + " использований ", 1)
                               ]),
-                              createVNode("div", { class: "space-y-1 text-right" }, [
-                                createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(unref(formatMoney)(row.revenue)), 1),
-                                createVNode("p", { class: "text-xs text-charcoal-500" }, " Средняя цена " + toDisplayString(unref(formatMoney)(row.avgPrice)), 1)
+                              vueExports.createVNode("div", { class: "space-y-1 text-right" }, [
+                                vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(vueExports.unref(formatMoney)(row.revenue)), 1),
+                                vueExports.createVNode("p", { class: "text-xs text-charcoal-500" }, " Средняя цена " + vueExports.toDisplayString(vueExports.unref(formatMoney)(row.avgPrice)), 1)
                               ])
                             ])
                           ]);
                         }), 128))
-                      ])) : (openBlock(), createBlock(_component_SharedEmptyState, {
+                      ])) : (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                         key: 1,
                         description: "В истории нет услуг для разбивки.",
                         icon: "i-lucide-badge-dollar-sign",
@@ -1422,29 +1420,29 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 }),
                 _: 1
               }, _parent2, _scopeId));
-              _push2(ssrRenderComponent(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-                header: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              _push2(ssrRenderComponent_1(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+                header: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                   if (_push3) {
                     _push3(`<div class="space-y-2"${_scopeId2}><p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500"${_scopeId2}> Разбивка </p><h2 class="barbershop-heading text-2xl text-charcoal-950"${_scopeId2}> По способам оплаты </h2></div>`);
                   } else {
                     return [
-                      createVNode("div", { class: "space-y-2" }, [
-                        createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Разбивка "),
-                        createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " По способам оплаты ")
+                      vueExports.createVNode("div", { class: "space-y-2" }, [
+                        vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Разбивка "),
+                        vueExports.createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " По способам оплаты ")
                       ])
                     ];
                   }
                 }),
-                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                default: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                   if (_push3) {
-                    if (unref(paymentBreakdown).length) {
+                    if (vueExports.unref(paymentBreakdown).length) {
                       _push3(`<div class="space-y-3"${_scopeId2}><!--[-->`);
-                      ssrRenderList(unref(paymentBreakdown), (row) => {
-                        _push3(`<div class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"${_scopeId2}><div class="flex items-start justify-between gap-4"${_scopeId2}><div class="space-y-1"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate(row.label)}</p><p class="text-xs uppercase tracking-[0.16em] text-charcoal-500"${_scopeId2}>${ssrInterpolate(unref(formatCount)(row.count))} записей · ${ssrInterpolate(unref(formatPercent)(row.percent))}</p></div><div class="text-right"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate(unref(formatMoney)(row.revenue))}</p></div></div></div>`);
+                      ssrRenderList_1(vueExports.unref(paymentBreakdown), (row) => {
+                        _push3(`<div class="rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"${_scopeId2}><div class="flex items-start justify-between gap-4"${_scopeId2}><div class="space-y-1"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate_1(row.label)}</p><p class="text-xs uppercase tracking-[0.16em] text-charcoal-500"${_scopeId2}>${ssrInterpolate_1(vueExports.unref(formatCount)(row.count))} записей · ${ssrInterpolate_1(vueExports.unref(formatPercent)(row.percent))}</p></div><div class="text-right"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate_1(vueExports.unref(formatMoney)(row.revenue))}</p></div></div></div>`);
                       });
                       _push3(`<!--]--></div>`);
                     } else {
-                      _push3(ssrRenderComponent(_component_SharedEmptyState, {
+                      _push3(ssrRenderComponent_1(_component_SharedEmptyState, {
                         description: "Не найдено ни одного способа оплаты.",
                         icon: "i-lucide-credit-card",
                         title: "Разбивка пуста"
@@ -1452,27 +1450,27 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     }
                   } else {
                     return [
-                      unref(paymentBreakdown).length ? (openBlock(), createBlock("div", {
+                      vueExports.unref(paymentBreakdown).length ? (vueExports.openBlock(), vueExports.createBlock("div", {
                         key: 0,
                         class: "space-y-3"
                       }, [
-                        (openBlock(true), createBlock(Fragment, null, renderList(unref(paymentBreakdown), (row) => {
-                          return openBlock(), createBlock("div", {
+                        (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(paymentBreakdown), (row) => {
+                          return vueExports.openBlock(), vueExports.createBlock("div", {
                             key: row.key,
                             class: "rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"
                           }, [
-                            createVNode("div", { class: "flex items-start justify-between gap-4" }, [
-                              createVNode("div", { class: "space-y-1" }, [
-                                createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(row.label), 1),
-                                createVNode("p", { class: "text-xs uppercase tracking-[0.16em] text-charcoal-500" }, toDisplayString(unref(formatCount)(row.count)) + " записей · " + toDisplayString(unref(formatPercent)(row.percent)), 1)
+                            vueExports.createVNode("div", { class: "flex items-start justify-between gap-4" }, [
+                              vueExports.createVNode("div", { class: "space-y-1" }, [
+                                vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(row.label), 1),
+                                vueExports.createVNode("p", { class: "text-xs uppercase tracking-[0.16em] text-charcoal-500" }, vueExports.toDisplayString(vueExports.unref(formatCount)(row.count)) + " записей · " + vueExports.toDisplayString(vueExports.unref(formatPercent)(row.percent)), 1)
                               ]),
-                              createVNode("div", { class: "text-right" }, [
-                                createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(unref(formatMoney)(row.revenue)), 1)
+                              vueExports.createVNode("div", { class: "text-right" }, [
+                                vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(vueExports.unref(formatMoney)(row.revenue)), 1)
                               ])
                             ])
                           ]);
                         }), 128))
-                      ])) : (openBlock(), createBlock(_component_SharedEmptyState, {
+                      ])) : (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                         key: 1,
                         description: "Не найдено ни одного способа оплаты.",
                         icon: "i-lucide-credit-card",
@@ -1484,29 +1482,29 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 _: 1
               }, _parent2, _scopeId));
               _push2(`</div><div class="grid gap-6 xl:grid-cols-3"${_scopeId}>`);
-              _push2(ssrRenderComponent(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-                header: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              _push2(ssrRenderComponent_1(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+                header: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                   if (_push3) {
                     _push3(`<div class="space-y-2"${_scopeId2}><p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500"${_scopeId2}> Top-лист </p><h2 class="barbershop-heading text-2xl text-charcoal-950"${_scopeId2}> Лучшие филиалы </h2></div>`);
                   } else {
                     return [
-                      createVNode("div", { class: "space-y-2" }, [
-                        createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Top-лист "),
-                        createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " Лучшие филиалы ")
+                      vueExports.createVNode("div", { class: "space-y-2" }, [
+                        vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Top-лист "),
+                        vueExports.createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " Лучшие филиалы ")
                       ])
                     ];
                   }
                 }),
-                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                default: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                   if (_push3) {
-                    if (unref(topBranches).length) {
+                    if (vueExports.unref(topBranches).length) {
                       _push3(`<div class="space-y-3"${_scopeId2}><!--[-->`);
-                      ssrRenderList(unref(topBranches), (row, index) => {
-                        _push3(`<div class="flex items-center justify-between gap-4 rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"${_scopeId2}><div class="flex items-center gap-3"${_scopeId2}><div class="flex size-9 items-center justify-center rounded-2xl bg-brass-100 font-semibold text-brass-800"${_scopeId2}>${ssrInterpolate(index + 1)}</div><div class="space-y-1"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate(row.label)}</p><p class="text-xs text-charcoal-500"${_scopeId2}>${ssrInterpolate(unref(formatCount)(row.count))} записей </p></div></div><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate(unref(formatMoney)(row.revenue))}</p></div>`);
+                      ssrRenderList_1(vueExports.unref(topBranches), (row, index) => {
+                        _push3(`<div class="flex items-center justify-between gap-4 rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"${_scopeId2}><div class="flex items-center gap-3"${_scopeId2}><div class="flex size-9 items-center justify-center rounded-2xl bg-brass-100 font-semibold text-brass-800"${_scopeId2}>${ssrInterpolate_1(index + 1)}</div><div class="space-y-1"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate_1(row.label)}</p><p class="text-xs text-charcoal-500"${_scopeId2}>${ssrInterpolate_1(vueExports.unref(formatCount)(row.count))} записей </p></div></div><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate_1(vueExports.unref(formatMoney)(row.revenue))}</p></div>`);
                       });
                       _push3(`<!--]--></div>`);
                     } else {
-                      _push3(ssrRenderComponent(_component_SharedEmptyState, {
+                      _push3(ssrRenderComponent_1(_component_SharedEmptyState, {
                         description: "Нет филиалов для ранжирования.",
                         icon: "i-lucide-trophy",
                         title: "Top-лист пуст"
@@ -1514,26 +1512,26 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     }
                   } else {
                     return [
-                      unref(topBranches).length ? (openBlock(), createBlock("div", {
+                      vueExports.unref(topBranches).length ? (vueExports.openBlock(), vueExports.createBlock("div", {
                         key: 0,
                         class: "space-y-3"
                       }, [
-                        (openBlock(true), createBlock(Fragment, null, renderList(unref(topBranches), (row, index) => {
-                          return openBlock(), createBlock("div", {
+                        (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(topBranches), (row, index) => {
+                          return vueExports.openBlock(), vueExports.createBlock("div", {
                             key: row.id,
                             class: "flex items-center justify-between gap-4 rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"
                           }, [
-                            createVNode("div", { class: "flex items-center gap-3" }, [
-                              createVNode("div", { class: "flex size-9 items-center justify-center rounded-2xl bg-brass-100 font-semibold text-brass-800" }, toDisplayString(index + 1), 1),
-                              createVNode("div", { class: "space-y-1" }, [
-                                createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(row.label), 1),
-                                createVNode("p", { class: "text-xs text-charcoal-500" }, toDisplayString(unref(formatCount)(row.count)) + " записей ", 1)
+                            vueExports.createVNode("div", { class: "flex items-center gap-3" }, [
+                              vueExports.createVNode("div", { class: "flex size-9 items-center justify-center rounded-2xl bg-brass-100 font-semibold text-brass-800" }, vueExports.toDisplayString(index + 1), 1),
+                              vueExports.createVNode("div", { class: "space-y-1" }, [
+                                vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(row.label), 1),
+                                vueExports.createVNode("p", { class: "text-xs text-charcoal-500" }, vueExports.toDisplayString(vueExports.unref(formatCount)(row.count)) + " записей ", 1)
                               ])
                             ]),
-                            createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(unref(formatMoney)(row.revenue)), 1)
+                            vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(vueExports.unref(formatMoney)(row.revenue)), 1)
                           ]);
                         }), 128))
-                      ])) : (openBlock(), createBlock(_component_SharedEmptyState, {
+                      ])) : (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                         key: 1,
                         description: "Нет филиалов для ранжирования.",
                         icon: "i-lucide-trophy",
@@ -1544,29 +1542,29 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 }),
                 _: 1
               }, _parent2, _scopeId));
-              _push2(ssrRenderComponent(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-                header: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              _push2(ssrRenderComponent_1(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+                header: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                   if (_push3) {
                     _push3(`<div class="space-y-2"${_scopeId2}><p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500"${_scopeId2}> Top-лист </p><h2 class="barbershop-heading text-2xl text-charcoal-950"${_scopeId2}> Лучшие барберы </h2></div>`);
                   } else {
                     return [
-                      createVNode("div", { class: "space-y-2" }, [
-                        createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Top-лист "),
-                        createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " Лучшие барберы ")
+                      vueExports.createVNode("div", { class: "space-y-2" }, [
+                        vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Top-лист "),
+                        vueExports.createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " Лучшие барберы ")
                       ])
                     ];
                   }
                 }),
-                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                default: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                   if (_push3) {
-                    if (unref(topBarbers).length) {
+                    if (vueExports.unref(topBarbers).length) {
                       _push3(`<div class="space-y-3"${_scopeId2}><!--[-->`);
-                      ssrRenderList(unref(topBarbers), (row, index) => {
-                        _push3(`<div class="flex items-center justify-between gap-4 rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"${_scopeId2}><div class="flex items-center gap-3"${_scopeId2}><div class="flex size-9 items-center justify-center rounded-2xl bg-sand-100 font-semibold text-charcoal-900"${_scopeId2}>${ssrInterpolate(index + 1)}</div><div class="space-y-1"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate(row.label)}</p><p class="text-xs text-charcoal-500"${_scopeId2}>${ssrInterpolate(unref(formatCount)(row.count))} записей </p></div></div><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate(unref(formatMoney)(row.revenue))}</p></div>`);
+                      ssrRenderList_1(vueExports.unref(topBarbers), (row, index) => {
+                        _push3(`<div class="flex items-center justify-between gap-4 rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"${_scopeId2}><div class="flex items-center gap-3"${_scopeId2}><div class="flex size-9 items-center justify-center rounded-2xl bg-sand-100 font-semibold text-charcoal-900"${_scopeId2}>${ssrInterpolate_1(index + 1)}</div><div class="space-y-1"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate_1(row.label)}</p><p class="text-xs text-charcoal-500"${_scopeId2}>${ssrInterpolate_1(vueExports.unref(formatCount)(row.count))} записей </p></div></div><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate_1(vueExports.unref(formatMoney)(row.revenue))}</p></div>`);
                       });
                       _push3(`<!--]--></div>`);
                     } else {
-                      _push3(ssrRenderComponent(_component_SharedEmptyState, {
+                      _push3(ssrRenderComponent_1(_component_SharedEmptyState, {
                         description: "Нет барберов для ранжирования.",
                         icon: "i-lucide-award",
                         title: "Top-лист пуст"
@@ -1574,26 +1572,26 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     }
                   } else {
                     return [
-                      unref(topBarbers).length ? (openBlock(), createBlock("div", {
+                      vueExports.unref(topBarbers).length ? (vueExports.openBlock(), vueExports.createBlock("div", {
                         key: 0,
                         class: "space-y-3"
                       }, [
-                        (openBlock(true), createBlock(Fragment, null, renderList(unref(topBarbers), (row, index) => {
-                          return openBlock(), createBlock("div", {
+                        (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(topBarbers), (row, index) => {
+                          return vueExports.openBlock(), vueExports.createBlock("div", {
                             key: row.id,
                             class: "flex items-center justify-between gap-4 rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"
                           }, [
-                            createVNode("div", { class: "flex items-center gap-3" }, [
-                              createVNode("div", { class: "flex size-9 items-center justify-center rounded-2xl bg-sand-100 font-semibold text-charcoal-900" }, toDisplayString(index + 1), 1),
-                              createVNode("div", { class: "space-y-1" }, [
-                                createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(row.label), 1),
-                                createVNode("p", { class: "text-xs text-charcoal-500" }, toDisplayString(unref(formatCount)(row.count)) + " записей ", 1)
+                            vueExports.createVNode("div", { class: "flex items-center gap-3" }, [
+                              vueExports.createVNode("div", { class: "flex size-9 items-center justify-center rounded-2xl bg-sand-100 font-semibold text-charcoal-900" }, vueExports.toDisplayString(index + 1), 1),
+                              vueExports.createVNode("div", { class: "space-y-1" }, [
+                                vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(row.label), 1),
+                                vueExports.createVNode("p", { class: "text-xs text-charcoal-500" }, vueExports.toDisplayString(vueExports.unref(formatCount)(row.count)) + " записей ", 1)
                               ])
                             ]),
-                            createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(unref(formatMoney)(row.revenue)), 1)
+                            vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(vueExports.unref(formatMoney)(row.revenue)), 1)
                           ]);
                         }), 128))
-                      ])) : (openBlock(), createBlock(_component_SharedEmptyState, {
+                      ])) : (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                         key: 1,
                         description: "Нет барберов для ранжирования.",
                         icon: "i-lucide-award",
@@ -1604,29 +1602,29 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 }),
                 _: 1
               }, _parent2, _scopeId));
-              _push2(ssrRenderComponent(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-                header: withCtx((_2, _push3, _parent3, _scopeId2) => {
+              _push2(ssrRenderComponent_1(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+                header: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                   if (_push3) {
                     _push3(`<div class="space-y-2"${_scopeId2}><p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500"${_scopeId2}> Top-лист </p><h2 class="barbershop-heading text-2xl text-charcoal-950"${_scopeId2}> Частые услуги </h2></div>`);
                   } else {
                     return [
-                      createVNode("div", { class: "space-y-2" }, [
-                        createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Top-лист "),
-                        createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " Частые услуги ")
+                      vueExports.createVNode("div", { class: "space-y-2" }, [
+                        vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Top-лист "),
+                        vueExports.createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " Частые услуги ")
                       ])
                     ];
                   }
                 }),
-                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                default: vueExports.withCtx((_2, _push3, _parent3, _scopeId2) => {
                   if (_push3) {
-                    if (unref(topServices).length) {
+                    if (vueExports.unref(topServices).length) {
                       _push3(`<div class="space-y-3"${_scopeId2}><!--[-->`);
-                      ssrRenderList(unref(topServices), (row, index) => {
-                        _push3(`<div class="flex items-center justify-between gap-4 rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"${_scopeId2}><div class="flex items-center gap-3"${_scopeId2}><div class="flex size-9 items-center justify-center rounded-2xl bg-charcoal-100 font-semibold text-charcoal-900"${_scopeId2}>${ssrInterpolate(index + 1)}</div><div class="space-y-1"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate(row.label)}</p><p class="text-xs text-charcoal-500"${_scopeId2}>${ssrInterpolate(row.category)} · ${ssrInterpolate(unref(formatCount)(row.count))} раз </p></div></div><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate(unref(formatMoney)(row.revenue))}</p></div>`);
+                      ssrRenderList_1(vueExports.unref(topServices), (row, index) => {
+                        _push3(`<div class="flex items-center justify-between gap-4 rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"${_scopeId2}><div class="flex items-center gap-3"${_scopeId2}><div class="flex size-9 items-center justify-center rounded-2xl bg-charcoal-100 font-semibold text-charcoal-900"${_scopeId2}>${ssrInterpolate_1(index + 1)}</div><div class="space-y-1"${_scopeId2}><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate_1(row.label)}</p><p class="text-xs text-charcoal-500"${_scopeId2}>${ssrInterpolate_1(row.category)} · ${ssrInterpolate_1(vueExports.unref(formatCount)(row.count))} раз </p></div></div><p class="font-semibold text-charcoal-950"${_scopeId2}>${ssrInterpolate_1(vueExports.unref(formatMoney)(row.revenue))}</p></div>`);
                       });
                       _push3(`<!--]--></div>`);
                     } else {
-                      _push3(ssrRenderComponent(_component_SharedEmptyState, {
+                      _push3(ssrRenderComponent_1(_component_SharedEmptyState, {
                         description: "Нет услуг для ранжирования.",
                         icon: "i-lucide-list-ordered",
                         title: "Top-лист пуст"
@@ -1634,26 +1632,26 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     }
                   } else {
                     return [
-                      unref(topServices).length ? (openBlock(), createBlock("div", {
+                      vueExports.unref(topServices).length ? (vueExports.openBlock(), vueExports.createBlock("div", {
                         key: 0,
                         class: "space-y-3"
                       }, [
-                        (openBlock(true), createBlock(Fragment, null, renderList(unref(topServices), (row, index) => {
-                          return openBlock(), createBlock("div", {
+                        (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(topServices), (row, index) => {
+                          return vueExports.openBlock(), vueExports.createBlock("div", {
                             key: row.id,
                             class: "flex items-center justify-between gap-4 rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"
                           }, [
-                            createVNode("div", { class: "flex items-center gap-3" }, [
-                              createVNode("div", { class: "flex size-9 items-center justify-center rounded-2xl bg-charcoal-100 font-semibold text-charcoal-900" }, toDisplayString(index + 1), 1),
-                              createVNode("div", { class: "space-y-1" }, [
-                                createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(row.label), 1),
-                                createVNode("p", { class: "text-xs text-charcoal-500" }, toDisplayString(row.category) + " · " + toDisplayString(unref(formatCount)(row.count)) + " раз ", 1)
+                            vueExports.createVNode("div", { class: "flex items-center gap-3" }, [
+                              vueExports.createVNode("div", { class: "flex size-9 items-center justify-center rounded-2xl bg-charcoal-100 font-semibold text-charcoal-900" }, vueExports.toDisplayString(index + 1), 1),
+                              vueExports.createVNode("div", { class: "space-y-1" }, [
+                                vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(row.label), 1),
+                                vueExports.createVNode("p", { class: "text-xs text-charcoal-500" }, vueExports.toDisplayString(row.category) + " · " + vueExports.toDisplayString(vueExports.unref(formatCount)(row.count)) + " раз ", 1)
                               ])
                             ]),
-                            createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(unref(formatMoney)(row.revenue)), 1)
+                            vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(vueExports.unref(formatMoney)(row.revenue)), 1)
                           ]);
                         }), 128))
-                      ])) : (openBlock(), createBlock(_component_SharedEmptyState, {
+                      ])) : (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                         key: 1,
                         description: "Нет услуг для ранжирования.",
                         icon: "i-lucide-list-ordered",
@@ -1669,74 +1667,74 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             _push2(`</div>`);
           } else {
             return [
-              createVNode("div", { class: "space-y-6" }, [
-                createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-                  header: withCtx(() => [
-                    createVNode("div", { class: "flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between" }, [
-                      createVNode("div", { class: "space-y-2" }, [
-                        createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Настройка среза "),
-                        createVNode("h2", { class: "barbershop-heading text-3xl text-charcoal-950" }, " Бизнес-аналитика по истории записей "),
-                        createVNode("p", { class: "text-sm text-charcoal-500" }, " Выручка и средний чек считаются по прайсу услуг в завершённых записях, так как backend не отдаёт отдельное поле revenue. ")
+              vueExports.createVNode("div", { class: "space-y-6" }, [
+                vueExports.createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+                  header: vueExports.withCtx(() => [
+                    vueExports.createVNode("div", { class: "flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between" }, [
+                      vueExports.createVNode("div", { class: "space-y-2" }, [
+                        vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Настройка среза "),
+                        vueExports.createVNode("h2", { class: "barbershop-heading text-3xl text-charcoal-950" }, " Бизнес-аналитика по истории записей "),
+                        vueExports.createVNode("p", { class: "text-sm text-charcoal-500" }, " Выручка и средний чек считаются по прайсу услуг в завершённых записях, так как backend не отдаёт отдельное поле revenue. ")
                       ]),
-                      createVNode("div", { class: "flex flex-wrap items-center gap-3" }, [
-                        createVNode(_component_UBadge, {
+                      vueExports.createVNode("div", { class: "flex flex-wrap items-center gap-3" }, [
+                        vueExports.createVNode(_component_UBadge, {
                           color: "neutral",
                           size: "lg",
                           variant: "soft"
                         }, {
-                          default: withCtx(() => [
-                            createTextVNode(toDisplayString(unref(formatScopeLabel)(unref(scope))), 1)
+                          default: vueExports.withCtx(() => [
+                            vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(formatScopeLabel)(vueExports.unref(scope))), 1)
                           ]),
                           _: 1
                         }),
-                        createVNode(_component_UBadge, {
+                        vueExports.createVNode(_component_UBadge, {
                           color: "neutral",
                           variant: "outline"
                         }, {
-                          default: withCtx(() => [
-                            createTextVNode(toDisplayString(unref(scopeContextLabel)), 1)
+                          default: vueExports.withCtx(() => [
+                            vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(scopeContextLabel)), 1)
                           ]),
                           _: 1
                         }),
-                        createVNode(_component_UBadge, {
+                        vueExports.createVNode(_component_UBadge, {
                           color: "neutral",
                           variant: "outline"
                         }, {
-                          default: withCtx(() => [
-                            createTextVNode(toDisplayString(unref(formatCount)(unref(filteredHistory).length)) + " записей ", 1)
+                          default: vueExports.withCtx(() => [
+                            vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(formatCount)(vueExports.unref(filteredHistory).length)) + " записей ", 1)
                           ]),
                           _: 1
                         })
                       ])
                     ])
                   ]),
-                  default: withCtx(() => [
-                    createVNode("div", { class: "grid gap-4 xl:grid-cols-[0.26fr_0.26fr_0.18fr_0.3fr]" }, [
-                      createVNode(_component_UFormField, { label: "Дата начала" }, {
-                        default: withCtx(() => [
-                          createVNode(_component_UInput, {
-                            modelValue: unref(uiStore).statisticsRange.start,
-                            "onUpdate:modelValue": ($event) => unref(uiStore).statisticsRange.start = $event,
+                  default: vueExports.withCtx(() => [
+                    vueExports.createVNode("div", { class: "grid gap-4 xl:grid-cols-[0.26fr_0.26fr_0.18fr_0.3fr]" }, [
+                      vueExports.createVNode(_component_UFormField, { label: "Дата начала" }, {
+                        default: vueExports.withCtx(() => [
+                          vueExports.createVNode(_component_UInput, {
+                            modelValue: vueExports.unref(uiStore).statisticsRange.start,
+                            "onUpdate:modelValue": ($event) => vueExports.unref(uiStore).statisticsRange.start = $event,
                             type: "date"
                           }, null, 8, ["modelValue", "onUpdate:modelValue"])
                         ]),
                         _: 1
                       }),
-                      createVNode(_component_UFormField, { label: "Дата окончания" }, {
-                        default: withCtx(() => [
-                          createVNode(_component_UInput, {
-                            modelValue: unref(uiStore).statisticsRange.end,
-                            "onUpdate:modelValue": ($event) => unref(uiStore).statisticsRange.end = $event,
+                      vueExports.createVNode(_component_UFormField, { label: "Дата окончания" }, {
+                        default: vueExports.withCtx(() => [
+                          vueExports.createVNode(_component_UInput, {
+                            modelValue: vueExports.unref(uiStore).statisticsRange.end,
+                            "onUpdate:modelValue": ($event) => vueExports.unref(uiStore).statisticsRange.end = $event,
                             type: "date"
                           }, null, 8, ["modelValue", "onUpdate:modelValue"])
                         ]),
                         _: 1
                       }),
-                      createVNode(_component_UFormField, { label: "Область" }, {
-                        default: withCtx(() => [
-                          createVNode(_component_USelectMenu, {
-                            modelValue: unref(scope),
-                            "onUpdate:modelValue": ($event) => isRef(scope) ? scope.value = $event : null,
+                      vueExports.createVNode(_component_UFormField, { label: "Область" }, {
+                        default: vueExports.withCtx(() => [
+                          vueExports.createVNode(_component_USelectMenu, {
+                            modelValue: vueExports.unref(scope),
+                            "onUpdate:modelValue": ($event) => vueExports.isRef(scope) ? scope.value = $event : null,
                             items: [
                               { label: "Общая", value: "global" },
                               { label: "Филиал", value: "branch" },
@@ -1747,38 +1745,38 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                         ]),
                         _: 1
                       }),
-                      unref(scope) === "barber" ? (openBlock(), createBlock(_component_UFormField, {
+                      vueExports.unref(scope) === "barber" ? (vueExports.openBlock(), vueExports.createBlock(_component_UFormField, {
                         key: 0,
                         label: "Барбер"
                       }, {
-                        default: withCtx(() => [
-                          createVNode(_component_USelectMenu, {
-                            modelValue: unref(selectedBarberId),
-                            "onUpdate:modelValue": ($event) => isRef(selectedBarberId) ? selectedBarberId.value = $event : null,
-                            items: unref(barberOptions),
+                        default: vueExports.withCtx(() => [
+                          vueExports.createVNode(_component_USelectMenu, {
+                            modelValue: vueExports.unref(selectedBarberId),
+                            "onUpdate:modelValue": ($event) => vueExports.isRef(selectedBarberId) ? selectedBarberId.value = $event : null,
+                            items: vueExports.unref(barberOptions),
                             "value-key": "value"
                           }, null, 8, ["modelValue", "onUpdate:modelValue", "items"])
                         ]),
                         _: 1
-                      })) : createCommentVNode("", true)
+                      })) : vueExports.createCommentVNode("", true)
                     ])
                   ]),
                   _: 1
                 }),
-                unref(needsBranchSelection) ? (openBlock(), createBlock(_component_SharedEmptyState, {
+                vueExports.unref(needsBranchSelection) ? (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                   key: 0,
                   description: "Для режима филиала выберите branch через BranchSelector в левой панели.",
                   icon: "i-lucide-map-pinned",
                   title: "Филиал не выбран"
-                })) : unref(needsBarberSelection) ? (openBlock(), createBlock(_component_SharedEmptyState, {
+                })) : vueExports.unref(needsBarberSelection) ? (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                   key: 1,
                   description: "Не найдено ни одного барбера для построения персональной статистики.",
                   icon: "i-lucide-user-round-search",
                   title: "Барбер не выбран"
-                })) : (openBlock(), createBlock(Fragment, { key: 2 }, [
-                  createVNode("div", { class: "grid gap-4 xl:grid-cols-4 md:grid-cols-2" }, [
-                    (openBlock(true), createBlock(Fragment, null, renderList(unref(primaryKpiCards), (card) => {
-                      return openBlock(), createBlock(_component_DashboardMetricCard, {
+                })) : (vueExports.openBlock(), vueExports.createBlock(vueExports.Fragment, { key: 2 }, [
+                  vueExports.createVNode("div", { class: "grid gap-4 xl:grid-cols-4 md:grid-cols-2" }, [
+                    (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(primaryKpiCards), (card) => {
+                      return vueExports.openBlock(), vueExports.createBlock(_component_DashboardMetricCard, {
                         key: card.label,
                         description: card.description,
                         icon: card.icon,
@@ -1787,9 +1785,9 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                       }, null, 8, ["description", "icon", "label", "value"]);
                     }), 128))
                   ]),
-                  createVNode("div", { class: "grid gap-4 xl:grid-cols-3 md:grid-cols-2" }, [
-                    (openBlock(true), createBlock(Fragment, null, renderList(unref(supportingKpiCards), (card) => {
-                      return openBlock(), createBlock(_component_DashboardMetricCard, {
+                  vueExports.createVNode("div", { class: "grid gap-4 xl:grid-cols-3 md:grid-cols-2" }, [
+                    (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(supportingKpiCards), (card) => {
+                      return vueExports.openBlock(), vueExports.createBlock(_component_DashboardMetricCard, {
                         key: card.label,
                         description: card.description,
                         icon: card.icon,
@@ -1798,9 +1796,9 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                       }, null, 8, ["description", "icon", "label", "value"]);
                     }), 128))
                   ]),
-                  createVNode("div", { class: "grid gap-4 xl:grid-cols-4 md:grid-cols-2" }, [
-                    (openBlock(true), createBlock(Fragment, null, renderList(unref(operationsCards), (card) => {
-                      return openBlock(), createBlock(_component_DashboardMetricCard, {
+                  vueExports.createVNode("div", { class: "grid gap-4 xl:grid-cols-4 md:grid-cols-2" }, [
+                    (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(operationsCards), (card) => {
+                      return vueExports.openBlock(), vueExports.createBlock(_component_DashboardMetricCard, {
                         key: card.label,
                         description: card.description,
                         icon: card.icon,
@@ -1809,77 +1807,77 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                       }, null, 8, ["description", "icon", "label", "value"]);
                     }), 128))
                   ]),
-                  createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-                    header: withCtx(() => [
-                      createVNode("div", { class: "flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between" }, [
-                        createVNode("div", { class: "space-y-2" }, [
-                          createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Динамика "),
-                          createVNode("h2", { class: "barbershop-heading text-3xl text-charcoal-950" }, " Завершённые заказы и отказы по дням ")
+                  vueExports.createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+                    header: vueExports.withCtx(() => [
+                      vueExports.createVNode("div", { class: "flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between" }, [
+                        vueExports.createVNode("div", { class: "space-y-2" }, [
+                          vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Динамика "),
+                          vueExports.createVNode("h2", { class: "barbershop-heading text-3xl text-charcoal-950" }, " Завершённые заказы и отказы по дням ")
                         ]),
-                        createVNode("div", { class: "flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.18em] text-charcoal-500" }, [
-                          createVNode("div", { class: "flex items-center gap-2" }, [
-                            createVNode("span", { class: "size-3 rounded-full bg-emerald-400" }),
-                            createTextVNode(" Завершено ")
+                        vueExports.createVNode("div", { class: "flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.18em] text-charcoal-500" }, [
+                          vueExports.createVNode("div", { class: "flex items-center gap-2" }, [
+                            vueExports.createVNode("span", { class: "size-3 rounded-full bg-emerald-400" }),
+                            vueExports.createTextVNode(" Завершено ")
                           ]),
-                          createVNode("div", { class: "flex items-center gap-2" }, [
-                            createVNode("span", { class: "size-3 rounded-full bg-amber-400" }),
-                            createTextVNode(" Отказы ")
+                          vueExports.createVNode("div", { class: "flex items-center gap-2" }, [
+                            vueExports.createVNode("span", { class: "size-3 rounded-full bg-amber-400" }),
+                            vueExports.createTextVNode(" Отказы ")
                           ]),
-                          createVNode(_component_UBadge, {
+                          vueExports.createVNode(_component_UBadge, {
                             color: "neutral",
                             variant: "outline"
                           }, {
-                            default: withCtx(() => [
-                              createTextVNode(toDisplayString(unref(formatCount)(unref(selectedPeriodDays))) + " дн. ", 1)
+                            default: vueExports.withCtx(() => [
+                              vueExports.createTextVNode(vueExports.toDisplayString(vueExports.unref(formatCount)(vueExports.unref(selectedPeriodDays))) + " дн. ", 1)
                             ]),
                             _: 1
                           })
                         ])
                       ])
                     ]),
-                    default: withCtx(() => [
-                      unref(timelineRows).length && unref(filteredHistory).length ? (openBlock(), createBlock("div", {
+                    default: vueExports.withCtx(() => [
+                      vueExports.unref(timelineRows).length && vueExports.unref(filteredHistory).length ? (vueExports.openBlock(), vueExports.createBlock("div", {
                         key: 0,
                         class: "overflow-x-auto pb-2"
                       }, [
-                        createVNode("div", { class: "min-w-[64rem] rounded-[2rem] bg-charcoal-950 p-4 shadow-[0_24px_60px_rgba(15,23,42,0.24)] sm:p-6" }, [
-                          createVNode("div", { class: "grid grid-cols-[3.75rem_minmax(0,1fr)] gap-4" }, [
-                            createVNode("div", { class: "flex h-[24rem] flex-col justify-between pb-12 text-right text-xs font-medium text-sand-200/70" }, [
-                              (openBlock(true), createBlock(Fragment, null, renderList(unref(timelineAxisTicks), (tick) => {
-                                return openBlock(), createBlock("span", {
+                        vueExports.createVNode("div", { class: "min-w-[64rem] rounded-[2rem] bg-charcoal-950 p-4 shadow-[0_24px_60px_rgba(15,23,42,0.24)] sm:p-6" }, [
+                          vueExports.createVNode("div", { class: "grid grid-cols-[3.75rem_minmax(0,1fr)] gap-4" }, [
+                            vueExports.createVNode("div", { class: "flex h-[24rem] flex-col justify-between pb-12 text-right text-xs font-medium text-sand-200/70" }, [
+                              (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(timelineAxisTicks), (tick) => {
+                                return vueExports.openBlock(), vueExports.createBlock("span", {
                                   key: `tick-${tick.value}`
-                                }, toDisplayString(tick.label), 1);
+                                }, vueExports.toDisplayString(tick.label), 1);
                               }), 128))
                             ]),
-                            createVNode("div", { class: "relative" }, [
-                              createVNode("div", { class: "pointer-events-none absolute inset-0 flex h-[24rem] flex-col justify-between pb-12" }, [
-                                (openBlock(true), createBlock(Fragment, null, renderList(unref(timelineAxisTicks), (tick) => {
-                                  return openBlock(), createBlock("div", {
+                            vueExports.createVNode("div", { class: "relative" }, [
+                              vueExports.createVNode("div", { class: "pointer-events-none absolute inset-0 flex h-[24rem] flex-col justify-between pb-12" }, [
+                                (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(timelineAxisTicks), (tick) => {
+                                  return vueExports.openBlock(), vueExports.createBlock("div", {
                                     key: `grid-${tick.value}`,
                                     class: "border-t border-dashed border-white/10"
                                   });
                                 }), 128))
                               ]),
-                              createVNode("div", { class: "relative flex h-[24rem] min-w-max items-end gap-3 pb-12" }, [
-                                (openBlock(true), createBlock(Fragment, null, renderList(unref(timelineRows), (point) => {
-                                  return openBlock(), createBlock("div", {
+                              vueExports.createVNode("div", { class: "relative flex h-[24rem] min-w-max items-end gap-3 pb-12" }, [
+                                (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(timelineRows), (point) => {
+                                  return vueExports.openBlock(), vueExports.createBlock("div", {
                                     key: point.dateKey,
                                     class: "flex w-14 shrink-0 flex-col items-center gap-3",
-                                    title: `${point.label}: ${unref(formatCount)(point.completed)} завершено, ${unref(formatCount)(point.cancelled)} отказов`
+                                    title: `${point.label}: ${vueExports.unref(formatCount)(point.completed)} завершено, ${vueExports.unref(formatCount)(point.cancelled)} отказов`
                                   }, [
-                                    createVNode("div", { class: "flex h-full w-full items-end justify-center gap-1.5 rounded-[1.5rem] px-1" }, [
-                                      createVNode("div", {
+                                    vueExports.createVNode("div", { class: "flex h-full w-full items-end justify-center gap-1.5 rounded-[1.5rem] px-1" }, [
+                                      vueExports.createVNode("div", {
                                         class: "w-4 rounded-t-full bg-emerald-400 shadow-[0_0_18px_rgba(74,222,128,0.35)] transition-all",
                                         style: { height: `${point.completedHeight}%` }
                                       }, null, 4),
-                                      createVNode("div", {
+                                      vueExports.createVNode("div", {
                                         class: "w-4 rounded-t-full bg-amber-400 shadow-[0_0_18px_rgba(251,191,36,0.28)] transition-all",
                                         style: { height: `${point.cancelledHeight}%` }
                                       }, null, 4)
                                     ]),
-                                    createVNode("div", { class: "space-y-1 text-center" }, [
-                                      createVNode("p", { class: "text-[11px] font-medium text-sand-50" }, toDisplayString(point.label), 1),
-                                      createVNode("p", { class: "text-[10px] text-sand-200/60" }, toDisplayString(unref(formatCount)(point.completed)) + " / " + toDisplayString(unref(formatCount)(point.cancelled)), 1)
+                                    vueExports.createVNode("div", { class: "space-y-1 text-center" }, [
+                                      vueExports.createVNode("p", { class: "text-[11px] font-medium text-sand-50" }, vueExports.toDisplayString(point.label), 1),
+                                      vueExports.createVNode("p", { class: "text-[10px] text-sand-200/60" }, vueExports.toDisplayString(vueExports.unref(formatCount)(point.completed)) + " / " + vueExports.toDisplayString(vueExports.unref(formatCount)(point.cancelled)), 1)
                                     ])
                                   ], 8, ["title"]);
                                 }), 128))
@@ -1887,7 +1885,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                             ])
                           ])
                         ])
-                      ])) : (openBlock(), createBlock(_component_SharedEmptyState, {
+                      ])) : (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                         key: 1,
                         description: "За выбранный диапазон нет записей для построения графика завершений и отказов.",
                         icon: "i-lucide-chart-no-axes-combined",
@@ -1896,43 +1894,43 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     ]),
                     _: 1
                   }),
-                  createVNode("div", { class: "grid gap-6 2xl:grid-cols-2" }, [
-                    createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-                      header: withCtx(() => [
-                        createVNode("div", { class: "space-y-2" }, [
-                          createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Разбивка "),
-                          createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " По филиалам ")
+                  vueExports.createVNode("div", { class: "grid gap-6 2xl:grid-cols-2" }, [
+                    vueExports.createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+                      header: vueExports.withCtx(() => [
+                        vueExports.createVNode("div", { class: "space-y-2" }, [
+                          vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Разбивка "),
+                          vueExports.createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " По филиалам ")
                         ])
                       ]),
-                      default: withCtx(() => [
-                        unref(branchBreakdown).length ? (openBlock(), createBlock("div", {
+                      default: vueExports.withCtx(() => [
+                        vueExports.unref(branchBreakdown).length ? (vueExports.openBlock(), vueExports.createBlock("div", {
                           key: 0,
                           class: "space-y-3"
                         }, [
-                          (openBlock(true), createBlock(Fragment, null, renderList(unref(branchBreakdown), (row) => {
-                            return openBlock(), createBlock("div", {
+                          (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(branchBreakdown), (row) => {
+                            return vueExports.openBlock(), vueExports.createBlock("div", {
                               key: row.id,
                               class: "rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"
                             }, [
-                              createVNode("div", { class: "flex items-start justify-between gap-4" }, [
-                                createVNode("div", { class: "space-y-1" }, [
-                                  createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(row.label), 1),
-                                  createVNode("p", { class: "text-xs uppercase tracking-[0.16em] text-charcoal-500" }, toDisplayString(unref(formatCount)(row.count)) + " записей · " + toDisplayString(unref(formatCount)(row.uniqueClients)) + " клиентов ", 1)
+                              vueExports.createVNode("div", { class: "flex items-start justify-between gap-4" }, [
+                                vueExports.createVNode("div", { class: "space-y-1" }, [
+                                  vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(row.label), 1),
+                                  vueExports.createVNode("p", { class: "text-xs uppercase tracking-[0.16em] text-charcoal-500" }, vueExports.toDisplayString(vueExports.unref(formatCount)(row.count)) + " записей · " + vueExports.toDisplayString(vueExports.unref(formatCount)(row.uniqueClients)) + " клиентов ", 1)
                                 ]),
-                                createVNode("div", { class: "space-y-1 text-right" }, [
-                                  createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(unref(formatMoney)(row.revenue)), 1),
-                                  createVNode("p", { class: "text-xs text-charcoal-500" }, " Completion " + toDisplayString(unref(formatPercent)(row.completionRate)), 1)
+                                vueExports.createVNode("div", { class: "space-y-1 text-right" }, [
+                                  vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(vueExports.unref(formatMoney)(row.revenue)), 1),
+                                  vueExports.createVNode("p", { class: "text-xs text-charcoal-500" }, " Completion " + vueExports.toDisplayString(vueExports.unref(formatPercent)(row.completionRate)), 1)
                                 ])
                               ]),
-                              createVNode("div", { class: "mt-3 h-2 rounded-full bg-sand-100" }, [
-                                createVNode("div", {
+                              vueExports.createVNode("div", { class: "mt-3 h-2 rounded-full bg-sand-100" }, [
+                                vueExports.createVNode("div", {
                                   class: "h-full rounded-full bg-brass-400",
                                   style: { width: `${row.completionRate}%` }
                                 }, null, 4)
                               ])
                             ]);
                           }), 128))
-                        ])) : (openBlock(), createBlock(_component_SharedEmptyState, {
+                        ])) : (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                           key: 1,
                           description: "Нет записей для группировки по филиалам.",
                           icon: "i-lucide-map",
@@ -1941,42 +1939,42 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                       ]),
                       _: 1
                     }),
-                    createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-                      header: withCtx(() => [
-                        createVNode("div", { class: "space-y-2" }, [
-                          createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Разбивка "),
-                          createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " По барберам ")
+                    vueExports.createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+                      header: vueExports.withCtx(() => [
+                        vueExports.createVNode("div", { class: "space-y-2" }, [
+                          vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Разбивка "),
+                          vueExports.createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " По барберам ")
                         ])
                       ]),
-                      default: withCtx(() => [
-                        unref(barberBreakdown).length ? (openBlock(), createBlock("div", {
+                      default: vueExports.withCtx(() => [
+                        vueExports.unref(barberBreakdown).length ? (vueExports.openBlock(), vueExports.createBlock("div", {
                           key: 0,
                           class: "space-y-3"
                         }, [
-                          (openBlock(true), createBlock(Fragment, null, renderList(unref(barberBreakdown), (row) => {
-                            return openBlock(), createBlock("div", {
+                          (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(barberBreakdown), (row) => {
+                            return vueExports.openBlock(), vueExports.createBlock("div", {
                               key: row.id,
                               class: "rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"
                             }, [
-                              createVNode("div", { class: "flex items-start justify-between gap-4" }, [
-                                createVNode("div", { class: "space-y-1" }, [
-                                  createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(row.label), 1),
-                                  createVNode("p", { class: "text-xs uppercase tracking-[0.16em] text-charcoal-500" }, toDisplayString(unref(formatCount)(row.count)) + " записей · " + toDisplayString(unref(formatCount)(row.uniqueClients)) + " клиентов ", 1)
+                              vueExports.createVNode("div", { class: "flex items-start justify-between gap-4" }, [
+                                vueExports.createVNode("div", { class: "space-y-1" }, [
+                                  vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(row.label), 1),
+                                  vueExports.createVNode("p", { class: "text-xs uppercase tracking-[0.16em] text-charcoal-500" }, vueExports.toDisplayString(vueExports.unref(formatCount)(row.count)) + " записей · " + vueExports.toDisplayString(vueExports.unref(formatCount)(row.uniqueClients)) + " клиентов ", 1)
                                 ]),
-                                createVNode("div", { class: "space-y-1 text-right" }, [
-                                  createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(unref(formatMoney)(row.revenue)), 1),
-                                  createVNode("p", { class: "text-xs text-charcoal-500" }, " Completion " + toDisplayString(unref(formatPercent)(row.completionRate)), 1)
+                                vueExports.createVNode("div", { class: "space-y-1 text-right" }, [
+                                  vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(vueExports.unref(formatMoney)(row.revenue)), 1),
+                                  vueExports.createVNode("p", { class: "text-xs text-charcoal-500" }, " Completion " + vueExports.toDisplayString(vueExports.unref(formatPercent)(row.completionRate)), 1)
                                 ])
                               ]),
-                              createVNode("div", { class: "mt-3 h-2 rounded-full bg-sand-100" }, [
-                                createVNode("div", {
+                              vueExports.createVNode("div", { class: "mt-3 h-2 rounded-full bg-sand-100" }, [
+                                vueExports.createVNode("div", {
                                   class: "h-full rounded-full bg-charcoal-700",
                                   style: { width: `${row.completionRate}%` }
                                 }, null, 4)
                               ])
                             ]);
                           }), 128))
-                        ])) : (openBlock(), createBlock(_component_SharedEmptyState, {
+                        ])) : (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                           key: 1,
                           description: "Нет записей для группировки по барберам.",
                           icon: "i-lucide-scissors",
@@ -1985,36 +1983,36 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                       ]),
                       _: 1
                     }),
-                    createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-                      header: withCtx(() => [
-                        createVNode("div", { class: "space-y-2" }, [
-                          createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Разбивка "),
-                          createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " По услугам ")
+                    vueExports.createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+                      header: vueExports.withCtx(() => [
+                        vueExports.createVNode("div", { class: "space-y-2" }, [
+                          vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Разбивка "),
+                          vueExports.createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " По услугам ")
                         ])
                       ]),
-                      default: withCtx(() => [
-                        unref(serviceBreakdown).length ? (openBlock(), createBlock("div", {
+                      default: vueExports.withCtx(() => [
+                        vueExports.unref(serviceBreakdown).length ? (vueExports.openBlock(), vueExports.createBlock("div", {
                           key: 0,
                           class: "max-h-[34rem] space-y-3 overflow-auto pr-1"
                         }, [
-                          (openBlock(true), createBlock(Fragment, null, renderList(unref(serviceBreakdown), (row) => {
-                            return openBlock(), createBlock("div", {
+                          (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(serviceBreakdown), (row) => {
+                            return vueExports.openBlock(), vueExports.createBlock("div", {
                               key: row.id,
                               class: "rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"
                             }, [
-                              createVNode("div", { class: "flex items-start justify-between gap-4" }, [
-                                createVNode("div", { class: "space-y-1" }, [
-                                  createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(row.label), 1),
-                                  createVNode("p", { class: "text-xs uppercase tracking-[0.16em] text-charcoal-500" }, toDisplayString(row.category) + " · " + toDisplayString(unref(formatCount)(row.count)) + " использований ", 1)
+                              vueExports.createVNode("div", { class: "flex items-start justify-between gap-4" }, [
+                                vueExports.createVNode("div", { class: "space-y-1" }, [
+                                  vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(row.label), 1),
+                                  vueExports.createVNode("p", { class: "text-xs uppercase tracking-[0.16em] text-charcoal-500" }, vueExports.toDisplayString(row.category) + " · " + vueExports.toDisplayString(vueExports.unref(formatCount)(row.count)) + " использований ", 1)
                                 ]),
-                                createVNode("div", { class: "space-y-1 text-right" }, [
-                                  createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(unref(formatMoney)(row.revenue)), 1),
-                                  createVNode("p", { class: "text-xs text-charcoal-500" }, " Средняя цена " + toDisplayString(unref(formatMoney)(row.avgPrice)), 1)
+                                vueExports.createVNode("div", { class: "space-y-1 text-right" }, [
+                                  vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(vueExports.unref(formatMoney)(row.revenue)), 1),
+                                  vueExports.createVNode("p", { class: "text-xs text-charcoal-500" }, " Средняя цена " + vueExports.toDisplayString(vueExports.unref(formatMoney)(row.avgPrice)), 1)
                                 ])
                               ])
                             ]);
                           }), 128))
-                        ])) : (openBlock(), createBlock(_component_SharedEmptyState, {
+                        ])) : (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                           key: 1,
                           description: "В истории нет услуг для разбивки.",
                           icon: "i-lucide-badge-dollar-sign",
@@ -2023,35 +2021,35 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                       ]),
                       _: 1
                     }),
-                    createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-                      header: withCtx(() => [
-                        createVNode("div", { class: "space-y-2" }, [
-                          createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Разбивка "),
-                          createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " По способам оплаты ")
+                    vueExports.createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+                      header: vueExports.withCtx(() => [
+                        vueExports.createVNode("div", { class: "space-y-2" }, [
+                          vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Разбивка "),
+                          vueExports.createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " По способам оплаты ")
                         ])
                       ]),
-                      default: withCtx(() => [
-                        unref(paymentBreakdown).length ? (openBlock(), createBlock("div", {
+                      default: vueExports.withCtx(() => [
+                        vueExports.unref(paymentBreakdown).length ? (vueExports.openBlock(), vueExports.createBlock("div", {
                           key: 0,
                           class: "space-y-3"
                         }, [
-                          (openBlock(true), createBlock(Fragment, null, renderList(unref(paymentBreakdown), (row) => {
-                            return openBlock(), createBlock("div", {
+                          (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(paymentBreakdown), (row) => {
+                            return vueExports.openBlock(), vueExports.createBlock("div", {
                               key: row.key,
                               class: "rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"
                             }, [
-                              createVNode("div", { class: "flex items-start justify-between gap-4" }, [
-                                createVNode("div", { class: "space-y-1" }, [
-                                  createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(row.label), 1),
-                                  createVNode("p", { class: "text-xs uppercase tracking-[0.16em] text-charcoal-500" }, toDisplayString(unref(formatCount)(row.count)) + " записей · " + toDisplayString(unref(formatPercent)(row.percent)), 1)
+                              vueExports.createVNode("div", { class: "flex items-start justify-between gap-4" }, [
+                                vueExports.createVNode("div", { class: "space-y-1" }, [
+                                  vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(row.label), 1),
+                                  vueExports.createVNode("p", { class: "text-xs uppercase tracking-[0.16em] text-charcoal-500" }, vueExports.toDisplayString(vueExports.unref(formatCount)(row.count)) + " записей · " + vueExports.toDisplayString(vueExports.unref(formatPercent)(row.percent)), 1)
                                 ]),
-                                createVNode("div", { class: "text-right" }, [
-                                  createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(unref(formatMoney)(row.revenue)), 1)
+                                vueExports.createVNode("div", { class: "text-right" }, [
+                                  vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(vueExports.unref(formatMoney)(row.revenue)), 1)
                                 ])
                               ])
                             ]);
                           }), 128))
-                        ])) : (openBlock(), createBlock(_component_SharedEmptyState, {
+                        ])) : (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                           key: 1,
                           description: "Не найдено ни одного способа оплаты.",
                           icon: "i-lucide-credit-card",
@@ -2061,35 +2059,35 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                       _: 1
                     })
                   ]),
-                  createVNode("div", { class: "grid gap-6 xl:grid-cols-3" }, [
-                    createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-                      header: withCtx(() => [
-                        createVNode("div", { class: "space-y-2" }, [
-                          createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Top-лист "),
-                          createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " Лучшие филиалы ")
+                  vueExports.createVNode("div", { class: "grid gap-6 xl:grid-cols-3" }, [
+                    vueExports.createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+                      header: vueExports.withCtx(() => [
+                        vueExports.createVNode("div", { class: "space-y-2" }, [
+                          vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Top-лист "),
+                          vueExports.createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " Лучшие филиалы ")
                         ])
                       ]),
-                      default: withCtx(() => [
-                        unref(topBranches).length ? (openBlock(), createBlock("div", {
+                      default: vueExports.withCtx(() => [
+                        vueExports.unref(topBranches).length ? (vueExports.openBlock(), vueExports.createBlock("div", {
                           key: 0,
                           class: "space-y-3"
                         }, [
-                          (openBlock(true), createBlock(Fragment, null, renderList(unref(topBranches), (row, index) => {
-                            return openBlock(), createBlock("div", {
+                          (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(topBranches), (row, index) => {
+                            return vueExports.openBlock(), vueExports.createBlock("div", {
                               key: row.id,
                               class: "flex items-center justify-between gap-4 rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"
                             }, [
-                              createVNode("div", { class: "flex items-center gap-3" }, [
-                                createVNode("div", { class: "flex size-9 items-center justify-center rounded-2xl bg-brass-100 font-semibold text-brass-800" }, toDisplayString(index + 1), 1),
-                                createVNode("div", { class: "space-y-1" }, [
-                                  createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(row.label), 1),
-                                  createVNode("p", { class: "text-xs text-charcoal-500" }, toDisplayString(unref(formatCount)(row.count)) + " записей ", 1)
+                              vueExports.createVNode("div", { class: "flex items-center gap-3" }, [
+                                vueExports.createVNode("div", { class: "flex size-9 items-center justify-center rounded-2xl bg-brass-100 font-semibold text-brass-800" }, vueExports.toDisplayString(index + 1), 1),
+                                vueExports.createVNode("div", { class: "space-y-1" }, [
+                                  vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(row.label), 1),
+                                  vueExports.createVNode("p", { class: "text-xs text-charcoal-500" }, vueExports.toDisplayString(vueExports.unref(formatCount)(row.count)) + " записей ", 1)
                                 ])
                               ]),
-                              createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(unref(formatMoney)(row.revenue)), 1)
+                              vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(vueExports.unref(formatMoney)(row.revenue)), 1)
                             ]);
                           }), 128))
-                        ])) : (openBlock(), createBlock(_component_SharedEmptyState, {
+                        ])) : (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                           key: 1,
                           description: "Нет филиалов для ранжирования.",
                           icon: "i-lucide-trophy",
@@ -2098,34 +2096,34 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                       ]),
                       _: 1
                     }),
-                    createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-                      header: withCtx(() => [
-                        createVNode("div", { class: "space-y-2" }, [
-                          createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Top-лист "),
-                          createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " Лучшие барберы ")
+                    vueExports.createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+                      header: vueExports.withCtx(() => [
+                        vueExports.createVNode("div", { class: "space-y-2" }, [
+                          vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Top-лист "),
+                          vueExports.createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " Лучшие барберы ")
                         ])
                       ]),
-                      default: withCtx(() => [
-                        unref(topBarbers).length ? (openBlock(), createBlock("div", {
+                      default: vueExports.withCtx(() => [
+                        vueExports.unref(topBarbers).length ? (vueExports.openBlock(), vueExports.createBlock("div", {
                           key: 0,
                           class: "space-y-3"
                         }, [
-                          (openBlock(true), createBlock(Fragment, null, renderList(unref(topBarbers), (row, index) => {
-                            return openBlock(), createBlock("div", {
+                          (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(topBarbers), (row, index) => {
+                            return vueExports.openBlock(), vueExports.createBlock("div", {
                               key: row.id,
                               class: "flex items-center justify-between gap-4 rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"
                             }, [
-                              createVNode("div", { class: "flex items-center gap-3" }, [
-                                createVNode("div", { class: "flex size-9 items-center justify-center rounded-2xl bg-sand-100 font-semibold text-charcoal-900" }, toDisplayString(index + 1), 1),
-                                createVNode("div", { class: "space-y-1" }, [
-                                  createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(row.label), 1),
-                                  createVNode("p", { class: "text-xs text-charcoal-500" }, toDisplayString(unref(formatCount)(row.count)) + " записей ", 1)
+                              vueExports.createVNode("div", { class: "flex items-center gap-3" }, [
+                                vueExports.createVNode("div", { class: "flex size-9 items-center justify-center rounded-2xl bg-sand-100 font-semibold text-charcoal-900" }, vueExports.toDisplayString(index + 1), 1),
+                                vueExports.createVNode("div", { class: "space-y-1" }, [
+                                  vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(row.label), 1),
+                                  vueExports.createVNode("p", { class: "text-xs text-charcoal-500" }, vueExports.toDisplayString(vueExports.unref(formatCount)(row.count)) + " записей ", 1)
                                 ])
                               ]),
-                              createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(unref(formatMoney)(row.revenue)), 1)
+                              vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(vueExports.unref(formatMoney)(row.revenue)), 1)
                             ]);
                           }), 128))
-                        ])) : (openBlock(), createBlock(_component_SharedEmptyState, {
+                        ])) : (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                           key: 1,
                           description: "Нет барберов для ранжирования.",
                           icon: "i-lucide-award",
@@ -2134,34 +2132,34 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                       ]),
                       _: 1
                     }),
-                    createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
-                      header: withCtx(() => [
-                        createVNode("div", { class: "space-y-2" }, [
-                          createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Top-лист "),
-                          createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " Частые услуги ")
+                    vueExports.createVNode(_component_UCard, { class: "warm-card rounded-[1.9rem] border border-charcoal-200" }, {
+                      header: vueExports.withCtx(() => [
+                        vueExports.createVNode("div", { class: "space-y-2" }, [
+                          vueExports.createVNode("p", { class: "text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500" }, " Top-лист "),
+                          vueExports.createVNode("h2", { class: "barbershop-heading text-2xl text-charcoal-950" }, " Частые услуги ")
                         ])
                       ]),
-                      default: withCtx(() => [
-                        unref(topServices).length ? (openBlock(), createBlock("div", {
+                      default: vueExports.withCtx(() => [
+                        vueExports.unref(topServices).length ? (vueExports.openBlock(), vueExports.createBlock("div", {
                           key: 0,
                           class: "space-y-3"
                         }, [
-                          (openBlock(true), createBlock(Fragment, null, renderList(unref(topServices), (row, index) => {
-                            return openBlock(), createBlock("div", {
+                          (vueExports.openBlock(true), vueExports.createBlock(vueExports.Fragment, null, vueExports.renderList(vueExports.unref(topServices), (row, index) => {
+                            return vueExports.openBlock(), vueExports.createBlock("div", {
                               key: row.id,
                               class: "flex items-center justify-between gap-4 rounded-[1.25rem] border border-charcoal-200 bg-white/80 px-4 py-3"
                             }, [
-                              createVNode("div", { class: "flex items-center gap-3" }, [
-                                createVNode("div", { class: "flex size-9 items-center justify-center rounded-2xl bg-charcoal-100 font-semibold text-charcoal-900" }, toDisplayString(index + 1), 1),
-                                createVNode("div", { class: "space-y-1" }, [
-                                  createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(row.label), 1),
-                                  createVNode("p", { class: "text-xs text-charcoal-500" }, toDisplayString(row.category) + " · " + toDisplayString(unref(formatCount)(row.count)) + " раз ", 1)
+                              vueExports.createVNode("div", { class: "flex items-center gap-3" }, [
+                                vueExports.createVNode("div", { class: "flex size-9 items-center justify-center rounded-2xl bg-charcoal-100 font-semibold text-charcoal-900" }, vueExports.toDisplayString(index + 1), 1),
+                                vueExports.createVNode("div", { class: "space-y-1" }, [
+                                  vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(row.label), 1),
+                                  vueExports.createVNode("p", { class: "text-xs text-charcoal-500" }, vueExports.toDisplayString(row.category) + " · " + vueExports.toDisplayString(vueExports.unref(formatCount)(row.count)) + " раз ", 1)
                                 ])
                               ]),
-                              createVNode("p", { class: "font-semibold text-charcoal-950" }, toDisplayString(unref(formatMoney)(row.revenue)), 1)
+                              vueExports.createVNode("p", { class: "font-semibold text-charcoal-950" }, vueExports.toDisplayString(vueExports.unref(formatMoney)(row.revenue)), 1)
                             ]);
                           }), 128))
-                        ])) : (openBlock(), createBlock(_component_SharedEmptyState, {
+                        ])) : (vueExports.openBlock(), vueExports.createBlock(_component_SharedEmptyState, {
                           key: 1,
                           description: "Нет услуг для ранжирования.",
                           icon: "i-lucide-list-ordered",
@@ -2183,7 +2181,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
 });
 const _sfc_setup = _sfc_main.setup;
 _sfc_main.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
+  const ssrContext = vueExports.useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("pages/statistics.vue");
   return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
 };
