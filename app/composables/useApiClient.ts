@@ -1,11 +1,51 @@
+import { useBranchStore } from "~/stores/branch";
+
 type RequestOptions<TBody = unknown> = {
   body?: TBody;
   headers?: HeadersInit;
   method?: "DELETE" | "GET" | "PATCH" | "POST" | "PUT";
+  /**
+   * Query parameters passed to $fetch. To bypass automatic branch/object scoping,
+   * set `__skipBranchScope` to true; it will be stripped before the request.
+   */
   query?: Record<string, unknown>;
   silent?: boolean;
   successMessage?: string;
 };
+
+function buildScopedQuery(query: Record<string, unknown> | undefined, method?: RequestOptions["method"]) {
+  const normalizedMethod = (method || "GET").toUpperCase();
+
+  if (!["GET", "HEAD"].includes(normalizedMethod)) {
+    return query;
+  }
+
+  const branchStore = useBranchStore();
+  const activeBranchId = branchStore?.activeBranchId;
+
+  const nextQuery: Record<string, unknown> = {
+    ...(query || {})
+  };
+
+  if ((nextQuery as any).__skipBranchScope) {
+    delete (nextQuery as any).__skipBranchScope;
+    return nextQuery;
+  }
+
+  if (!activeBranchId) {
+    return nextQuery;
+  }
+
+  if (nextQuery.branch_id === undefined) {
+    nextQuery.branch_id = activeBranchId;
+  }
+
+  if (nextQuery.object_id === undefined) {
+    nextQuery.object_id = activeBranchId;
+  }
+
+  return nextQuery;
+}
 
 function extractErrorMessage(error: any) {
   const data = error?.data || error?.response?._data;
@@ -77,20 +117,22 @@ export function useApiClient() {
     url: string,
     options: RequestOptions<TBody> = {},
   ) {
+    const scopedQuery = buildScopedQuery(options.query, options.method);
+
     try {
       const data = await $fetch<TResponse>(url, {
         body: options.body as BodyInit | Record<string, unknown> | undefined,
         credentials: "include",
         headers: buildRequestHeaders(options.headers),
         method: options.method || "GET",
-        query: options.query,
+        query: scopedQuery,
       });
 
       if (import.meta.client) {
         uiStore.pushDebug({
           at: new Date().toISOString(),
           method: options.method || "GET",
-          request: options.body ?? options.query,
+          request: options.body ?? scopedQuery,
           response: data,
           status: "success",
           url,
@@ -127,20 +169,22 @@ export function useApiClient() {
     url: string,
     options: RequestOptions<TBody> = {},
   ) {
+    const scopedQuery = buildScopedQuery(options.query, options.method);
+
     try {
       const response = await $fetch.raw<TResponse>(url, {
         body: options.body as BodyInit | Record<string, unknown> | undefined,
         credentials: "include",
         headers: buildRequestHeaders(options.headers),
         method: options.method || "GET",
-        query: options.query,
+        query: scopedQuery,
       });
 
       if (import.meta.client) {
         uiStore.pushDebug({
           at: new Date().toISOString(),
           method: options.method || "GET",
-          request: options.body ?? options.query,
+          request: options.body ?? scopedQuery,
           response: response._data,
           status: "success",
           url,
@@ -158,7 +202,7 @@ export function useApiClient() {
           at: new Date().toISOString(),
           error,
           method: options.method || "GET",
-          request: options.body ?? options.query,
+          request: options.body ?? scopedQuery,
           response: null,
           status: "error",
           url,

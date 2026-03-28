@@ -7,7 +7,6 @@ export function useDashboardNavigation() {
 
   const primaryLinks = [[
     { icon: 'i-lucide-layout-dashboard', label: 'Обзор', to: '/' },
-    { icon: 'i-lucide-monitor-smartphone', label: 'Киоск', to: '/kiosk' },
     { icon: 'i-lucide-users', label: 'Барберы', to: '/barbers' },
     { icon: 'i-lucide-users-round', label: 'Клиенты', to: '/clients' },
     { icon: 'i-lucide-badge-dollar-sign', label: 'Услуги', to: '/services' },

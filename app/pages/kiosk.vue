@@ -50,9 +50,10 @@ const baseTabs = [
 ]
 
 const { data, pending, refresh } = await useAsyncData('kiosk-dashboard', async () => {
+  const branchId = branchStore.activeBranchId || undefined
   const [services, barbers] = await Promise.all([
-    kioskApi.services({ active: true, grouped: true }),
-    branchStore.activeBranchId ? kioskApi.barbers(branchStore.activeBranchId) : Promise.resolve({ data: [] })
+    kioskApi.services({ active: true, grouped: true, ...(branchId ? { branch_id: branchId } : {}) }),
+    branchId ? kioskApi.barbers(branchId) : Promise.resolve({ data: [] })
   ])
 
   return {

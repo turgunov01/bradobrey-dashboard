@@ -174,13 +174,19 @@ const columns: TableColumn<BarberRow>[] = [
 ]
 
 const { data, pending, refresh } = await useAsyncData('barber-history-directory', async () => {
-  const branches = [...branchStore.branches]
-  const branchMap = new Map(branches.map(branch => [branch.id, branch]))
+  const selectedBranches = branchStore.activeBranchId
+    ? branchStore.branches.filter(branch => branch.id === branchStore.activeBranchId)
+    : [...branchStore.branches]
+  const branchMap = new Map(selectedBranches.map(branch => [branch.id, branch]))
 
   const [accountsResponse, results] = await Promise.all([
-    barbersApi.list(),
+    barbersApi.list(
+      branchStore.activeBranchId
+        ? { branch_id: branchStore.activeBranchId }
+        : undefined
+    ),
     Promise.allSettled(
-      branches.map(async (branch) => {
+      selectedBranches.map(async (branch) => {
         const response = await kioskApi.barbers(branch.id)
 
         return {
@@ -195,7 +201,7 @@ const { data, pending, refresh } = await useAsyncData('barber-history-directory'
   const activeProfiles = new Map<string, BarberProfile & Record<string, any>>()
 
   results.forEach((result, index) => {
-    const branch = branches[index]
+    const branch = selectedBranches[index]
 
     if (!branch) {
       return
@@ -259,6 +265,8 @@ const { data, pending, refresh } = await useAsyncData('barber-history-directory'
     failedBranches,
     rows
   }
+}, {
+  watch: [() => branchStore.activeBranchId]
 })
 
 const barberRows = computed(() => data.value?.rows || [])

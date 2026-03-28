@@ -10,15 +10,18 @@ const branchStore = useBranchStore()
 await branchStore.ensureLoaded()
 
 const options = computed(() =>
-  branchStore.branches.map((branch: Branch) => ({
-    label: branch.name,
-    value: branch.id
-  }))
+  [
+    { label: 'Общее', value: null },
+    ...branchStore.branches.map((branch: Branch) => ({
+      label: branch.name,
+      value: branch.id
+    }))
+  ]
 )
 
 const activeBranchId = computed({
-  get: () => branchStore.activeBranchId ?? undefined,
-  set: (value?: string) => branchStore.setActiveBranch(value)
+  get: () => branchStore.activeBranchId ?? null,
+  set: (value?: string | null) => branchStore.setActiveBranch(value)
 })
 </script>
 

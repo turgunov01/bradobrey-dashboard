@@ -45,7 +45,11 @@ const page = ref(1)
 const pageSize = 10
 
 const { data, pending, refresh } = await useAsyncData('barbers-directory', async () => {
-  const response = await barbersApi.list()
+  const response = await barbersApi.list(
+    branchStore.activeBranchId
+      ? { branch_id: branchStore.activeBranchId }
+      : undefined
+  )
   const items = Array.isArray(response?.items) ? response.items : []
 
   return { items }

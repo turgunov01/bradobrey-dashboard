@@ -22,6 +22,7 @@ await Promise.all([
 ])
 
 const { data, pending, refresh } = await useAsyncData('overview-dashboard', async () => {
+  const branchId = branchStore.activeBranchId || undefined
   const [health, queue, promoDashboard, statistics] = await Promise.all([
     $fetch('/api/health'),
     sessionStore.barber?.id
@@ -30,7 +31,8 @@ const { data, pending, refresh } = await useAsyncData('overview-dashboard', asyn
     promoApi.dashboard(),
     statisticsApi.global({
       end_date: uiStore.statisticsRange.end,
-      start_date: uiStore.statisticsRange.start
+      start_date: uiStore.statisticsRange.start,
+      ...(branchId ? { branch_id: branchId } : {})
     })
   ])
 
@@ -41,7 +43,7 @@ const { data, pending, refresh } = await useAsyncData('overview-dashboard', asyn
     statistics
   }
 }, {
-  watch: [() => uiStore.statisticsRange.end, () => uiStore.statisticsRange.start]
+  watch: [() => uiStore.statisticsRange.end, () => uiStore.statisticsRange.start, () => branchStore.activeBranchId]
 })
 
 const promoItems = computed(() => {

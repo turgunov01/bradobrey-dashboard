@@ -82,6 +82,7 @@ export async function listSupabaseUsers(
   options: {
     limit?: number
     role?: string | null
+    branchId?: string | null
   } = {}
 ) {
   const { serviceRoleKey, supabaseUrl } = getSupabaseAccessConfig(event)
@@ -97,7 +98,8 @@ export async function listSupabaseUsers(
         limit: options.limit || 500,
         order: 'login.asc.nullslast',
         select: 'id,login,role,branch_id',
-        ...(options.role ? { role: `eq.${options.role}` } : {})
+        ...(options.role ? { role: `eq.${options.role}` } : {}),
+        ...(options.branchId ? { branch_id: `eq.${options.branchId}` } : {})
       }
     })
 

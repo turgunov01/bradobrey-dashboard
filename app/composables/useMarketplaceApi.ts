@@ -10,10 +10,14 @@ export function useMarketplaceApi() {
       })
     },
     detail(id: string) {
-      return client.request(`/api/marketplace/banners/${id}`)
+      return client.request(`/api/marketplace/banners/${id}`, {
+        query: { __skipBranchScope: true }
+      })
     },
     list() {
-      return client.request('/api/marketplace/banners')
+      return client.request('/api/marketplace/banners', {
+        query: { __skipBranchScope: true }
+      })
     },
     toggleActive(id: string, isActive: boolean) {
       return client.request(`/api/marketplace/banners/${id}`, {

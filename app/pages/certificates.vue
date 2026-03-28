@@ -75,6 +75,9 @@ function extractCertificateRows(response: unknown): CertificateRow[] {
 
 const certificatesApi = useCertificatesApi()
 const kioskApi = useKioskApi()
+const branchStore = useBranchStore()
+
+await branchStore.ensureLoaded()
 
 const createModalOpen = ref(false)
 const lookupModalOpen = ref(false)
@@ -103,8 +106,9 @@ const certificateColumns: TableColumn<CertificateRow>[] = [
 ]
 
 const { data, pending, refresh } = await useAsyncData('certificates-dashboard', async () => {
+  const branchId = branchStore.activeBranchId || undefined
   const [servicesResult, certificatesResult] = await Promise.allSettled([
-    kioskApi.services({ active: true, grouped: false }),
+    kioskApi.services({ active: true, grouped: false, ...(branchId ? { branch_id: branchId } : {}) }),
     certificatesApi.listActive()
   ])
 
@@ -116,6 +120,8 @@ const { data, pending, refresh } = await useAsyncData('certificates-dashboard', 
       ? flattenServicesPayload(servicesResult.value)
       : []
   }
+}, {
+  watch: [() => branchStore.activeBranchId]
 })
 
 const services = computed(() => data.value?.services || [])

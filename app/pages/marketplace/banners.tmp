@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { TableColumn } from '@nuxt/ui'
-
 const marketplaceApi = useMarketplaceApi()
 const branchStore = useBranchStore()
 
@@ -60,17 +58,8 @@ const form = reactive({
   title_ru: '',
   title_uz: ''
 })
-
 const selectedFile = ref<File | null>(null)
-const imagePreviewSrc = ref<string | null>(null)
-
-const columns: TableColumn<any>[] = [
-  { accessorKey: 'title', header: 'Название' },
-  { accessorKey: 'sort_order', header: 'Сортировка' },
-  { accessorKey: 'is_active', header: 'Статус' },
-  { id: 'media', header: 'Медиа' },
-  { id: 'actions', header: 'Действия' }
-]
+const selectedBannerId = ref('')
 
 const { data, pending, refresh } = await useAsyncData('marketplace-banners', async () => {
   const banners = await marketplaceApi.list()
@@ -79,11 +68,30 @@ const { data, pending, refresh } = await useAsyncData('marketplace-banners', asy
   watch: [() => branchStore.activeBranchId]
 })
 
+watch(
+  () => data.value || [],
+  (items) => {
+    if (!items.length) {
+      selectedBannerId.value = ''
+      return
+    }
+
+    if (!items.some((item: any) => String(item.id) === selectedBannerId.value)) {
+      selectedBannerId.value = String(items[0].id)
+    }
+  },
+  { immediate: true }
+)
+
 watch(bannerModalOpen, (open) => {
   if (!open) {
     resetForm()
   }
 })
+
+const selectedBanner = computed(() =>
+  (data.value || []).find((item: any) => String(item.id) === selectedBannerId.value) || null
+)
 
 const modalTitle = computed(() =>
   form.id ? 'Редактировать баннер' : 'Создать баннер'
@@ -117,6 +125,7 @@ function editBanner(item: any) {
   form.title_en = item.title_en || titleLocales.en || ''
   form.title_ru = item.title_ru || titleLocales.ru || ''
   form.title_uz = item.title_uz || titleLocales.uz || ''
+  selectedBannerId.value = String(item.id)
   bannerModalOpen.value = true
 }
 
@@ -177,10 +186,6 @@ async function toggleBanner(item: any) {
   await refresh()
 }
 
-function openImagePreview(url?: string | null) {
-  imagePreviewSrc.value = url || null
-}
-
 function getBannerTitle(item: any) {
   const locales = item.locales || {}
   const titleLocales = locales.title || {}
@@ -193,18 +198,9 @@ function getBannerTitle(item: any) {
     item.title_en ||
     titleLocales.en ||
     item.title ||
-    'Баннер без названия'
+    'Р‘Р°РЅРЅРµСЂ Р±РµР· РЅР°Р·РІР°РЅРёСЏ'
   )
 }
-
-const imageModalOpen = computed({
-  get: () => Boolean(imagePreviewSrc.value),
-  set: (value: boolean) => {
-    if (!value) {
-      imagePreviewSrc.value = null
-    }
-  }
-})
 </script>
 
 <template>
@@ -214,11 +210,17 @@ const imageModalOpen = computed({
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
+
+        <template #right>
+          <UButton color="neutral" icon="i-lucide-refresh-cw" :loading="pending" variant="outline" @click="refresh()">
+            Обновить
+          </UButton>
+        </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
-      <div class="grid gap-6">
+      <div class="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <UCard class="warm-card rounded-[1.9rem] border border-charcoal-200">
           <template #header>
             <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -237,67 +239,33 @@ const imageModalOpen = computed({
             </div>
           </template>
 
-          <div v-if="data?.length" class="overflow-hidden rounded-[1.25rem] border border-charcoal-200 bg-white/90">
-            <div class="max-h-[78vh] overflow-auto">
-              <UTable
-                :columns="columns"
-                :data="data || []"
-                :loading="pending"
-                sticky="header"
-                :ui="{
-                  root: 'w-full overflow-auto',
-                  base: 'w-full min-w-[62rem]',
-                  thead: 'bg-charcoal-50/90',
-                  tbody: 'divide-y divide-charcoal-100',
-                  th: 'px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-charcoal-500',
-                  td: 'px-4 py-4 text-sm text-charcoal-700 align-middle'
-                }"
-              >
-                <template #title-cell="{ row }">
-                  <div class="space-y-1">
-                    <p class="font-semibold text-charcoal-950">{{ getBannerTitle(row.original) }}</p>
-                    <p class="text-xs text-charcoal-500">{{ row.original.locale || 'Локаль не указана' }}</p>
-                  </div>
-                </template>
-
-                <template #sort_order-cell="{ row }">
-                  <span class="font-mono text-sm text-charcoal-900">{{ row.original.sort_order ?? 0 }}</span>
-                </template>
-
-                <template #is_active-cell="{ row }">
-                  <SharedStatusBadge :label="row.original.is_active ? 'active' : 'inactive'" />
-                </template>
-
-                <template #media-cell="{ row }">
-                  <div class="flex items-center gap-3">
-                    <button
-                      v-if="row.original.media?.url"
-                      type="button"
-                      class="rounded-lg border border-charcoal-200 transition hover:border-brass-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-brass-300"
-                      @click="openImagePreview(row.original.media.url)"
-                    >
-                      <img
-                        :src="row.original.media.url"
-                        alt="banner"
-                        class="h-12 w-16 rounded-lg object-cover"
-                      >
-                    </button>
-                    <span v-else class="text-xs text-charcoal-500">—</span>
-                  </div>
-                </template>
-
-                <template #actions-cell="{ row }">
-                  <div class="flex flex-wrap gap-2">
-                    <UButton color="neutral" size="xs" variant="outline" @click="editBanner(row.original)">
-                      Редактировать
-                    </UButton>
-                    <UButton color="neutral" size="xs" variant="outline" @click="toggleBanner(row.original)">
-                      {{ row.original.is_active ? 'Деактивировать' : 'Активировать' }}
-                    </UButton>
-                  </div>
-                </template>
-              </UTable>
-            </div>
+          <div v-if="data?.length" class="space-y-3">
+            <button
+              v-for="item in data"
+              :key="String(item.id)"
+              :class="[
+                String(item.id) === selectedBannerId ? 'border-brass-300 bg-brass-50' : 'border-charcoal-200 bg-white/80',
+                'w-full rounded-[1.25rem] border p-4 text-left transition'
+              ]"
+              type="button"
+              @click="selectedBannerId = String(item.id)"
+            >
+              <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div class="space-y-1">
+                  <p class="font-medium text-charcoal-950">{{ getBannerTitle(item) }}</p>
+                  <p class="text-sm text-charcoal-500">{{ item.locale || 'Локаль не указана' }} · {{ item.sort_order ?? 0 }}</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <SharedStatusBadge :label="item.is_active ? 'active' : 'inactive'" />
+                  <UButton color="neutral" size="xs" variant="outline" @click.stop="editBanner(item)">
+                    Редактировать
+                  </UButton>
+                  <UButton color="neutral" size="xs" variant="outline" @click.stop="toggleBanner(item)">
+                    {{ item.is_active ? 'Деактивировать' : 'Активировать' }}
+                  </UButton>
+                </div>
+              </div>
+            </button>
           </div>
           <SharedEmptyState
             v-else
@@ -306,25 +274,28 @@ const imageModalOpen = computed({
             title="Баннеров нет"
           />
         </UCard>
-      </div>
 
-      <UModal
-        v-model:open="imageModalOpen"
-        class="sm:max-w-3xl"
-        title="Просмотр баннера"
-      >
-        <template #body>
-          <div class="flex justify-center">
-            <img
-              v-if="imagePreviewSrc"
-              :src="imagePreviewSrc"
-              alt="banner preview"
-              class="max-h-[70vh] max-w-full rounded-2xl border border-charcoal-200 object-contain shadow-lg"
-            >
-            <p v-else class="text-sm text-charcoal-500">Изображение недоступно</p>
-          </div>
-        </template>
-      </UModal>
+        <UCard class="warm-card rounded-[1.9rem] border border-charcoal-200">
+          <template #header>
+            <div class="space-y-2">
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-charcoal-500">
+                Выбранные данные
+              </p>
+              <h2 class="barbershop-heading text-2xl text-charcoal-950">
+                Детали баннера
+              </h2>
+            </div>
+          </template>
+
+          <SharedJsonBlock v-if="selectedBanner" label="Баннер" :value="selectedBanner" />
+          <SharedEmptyState
+            v-else
+            description="Выберите баннер из списка, чтобы посмотреть его сырые данные."
+            icon="i-lucide-gallery-vertical-end"
+            title="Баннер не выбран"
+          />
+        </UCard>
+      </div>
 
       <UModal
         v-model:open="bannerModalOpen"
@@ -407,3 +378,5 @@ const imageModalOpen = computed({
     </template>
   </UDashboardPanel>
 </template>
+
+

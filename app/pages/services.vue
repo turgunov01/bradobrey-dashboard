@@ -16,6 +16,9 @@ type ServiceRow = {
 }
 
 const servicesApi = useServicesApi()
+const branchStore = useBranchStore()
+
+await branchStore.ensureLoaded()
 
 const serviceModalOpen = ref(false)
 const previewOpen = ref(false)
@@ -58,6 +61,8 @@ const serviceColumns: TableColumn<ServiceRow>[] = [
 
 const { data, pending, refresh } = await useAsyncData('services-dashboard', async () => {
   return await servicesApi.list()
+}, {
+  watch: [() => branchStore.activeBranchId]
 })
 
 const serviceRows = computed<ServiceRow[]>(() =>
@@ -89,6 +94,13 @@ watch([serviceRows, servicePage], () => {
     servicePage.value = servicePageCount.value
   }
 })
+
+watch(
+  () => [branchStore.activeBranchId, serviceRows.value.length],
+  () => {
+    servicePage.value = 1
+  }
+)
 
 watch(serviceModalOpen, (open) => {
   if (!open) {
@@ -231,8 +243,8 @@ onBeforeUnmount(() => {
         </div>
       </div>
 
-      <div v-if="serviceRows.length" class="overflow-hidden rounded-[1.25rem] border border-charcoal-200 bg-white/90">
-        <div class="max-h-[80vh] overflow-auto">
+      <div v-if="serviceRows.length" class="flex flex-col max-h-[70vh] overflow-hidden rounded-[1.25rem] border border-charcoal-200 bg-white/90">
+        <div class="flex-1 overflow-auto">
           <UTable
             :columns="serviceColumns"
             :data="pagedServices"
@@ -307,7 +319,7 @@ onBeforeUnmount(() => {
             Показано {{ pagedServices.length ? (servicePage - 1) * servicePageSize + 1 : 0 }}–{{ Math.min(servicePage * servicePageSize, serviceRows.length) }} из {{ serviceRows.length }}
           </span>
           <UPagination
-            v-model="servicePage"
+            v-model:page="servicePage"
             :page-count="servicePageCount"
             :total="serviceRows.length"
             :per-page="servicePageSize"

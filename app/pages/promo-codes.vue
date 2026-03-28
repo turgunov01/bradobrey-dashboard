@@ -32,6 +32,9 @@ type PromoRow = {
 
 const promoApi = usePromoApi()
 const apiClient = useApiClient()
+const branchStore = useBranchStore()
+
+await branchStore.ensureLoaded()
 
 const discountTypeOptions: Array<{ label: string, value: PromoDiscountType }> = [
   { label: 'Процент', value: 'percentage' },
@@ -163,6 +166,8 @@ const { data, pending, refresh } = await useAsyncData('promo-dashboard', async (
   return {
     items
   }
+}, {
+  watch: [() => branchStore.activeBranchId]
 })
 
 const promoRows = computed<PromoRow[]>(() => data.value?.items || [])

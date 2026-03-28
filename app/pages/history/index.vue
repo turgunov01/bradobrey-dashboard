@@ -4,6 +4,7 @@ import type { TableColumn } from '@nuxt/ui'
 import type { HistoryItem } from '~~/shared/schemas'
 import { formatDateTime, formatMoney } from '~/utils/format'
 import { formatPaymentMethod } from '~/utils/display'
+import { flattenServicesPayload } from '~/utils/services'
 
 function extractHistoryItems(response: unknown): HistoryItem[] {
   if (Array.isArray(response)) {
@@ -34,48 +35,126 @@ function extractHistoryItems(response: unknown): HistoryItem[] {
   return []
 }
 
+function normalizeText(value: unknown) {
+  if (value === undefined || value === null) {
+    return null
+  }
+
+  const text = String(value).trim()
+
+  return text || null
+}
+
+function getClientPhone(item: Record<string, any>) {
+  return normalizeText(
+    item.phone_number
+    || item.phone
+    || item.client?.phone
+    || item.client?.phone_number
+    || item.customer?.phone
+  )
+}
+
+function getClientName(item: Record<string, any>) {
+  return normalizeText(
+    item.customer_name
+    || item.client?.name
+    || item.user_name
+  )
+}
+
+const serviceNameMap = computed(() =>
+  new Map(
+    (servicesData.value || []).map((svc: any) => [String(svc.id), svc.name || `Услуга ${svc.id}`])
+  )
+)
+
+function getServiceNames(item: Record<string, any>) {
+  const ids = Array.isArray(item.service_ids)
+    ? item.service_ids
+    : item.service_id
+      ? [item.service_id]
+      : []
+
+  return ids
+    .map((id: any) => {
+      const key = String(id)
+      return serviceNameMap.value.get(key) || key
+    })
+    .filter(Boolean)
+}
+
 const branchStore = useBranchStore()
 const historyApi = useHistoryApi()
+const kioskApi = useKioskApi()
 
 const page = ref(1)
 const itemsPerPage = 10
 
 await branchStore.ensureLoaded()
 
-const columns: TableColumn<HistoryItem>[] = [
-  { accessorKey: 'phone_number', header: 'КЛИЕНТ' },
+const columns: TableColumn<any>[] = [
+  { accessorKey: 'client', header: 'КЛИЕНТ' },
+  { accessorKey: 'phone', header: 'ТЕЛЕФОН' },
   { accessorKey: 'status', header: 'СТАТУС' },
   { accessorKey: 'payment_method', header: 'ОПЛАТА' },
   { accessorKey: 'amount', header: 'СУММА' },
-  { accessorKey: 'created_at', header: 'СОЗДАНО' }
+  { accessorKey: 'created_at', header: 'СОЗДАНО' },
+  { id: 'actions', header: '' }
 ]
 
 const { data, pending, refresh } = await useAsyncData('history-current-filter', async () => {
-  if (!branchStore.activeBranchId) {
-    return [] as HistoryItem[]
-  }
+  const query = branchStore.activeBranchId
+    ? { branch_id: branchStore.activeBranchId }
+    : {}
 
-  const response = await historyApi.branch(branchStore.activeBranchId)
+  const response = await historyApi.list(query)
 
   return extractHistoryItems(response)
 }, {
   watch: [() => branchStore.activeBranchId]
 })
 
-const historyItems = computed(() => data.value || [])
+const { data: servicesData } = await useAsyncData('history-services', async () => {
+  const branchId = branchStore.activeBranchId || undefined
+  const response = await kioskApi.services({ active: true, grouped: true, ...(branchId ? { branch_id: branchId } : {}) })
+  return flattenServicesPayload(response)
+}, {
+  watch: [() => branchStore.activeBranchId]
+})
+
+const historyItems = computed<HistoryItem[]>(() => data.value || [])
+
+const filteredHistory = computed(() =>
+  historyItems.value.filter(item =>
+    branchStore.activeBranchId
+      ? String(item.branch_id || (item as any).branch?.id || '') === String(branchStore.activeBranchId)
+      : true
+  )
+)
+
+const rows = computed(() =>
+  filteredHistory.value.map((item) => ({
+    ...item,
+    client: getClientName(item) || 'Клиент',
+    phone: getClientPhone(item) || 'Не указан',
+    created_at: item.created_at || (item as any).createdAt || '',
+    amount: item.amount ?? (item as any).price_override ?? (item as any).price ?? null
+  }))
+)
 
 const paginatedHistory = computed(() => {
   const start = (page.value - 1) * itemsPerPage
-  return historyItems.value.slice(start, start + itemsPerPage)
+  return rows.value.slice(start, start + itemsPerPage)
 })
 
 const pageFrom = computed(() =>
-  historyItems.value.length ? (page.value - 1) * itemsPerPage + 1 : 0
+  rows.value.length ? (page.value - 1) * itemsPerPage + 1 : 0
 )
 
 const pageTo = computed(() =>
-  historyItems.value.length
-    ? Math.min(page.value * itemsPerPage, historyItems.value.length)
+  rows.value.length
+    ? Math.min(page.value * itemsPerPage, rows.value.length)
     : 0
 )
 
@@ -87,7 +166,7 @@ watch(
 )
 
 watch(
-  () => historyItems.value.length,
+  () => rows.value.length,
   (length) => {
     const maxPage = Math.max(1, Math.ceil(length / itemsPerPage))
 
@@ -96,6 +175,14 @@ watch(
     }
   }
 )
+
+const detailModalOpen = ref(false)
+const selectedEntry = ref<any | null>(null)
+
+function openDetails(row: any) {
+  selectedEntry.value = row
+  detailModalOpen.value = true
+}
 </script>
 
 <template>
@@ -103,7 +190,7 @@ watch(
     <template #body>
       <div class="flex flex-wrap items-center justify-between gap-3 pb-4">
         <UBadge color="neutral" variant="soft">
-          {{ branchStore.activeBranch?.name || 'Филиал не выбран' }}
+          {{ branchStore.activeBranch?.name || 'Общее по всем филиалам' }}
         </UBadge>
         <div class="flex items-center gap-2">
           <UBadge color="neutral" variant="outline">
@@ -115,19 +202,22 @@ watch(
         </div>
       </div>
 
-      <div v-if="historyItems.length" class="overflow-hidden rounded-[1.25rem] border border-charcoal-200 bg-white/90">
-        <div class="max-h-[80vh] overflow-auto">
+      <div v-if="rows.length" class="flex flex-col max-h-[70vh] overflow-hidden rounded-[1.25rem] border border-charcoal-200 bg-white/90">
+        <div class="flex-1 overflow-auto">
           <UTable :columns="columns" :data="paginatedHistory" :loading="pending" sticky="header" :ui="{
             root: 'w-full overflow-auto',
             base: 'w-full min-w-[64rem]',
             thead: 'bg-charcoal-50/90',
             tbody: 'divide-y divide-charcoal-100',
             th: 'px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-charcoal-500',
+            td: 'px-4 py-4 text-sm text-charcoal-700 align-middle'
           }">
-            <template #phone_number-cell="{ row }">
-              <span class="font-medium text-charcoal-950">
-                {{ row.original.phone_number || 'Не указан' }}
-              </span>
+            <template #client-cell="{ row }">
+              <span class="font-semibold text-charcoal-950">{{ row.original.client }}</span>
+            </template>
+
+            <template #phone-cell="{ row }">
+              <span class="text-sm text-charcoal-700">{{ row.original.phone }}</span>
             </template>
 
             <template #status-cell="{ row }">
@@ -145,19 +235,31 @@ watch(
             <template #created_at-cell="{ row }">
               {{ formatDateTime(row.original.created_at) }}
             </template>
+
+            <template #actions-cell="{ row }">
+              <UButton
+                color="neutral"
+                size="xs"
+                variant="outline"
+                icon="i-lucide-eye"
+                @click="openDetails(row.original)"
+              >
+                Подробнее
+              </UButton>
+            </template>
           </UTable>
         </div>
 
         <div class="flex flex-col gap-3 border-t border-charcoal-200 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <p class="text-sm text-charcoal-500">
-            Показано {{ pageFrom }}-{{ pageTo }} из {{ historyItems.length }}
+            Показано {{ pageFrom }}-{{ pageTo }} из {{ rows.length }}
           </p>
 
           <UPagination v-model:page="page"
             :items-per-page="itemsPerPage"
             :show-controls="true"
             :sibling-count="1"
-            :total="historyItems.length"
+            :total="rows.length"
             size="sm"
           />
         </div>
@@ -166,6 +268,53 @@ watch(
       <div v-else class="rounded-[1.25rem] border border-dashed border-charcoal-200 bg-white/70 px-5 py-6 text-sm text-charcoal-500">
         Для выбранного филиала записи отсутствуют.
       </div>
+
+      <UModal v-model:open="detailModalOpen" title="Детали визита">
+        <template #body>
+          <div v-if="selectedEntry" class="space-y-3">
+            <div class="rounded-xl border border-charcoal-200 bg-white/90 px-4 py-3">
+              <p class="text-xs uppercase tracking-[0.16em] text-charcoal-500">Клиент</p>
+              <p class="text-lg font-semibold text-charcoal-950">{{ getClientName(selectedEntry) || 'Клиент' }}</p>
+              <p class="text-sm text-charcoal-600">{{ getClientPhone(selectedEntry) || 'Телефон не указан' }}</p>
+            </div>
+
+            <div class="grid gap-3 sm:grid-cols-2">
+              <div class="rounded-xl border border-charcoal-200 bg-white/90 px-4 py-3">
+                <p class="text-xs uppercase tracking-[0.16em] text-charcoal-500">Статус</p>
+                <p class="text-sm font-semibold text-charcoal-950">{{ selectedEntry.status || '—' }}</p>
+              </div>
+              <div class="rounded-xl border border-charcoal-200 bg-white/90 px-4 py-3">
+                <p class="text-xs uppercase tracking-[0.16em] text-charcoal-500">Оплата</p>
+                <p class="text-sm font-semibold text-charcoal-950">{{ formatPaymentMethod(selectedEntry.payment_method) }}</p>
+              </div>
+              <div class="rounded-xl border border-charcoal-200 bg-white/90 px-4 py-3">
+                <p class="text-xs uppercase tracking-[0.16em] text-charcoal-500">Сумма</p>
+                <p class="text-sm font-semibold text-charcoal-950">{{ formatMoney(selectedEntry.amount) }}</p>
+              </div>
+              <div class="rounded-xl border border-charcoal-200 bg-white/90 px-4 py-3">
+                <p class="text-xs uppercase tracking-[0.16em] text-charcoal-500">Создано</p>
+                <p class="text-sm font-semibold text-charcoal-950">{{ formatDateTime(selectedEntry.created_at) }}</p>
+              </div>
+            </div>
+
+            <div class="rounded-xl border border-charcoal-200 bg-white/90 px-4 py-3">
+              <p class="text-xs uppercase tracking-[0.16em] text-charcoal-500 mb-2">Услуги</p>
+              <div v-if="getServiceNames(selectedEntry).length" class="text-sm text-charcoal-700 space-y-1">
+                <div v-for="(svc, i) in getServiceNames(selectedEntry)" :key="`svc-${i}`">
+                  • {{ svc }}
+                </div>
+              </div>
+              <p v-else class="text-sm text-charcoal-700">Не указаны</p>
+            </div>
+          </div>
+          <SharedEmptyState
+            v-else
+            description="Не удалось загрузить данные визита."
+            icon="i-lucide-notebook-pen"
+            title="Нет данных"
+          />
+        </template>
+      </UModal>
     </template>
   </UDashboardPanel>
 </template>

@@ -282,10 +282,11 @@ const selectedBarberId = ref('')
 await branchStore.ensureLoaded()
 
 const { data, pending, refresh } = await useAsyncData('statistics-dashboard-rich', async () => {
+  const branchId = branchStore.activeBranchId || undefined
   const [historyResult, servicesResult, barbersResult] = await Promise.allSettled([
-    historyApi.list(),
-    kioskApi.services({ active: true, grouped: true }),
-    barbersApi.list()
+    historyApi.list(branchId ? { branch_id: branchId } : undefined),
+    kioskApi.services({ active: true, grouped: true, ...(branchId ? { branch_id: branchId } : {}) }),
+    barbersApi.list(branchId ? { branch_id: branchId } : undefined)
   ])
 
   return {
@@ -299,6 +300,8 @@ const { data, pending, refresh } = await useAsyncData('statistics-dashboard-rich
       ? flattenServicesPayload(servicesResult.value)
       : [] as FlatServiceItem[]
   }
+}, {
+  watch: [() => branchStore.activeBranchId]
 })
 
 const serviceMap = computed<Map<string, FlatServiceItem>>(() =>
