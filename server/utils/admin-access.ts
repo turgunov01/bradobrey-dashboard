@@ -1,6 +1,8 @@
 import { createError, type H3Event } from 'h3'
 import { z } from 'zod'
 
+import { operationalBarberRoles } from '~~/shared/auth/employees'
+
 const identifierSchema = z.union([z.string(), z.number()]).transform(value => String(value))
 const optionalIdentifierSchema = identifierSchema.optional().nullable()
 const optionalTextSchema = z.string().trim().optional().nullable()
@@ -215,10 +217,12 @@ export async function findSupabaseUserByLogin(
 }
 
 export function assertAdminNetworkRole(accessUser: AccessUser) {
-  if (accessUser.role !== 'admin_network' && accessUser.role !== 'admin') {
+  const role = String(accessUser.role || '').trim()
+
+  if (!role || (operationalBarberRoles as readonly string[]).includes(role)) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Доступ к панели разрешен только пользователям admin_network или admin.'
+      statusMessage: 'Доступ в админку запрещён для барберов.'
     })
   }
 

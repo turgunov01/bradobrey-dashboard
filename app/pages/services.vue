@@ -160,20 +160,26 @@ async function submit() {
   }
 
   // Если загружен файл — отправляем multipart, иначе обычный JSON
-  const body: FormData | typeof payload.data = imageFile.value
+  const body: FormData | Record<string, any> = imageFile.value
     ? (() => {
         const fd = new FormData()
         fd.append('name', payload.data.name)
-        fd.append('price', String(payload.data.price ?? ''))
-        fd.append('duration', String(payload.data.duration ?? ''))
+        fd.append('base_price', String(payload.data.price ?? ''))
+        fd.append('duration_minutes', String(payload.data.duration ?? ''))
         fd.append('is_active', String(payload.data.is_active ?? true))
-        if (payload.data.category_name) fd.append('category_name', payload.data.category_name)
-        if (payload.data.category_id) fd.append('category_id', String(payload.data.category_id))
+        if (payload.data.category_name) fd.append('category', payload.data.category_name)
         if (payload.data.image) fd.append('image', payload.data.image)
         fd.append('file', imageFile.value as Blob)
         return fd
       })()
-    : payload.data
+    : {
+        base_price: payload.data.price ?? null,
+        category: payload.data.category_name ?? null,
+        duration_minutes: payload.data.duration ?? null,
+        image: payload.data.image || undefined,
+        is_active: payload.data.is_active,
+        name: payload.data.name
+      }
 
   if (form.id) {
     await servicesApi.update(form.id, body as any)

@@ -3,9 +3,19 @@ import type { ServiceFormPayload } from '~~/shared/schemas'
 export function useServicesApi() {
   const client = useApiClient()
 
+  const mapPayload = (payload: ServiceFormPayload) => ({
+    base_price: payload.price ?? null,
+    category: payload.category_name ?? null,
+    duration_minutes: payload.duration ?? null,
+    image: payload.image || undefined,
+    is_active: payload.is_active,
+    name: payload.name
+  })
+
   return {
-    create(payload: ServiceFormPayload) {
-      return client.request('/api/services', { body: payload, method: 'POST', successMessage: 'Услуга создана' })
+    create(payload: ServiceFormPayload | FormData) {
+      const body = payload instanceof FormData ? payload : mapPayload(payload)
+      return client.request('/api/services', { body, method: 'POST', successMessage: 'Услуга создана' })
     },
     detail(id: string) {
       return client.request(`/api/services/${id}`)
@@ -16,8 +26,9 @@ export function useServicesApi() {
     remove(id: string) {
       return client.request(`/api/services/${id}`, { method: 'DELETE', successMessage: 'Услуга удалена' })
     },
-    update(id: string, payload: Partial<ServiceFormPayload>) {
-      return client.request(`/api/services/${id}`, { body: payload, method: 'PATCH', successMessage: 'Услуга обновлена' })
+    update(id: string, payload: Partial<ServiceFormPayload> | FormData) {
+      const body = payload instanceof FormData ? payload : mapPayload(payload as ServiceFormPayload)
+      return client.request(`/api/services/${id}`, { body, method: 'PATCH', successMessage: 'Услуга обновлена' })
     }
   }
 }

@@ -591,7 +591,7 @@ onBeforeUnmount(() => {
     </template>
   </UDashboardPanel>
 
-  <UModal v-model:open="formModalOpen" class="sm:max-w-5xl" :title="modalTitle" :description="modalDescription">
+  <UModal v-model:open="formModalOpen" class="sm:max-w-[650px]" :title="modalTitle" :description="modalDescription">
     <template #body>
       <form class="flex flex-col gap-6" @submit.prevent="submitEmployee">
         <div class="space-y-6">
