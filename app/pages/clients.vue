@@ -134,6 +134,7 @@ const selectedPhone = ref('')
 const searchPhone = ref('')
 const minVisits = ref<number | null>(null)
 const serviceFilter = ref('')
+const ALL_SERVICES_VALUE = '__all__'
 
 const { data, pending, refresh } = await useAsyncData('clients-directory', async () => {
   const query = {
@@ -224,13 +225,14 @@ const visitsByPhone = computed(() => {
 const filteredClientRows = computed<ClientRow[]>(() => {
   const phoneNeedle = searchPhone.value.trim()
   const selectedService = serviceFilter.value.trim()
+  const hasServiceFilter = Boolean(selectedService && selectedService !== ALL_SERVICES_VALUE)
   const min = minVisits.value ?? null
 
   return clientRows.value.filter((row) => {
     const matchesPhone = !phoneNeedle || row.phone.includes(phoneNeedle)
     const matchesVisits = min === null || row.visits >= min
 
-    if (selectedService) {
+    if (hasServiceFilter) {
       const visits = visitsByPhone.value.get(row.phone) || []
       const hasService = visits.some(v => getVisitServiceIds(v).includes(selectedService))
       return matchesPhone && matchesVisits && hasService
@@ -293,7 +295,7 @@ const serviceNameMap = computed(() =>
   )
 )
 const serviceOptions = computed(() => [
-  { label: 'Все услуги', value: '' },
+  { label: 'Все услуги', value: ALL_SERVICES_VALUE },
   ...(servicesData.value || []).map((svc: any) => ({
     label: svc.name || `Услуга ${svc.id}`,
     value: String(svc.id)
@@ -354,11 +356,8 @@ function getVisitServiceIds(visit: Record<string, any>) {
         />
         <USelect
           v-model="serviceFilter"
-          :options="serviceOptions"
-          option-attribute="label"
-          value-attribute="value"
+          :items="serviceOptions"
           placeholder="Все услуги"
-          clearable
         />
       </div>
 

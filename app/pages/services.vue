@@ -319,12 +319,10 @@ function openPreview(src: string, title: string) {
         <div class="flex items-center gap-2">
           <USelect
             v-model="sortDirection"
-            :options="[
+            :items="[
               { label: 'A → Я', value: 'asc' },
               { label: 'Я → A', value: 'desc' }
             ]"
-            option-attribute="label"
-            value-attribute="value"
             size="sm"
           />
           <UButton color="success" icon="i-lucide-save" variant="solid" @click="persistAllOrders">
