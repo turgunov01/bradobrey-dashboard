@@ -26,8 +26,22 @@ export const branchSchema = z.object({
   id: identifierSchema,
   name: z.string().catch('Неизвестный филиал'),
   address: optionalTextSchema,
+  city: optionalTextSchema,
+  timezone: optionalTextSchema,
+  work_hours: z.any().optional().nullable(),
   is_active: z.boolean().optional().nullable()
 }).passthrough()
+
+export const branchFormSchema = z.object({
+  name: z.string().trim().min(1, 'Введите название филиала'),
+  address: optionalTextSchema,
+  city: optionalTextSchema,
+  timezone: optionalTextSchema,
+  work_hours: z.any().optional().nullable(),
+  is_active: z.boolean().optional().nullable()
+}).passthrough()
+
+export const branchUpdateSchema = branchFormSchema.partial().passthrough()
 
 export const barberUserSchema = z.object({
   id: identifierSchema.optional(),
@@ -290,6 +304,8 @@ export const bannerFormSchema = z.object({
 }).passthrough()
 
 export type Branch = z.infer<typeof branchSchema>
+export type BranchFormPayload = z.infer<typeof branchFormSchema>
+export type BranchUpdatePayload = z.infer<typeof branchUpdateSchema>
 export type BarberUser = z.infer<typeof barberUserSchema>
 export type BarberProfile = z.infer<typeof barberSchema>
 export type ServiceItem = z.infer<typeof serviceSchema>

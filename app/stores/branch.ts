@@ -60,12 +60,20 @@ function extractBranchItems(response: unknown): unknown[] {
 
 export const useBranchStore = defineStore('branch', {
   actions: {
-    async ensureLoaded(): Promise<Branch[]> {
-      if (this.loaded) {
+    async ensureLoaded(options: { force?: boolean } = {}): Promise<Branch[]> {
+      if (this.loaded && !options.force) {
         return this.branches
       }
 
-      const response = await useKioskApi().config()
+      let response: unknown
+
+      try {
+        response = await useBranchesApi().list()
+      }
+      catch {
+        response = await useKioskApi().config()
+      }
+
       const branches = extractBranchItems(response)
       const parsedBranches: Branch[] = []
 
@@ -79,13 +87,21 @@ export const useBranchStore = defineStore('branch', {
 
       this.branches = parsedBranches
 
-      if (!this.activeBranchId && this.branches[0]?.id) {
+      if (this.activeBranchId && !this.branches.some(branch => branch.id === this.activeBranchId)) {
+        this.activeBranchId = this.branches[0]?.id || null
+      }
+
+      if (!options.force && !this.activeBranchId && this.branches[0]?.id) {
         this.activeBranchId = this.branches[0].id
       }
 
       this.loaded = true
 
       return this.branches
+    },
+    async reload(): Promise<Branch[]> {
+      this.loaded = false
+      return await this.ensureLoaded({ force: true })
     },
     setActiveBranch(id?: string | null) {
       this.activeBranchId = id ? String(id) : null
