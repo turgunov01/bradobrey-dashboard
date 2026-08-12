@@ -1,8 +1,3 @@
-import { createError } from 'h3'
+import { proxyBackendCurrentPath } from '~~/server/utils/backend'
 
-export default defineEventHandler(() => {
-  throw createError({
-    statusCode: 405,
-    statusMessage: 'Employee deletion is disabled. Archive the employee instead.'
-  })
-})
+export default defineEventHandler(event => proxyBackendCurrentPath<unknown>(event, 'required'))

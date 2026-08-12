@@ -33,13 +33,12 @@ export default defineEventHandler(async (event): Promise<unknown> => {
     }
   }
 
-  const response = await backendRequest<{ barber?: Record<string, any> | null, user?: Record<string, any> | null }>(event, {
-    auth: 'required',
-    method: 'GET',
-    path: '/api/barbers/me'
-  })
-
   try {
+    const response = await backendRequest<{ barber?: Record<string, any> | null, user?: Record<string, any> | null }>(event, {
+      auth: 'required',
+      method: 'GET',
+      path: '/api/barbers/me'
+    })
     const accessUser = assertDashboardAccessUser(response.data?.user)
 
     setResponseStatus(event, response.status)
@@ -55,7 +54,7 @@ export default defineEventHandler(async (event): Promise<unknown> => {
     }
   }
   catch (error: any) {
-    if ((error?.statusCode || error?.response?.status) === 403) {
+    if ([401, 403].includes(error?.statusCode || error?.response?.status)) {
       clearAdminSession(event)
       clearAdminBackendToken(event)
       clearBarberToken(event)

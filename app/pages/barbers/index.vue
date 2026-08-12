@@ -579,12 +579,7 @@ const { data, pending, refresh } = await useAsyncData('employees-directory', asy
     items = fallbackItems.filter(item => String(item.branch_id || '') === selectedBranchId)
   }
 
-  const canFilterArchiveLocally = items.some(item => Object.prototype.hasOwnProperty.call(item || {}, 'is_active'))
-  const visibleItems = canFilterArchiveLocally
-    ? items.filter(item => archiveView.value === 'only' ? item.is_active === false : item.is_active !== false)
-    : items
-
-  const rows: EmployeeRow[] = visibleItems.map((item) => {
+  const rows: EmployeeRow[] = items.map((item) => {
     const branchId = String(item.branch_id || '')
     const login = item.login || 'Без логина'
     const role = String(item.role || 'barber')
@@ -696,7 +691,8 @@ const filteredRows = computed<EmployeeRow[]>(() => {
   return employeeRows.value.filter((row) => {
     const matchesLogin = !loginNeedle || row.login.toLowerCase().includes(loginNeedle)
     const matchesRole = roleFilter.value === 'all' || row.role === roleFilter.value
-    return matchesLogin && matchesRole
+    const matchesArchive = archiveView.value === 'only' ? !row.is_active : row.is_active
+    return matchesLogin && matchesRole && matchesArchive
   })
 })
 const pageCount = computed(() => Math.max(1, Math.ceil(filteredRows.value.length / pageSize)))
@@ -1348,8 +1344,9 @@ onBeforeUnmount(() => {
                       />
                     </UTooltip>
 
-                    <UTooltip v-if="row.original.is_active" text="Уволить">
+                    <UTooltip text="Уволить">
                       <UButton
+                        v-if="row.original.is_active"
                         aria-label="Уволить сотрудника"
                         color="error"
                         icon="i-lucide-user-x"
@@ -1359,7 +1356,7 @@ onBeforeUnmount(() => {
                         @click="fireEmployee(row.original)"
                       />
                     </UTooltip>
-                    <UTooltip v-else text="Восстановить">
+                    <UTooltip v-if="!row.original.is_active" text="Восстановить">
                       <UButton
                         aria-label="Восстановить сотрудника"
                         color="success"

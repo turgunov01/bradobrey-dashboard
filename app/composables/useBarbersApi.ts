@@ -15,43 +15,6 @@ import type {
 export function useBarbersApi() {
   const client = useApiClient();
 
-  function getErrorStatus(error: any) {
-    return Number(error?.statusCode || error?.status || error?.response?.status || 500);
-  }
-
-  function shouldFallbackToActivePatch(error: any) {
-    return [404, 405, 501].includes(getErrorStatus(error));
-  }
-
-  async function toggleEmployeeArchive(
-    id: string,
-    endpoint: "archive" | "restore",
-    isActive: boolean,
-    successMessage: string,
-  ) {
-    try {
-      const response = await client.request(`/api/barbers/${id}/${endpoint}`, {
-        method: "PATCH",
-        silent: true,
-      });
-
-      client.notifySuccess(successMessage);
-
-      return response;
-    } catch (error) {
-      if (!shouldFallbackToActivePatch(error)) {
-        client.notifyError(error);
-        throw error;
-      }
-
-      return client.request(`/api/barbers/${id}`, {
-        body: { is_active: isActive },
-        method: "PATCH",
-        successMessage,
-      });
-    }
-  }
-
   return {
     break(minutes: BreakPayload) {
       return client.request("/api/barbers/break", {
@@ -140,10 +103,22 @@ export function useBarbersApi() {
       });
     },
     archive(id: string) {
-      return toggleEmployeeArchive(id, "archive", false, "Сотрудник уволен");
+      return client.request(`/api/barbers/${id}/archive`, {
+        method: "PATCH",
+        successMessage: "Сотрудник уволен",
+      });
+    },
+    remove(id: string) {
+      return client.request(`/api/barbers/${id}/archive`, {
+        method: "PATCH",
+        successMessage: "Сотрудник уволен",
+      });
     },
     restore(id: string) {
-      return toggleEmployeeArchive(id, "restore", true, "Сотрудник восстановлен");
+      return client.request(`/api/barbers/${id}/restore`, {
+        method: "PATCH",
+        successMessage: "Сотрудник восстановлен",
+      });
     },
     returnFromBreak() {
       return client.request("/api/barbers/return", {

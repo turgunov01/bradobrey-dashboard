@@ -35,7 +35,13 @@ export const useSessionStore = defineStore("session", () => {
 
       barber.value = response?.barber ?? null;
       user.value = response?.user ?? null;
-    } catch {
+    } catch (error: any) {
+      const statusCode = Number(error?.statusCode || error?.status || error?.response?.status || 0)
+
+      if (import.meta.client && [401, 403].includes(statusCode)) {
+        adminToken.clear()
+      }
+
       barber.value = null;
       user.value = null;
     } finally {
