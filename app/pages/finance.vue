@@ -4,10 +4,12 @@ import type { TableColumn } from '@nuxt/ui'
 
 import { formatCount, formatMoney } from '~/utils/format'
 import { flattenServicesPayload, type FlatServiceItem } from '~/utils/services'
+import type { VerifixEvent } from '~/composables/useVerifixApi'
 
 type FinanceEmployeeDraft = {
   advances: number
   bonus_profit_percent: number
+  bonus_salary: number
   penalty: number
   profit: number
   profit_percent: number
@@ -35,13 +37,14 @@ type FinanceOverviewBranchRow = {
 }
 
 type FinanceDraftStorage = Record<string, FinanceSnapshotPayload>
-type FinanceMoneyField = 'advances' | 'penalty' | 'salary'
+type FinanceMoneyField = 'advances' | 'bonus_salary' | 'penalty' | 'salary'
 
 const branchStore = useBranchStore()
 const barbersApi = useBarbersApi()
 const financeApi = useFinanceApi()
 const historyApi = useHistoryApi()
 const kioskApi = useKioskApi()
+const verifixApi = useVerifixApi()
 const apiClient = useApiClient()
 
 await branchStore.ensureLoaded()
@@ -320,6 +323,7 @@ function createEmptyEmployeeDraft(): FinanceEmployeeDraft {
   return {
     advances: 0,
     bonus_profit_percent: 0,
+    bonus_salary: 0,
     penalty: 0,
     profit: 0,
     profit_percent: 0,
@@ -337,6 +341,7 @@ function normalizeEmployeeDraft(value: unknown): FinanceEmployeeDraft {
   return {
     advances: Math.max(0, normalizeNumber(source.advances)),
     bonus_profit_percent: Math.max(0, normalizeNumber(source.bonus_profit_percent)),
+    bonus_salary: Math.max(0, normalizeNumber(source.bonus_salary)),
     penalty: Math.max(0, normalizeNumber(source.penalty)),
     profit: Math.max(0, normalizeNumber(source.profit)),
     profit_percent: Math.max(0, normalizeNumber(source.profit_percent)),
@@ -398,7 +403,11 @@ function unwrapOverviewResponse(value: unknown) {
     return {}
   }
 
-  return asRecord(source.overview) || asRecord(source.data) || source
+  return {
+    ...source,
+    ...(asRecord(source.data) || {}),
+    ...(asRecord(source.overview) || {})
+  }
 }
 
 function pickNumber(source: Record<string, any>, keys: string[]) {
@@ -407,6 +416,32 @@ function pickNumber(source: Record<string, any>, keys: string[]) {
 
     if (amount !== null) {
       return amount
+    }
+  }
+
+  return 0
+}
+
+function pickMoneyValue(source: Record<string, any>, keys: string[]) {
+  for (const key of keys) {
+    const directAmount = toNumberOrNull(source?.[key])
+
+    if (directAmount !== null) {
+      return directAmount
+    }
+
+    const nested = asRecord(source?.[key])
+
+    if (!nested) {
+      continue
+    }
+
+    for (const nestedKey of ['payout', 'payroll', 'payroll_total', 'total', 'amount', 'turnover', 'salary']) {
+      const nestedAmount = toNumberOrNull(nested[nestedKey])
+
+      if (nestedAmount !== null) {
+        return nestedAmount
+      }
     }
   }
 
@@ -517,6 +552,23 @@ function commissionForDraft(draft: FinanceEmployeeDraft) {
   )
 }
 
+function profitShareForDraft(draft: FinanceEmployeeDraft) {
+  return Math.round(
+    commissionForDraft(draft)
+    - Math.max(0, draft.advances)
+    - Math.max(0, draft.penalty)
+  )
+}
+
+// Итоговая выплата по сотруднику: оклад + надбавка + сумма с прибыли после авансов и штрафов.
+function payoutForDraft(draft: FinanceEmployeeDraft) {
+  return Math.round(
+    Math.max(0, draft.salary)
+    + Math.max(0, draft.bonus_salary)
+    + profitShareForDraft(draft)
+  )
+}
+
 async function loadRemoteSnapshot(options: { overwrite?: boolean } = {}) {
   remoteLoading.value = true
   remoteError.value = null
@@ -587,6 +639,7 @@ async function refreshAll() {
     refreshOverview(),
     refreshFinanceHistory(),
     refreshFinanceServices(),
+    refreshVerifix(),
     loadRemoteSnapshot()
   ])
 }
@@ -633,6 +686,28 @@ const {
   return extractHistoryItems(response)
 }, {
   default: () => [] as Record<string, any>[],
+  server: false,
+  watch: [() => branchStore.activeBranchId, periodKey]
+})
+
+const {
+  data: verifixLateItems,
+  pending: verifixPending,
+  refresh: refreshVerifix
+} = await useAsyncData('finance-verifix-late', async () => {
+  const branchId = branchStore.activeBranchId || undefined
+  const range = periodRange.value
+  const response = await verifixApi.events({
+    ...(branchId ? { branch_id: branchId } : {}),
+    end_date: range.end_date,
+    late_only: true,
+    limit: 500,
+    start_date: range.start_date
+  }, { silent: true })
+
+  return Array.isArray(response?.items) ? response.items : []
+}, {
+  default: () => [] as VerifixEvent[],
   server: false,
   watch: [() => branchStore.activeBranchId, periodKey]
 })
@@ -689,9 +764,9 @@ const overviewBranchRows = computed<FinanceOverviewBranchRow[]>(() => {
       id,
       name,
       orders: pickNumber(item, ['orders', 'orders_count', 'ordersCount', 'completed', 'completed_count']),
-      payroll: pickNumber(item, ['payroll', 'payroll_total', 'salary_fund', 'salary_total', 'salaries_total']),
-      purchases: pickNumber(item, ['purchases', 'purchases_total', 'purchase_total', 'warehouse_purchases']),
-      turnover: pickNumber(item, ['turnover', 'turnover_total', 'revenue', 'revenue_total', 'total_revenue', 'amount', 'total'])
+      payroll: pickMoneyValue(item, ['payroll', 'payroll_total', 'salary_fund', 'salary_total', 'salaries_total']),
+      purchases: pickMoneyValue(item, ['purchases', 'purchases_total', 'purchase_total', 'warehouse_purchases']),
+      turnover: pickMoneyValue(item, ['turnover', 'turnover_total', 'revenue', 'revenue_total', 'total_revenue', 'amount', 'total'])
     }]
   })
 })
@@ -705,9 +780,9 @@ const overviewTotals = computed(() => {
 
   return {
     branches: branches.length || pickNumber(source, ['branches_count', 'branchesCount', 'branch_count']),
-    payroll: pickNumber(source, ['payroll', 'payroll_total', 'salary_fund', 'salary_total', 'salaries_total']) || fallbackPayroll,
-    purchases: pickNumber(source, ['purchases', 'purchases_total', 'purchase_total', 'warehouse_purchases']) || fallbackPurchases,
-    turnover: pickNumber(source, ['turnover', 'turnover_total', 'revenue', 'revenue_total', 'total_revenue', 'gross_turnover']) || fallbackTurnover
+    payroll: pickMoneyValue(source, ['payroll', 'payroll_total', 'salary_fund', 'salary_total', 'salaries_total']) || fallbackPayroll,
+    purchases: pickMoneyValue(source, ['purchases', 'purchases_total', 'purchase_total', 'warehouse_purchases']) || fallbackPurchases,
+    turnover: pickMoneyValue(source, ['turnover', 'turnover_total', 'revenue', 'revenue_total', 'total_revenue', 'gross_turnover']) || fallbackTurnover
   }
 })
 
@@ -743,6 +818,45 @@ const barberProfitMap = computed(() => {
   return rows
 })
 
+const barberLateMap = computed(() => {
+  const rows = new Map<string, { count: number, minutes: number }>()
+
+  for (const event of verifixLateItems.value || []) {
+    if (!event?.is_late) {
+      continue
+    }
+
+    const barberId = normalizeText(event.barber_id)
+
+    if (!barberId) {
+      continue
+    }
+
+    const current = rows.get(barberId) || { count: 0, minutes: 0 }
+    current.count += 1
+    current.minutes += Math.max(0, normalizeNumber(event.late_by_minutes))
+    rows.set(barberId, current)
+  }
+
+  return rows
+})
+
+const lateTotals = computed(() => {
+  let count = 0
+  let minutes = 0
+
+  for (const value of barberLateMap.value.values()) {
+    count += value.count
+    minutes += value.minutes
+  }
+
+  return { count, minutes }
+})
+
+function getEmployeeLate(id: string) {
+  return barberLateMap.value.get(String(id || '').trim()) || { count: 0, minutes: 0 }
+}
+
 function syncBarberProfitsFromHistory() {
   if (!historyProfitReady.value) {
     return
@@ -767,6 +881,7 @@ watch([
 
 const totals = computed(() => {
   let salary = 0
+  let bonusSalary = 0
   let profit = 0
   let advances = 0
   let penalties = 0
@@ -777,17 +892,17 @@ const totals = computed(() => {
     const draft = getEmployeeDraft(employee.id)
 
     salary += draft.salary
+    bonusSalary += draft.bonus_salary
     profit += draft.profit
     advances += draft.advances
     penalties += draft.penalty
-
-    const earned = commissionForDraft(draft)
-    commission += earned
-    payout += draft.salary + earned - draft.advances - draft.penalty
+    commission += profitShareForDraft(draft)
+    payout += payoutForDraft(draft)
   }
 
   return {
     advances,
+    bonusSalary,
     commission,
     netProfit: profit - payout,
     payout,
@@ -808,12 +923,15 @@ const overviewBranchColumns: TableColumn<FinanceOverviewBranchRow>[] = [
 const columns: TableColumn<FinanceEmployeeRow>[] = [
   { accessorKey: 'name', header: 'Сотрудник' },
   { id: 'salary', header: 'План' },
+  { id: 'bonusSalary', header: 'Надбавка' },
   { id: 'profit', header: 'Val' },
   { id: 'profitPercent', header: 'Процент' },
   { id: 'bonusProfitPercent', header: 'Бонусный процент' },
   { id: 'advances', header: 'Авансы' },
   { id: 'penalty', header: 'Штраф' },
-  { id: 'commission', header: 'С прибыли' }
+  { id: 'late', header: 'Опоздания' },
+  { id: 'commission', header: 'С прибыли' },
+  { id: 'payout', header: 'К выплате' }
 ]
 </script>
 
@@ -848,7 +966,7 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
             color="neutral"
             variant="outline"
             icon="i-lucide-refresh-cw"
-            :loading="employeesPending || financeHistoryPending || financeServicesPending || remoteLoading || overviewPending"
+            :loading="employeesPending || financeHistoryPending || financeServicesPending || verifixPending || remoteLoading || overviewPending"
             @click="refreshAll"
           >
             Обновить
@@ -934,13 +1052,21 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
 
       <div class="grid gap-3 pb-4 md:grid-cols-5">
         <UCard class="warm-card rounded-[1.25rem] border border-charcoal-200 bg-white/90 md:col-span-5">
-          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div class="rounded-2xl border border-charcoal-200 bg-white/70 px-4 py-3">
               <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">
                 Оклад
               </p>
               <p class="mt-2 text-lg font-semibold text-charcoal-950">
                 {{ formatMoney(totals.salary) }}
+              </p>
+            </div>
+            <div class="rounded-2xl border border-charcoal-200 bg-white/70 px-4 py-3">
+              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">
+                Надбавки
+              </p>
+              <p class="mt-2 text-lg font-semibold text-charcoal-950">
+                {{ formatMoney(totals.bonusSalary) }}
               </p>
             </div>
             <div class="rounded-2xl border border-charcoal-200 bg-white/70 px-4 py-3">
@@ -977,6 +1103,17 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
             </div>
             <div class="rounded-2xl border border-charcoal-200 bg-white/70 px-4 py-3">
               <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">
+                Опозданий за месяц
+              </p>
+              <p class="mt-2 text-lg font-semibold text-charcoal-950">
+                {{ formatCount(lateTotals.count) }}
+              </p>
+              <p class="text-xs text-charcoal-500">
+                {{ formatCount(lateTotals.minutes) }} мин · для учёта штрафа за график
+              </p>
+            </div>
+            <div class="rounded-2xl border border-charcoal-200 bg-white/70 px-4 py-3">
+              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">
                 Прибыль
               </p>
               <p class="mt-2 text-lg font-semibold text-charcoal-950">
@@ -994,8 +1131,133 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
         icon="i-lucide-users"
       />
 
-      <div v-else class="flex flex-col max-h-[70vh] overflow-hidden rounded-[1.25rem] border border-charcoal-200 bg-white/90">
-        <div class="flex-1 overflow-auto">
+      <div v-else class="space-y-4">
+        <!-- Мобильная версия: карточки по сотруднику (таблица не помещается на телефоне) -->
+        <div class="space-y-3 md:hidden">
+          <div
+            v-for="row in employees"
+            :key="row.id"
+            class="rounded-[1.25rem] border border-charcoal-200 bg-white/90 p-4 space-y-4"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <p class="font-semibold text-charcoal-950 truncate">
+                  {{ row.name }}
+                </p>
+                <p v-if="row.login" class="text-xs text-charcoal-500 truncate">
+                  @{{ row.login }}
+                </p>
+              </div>
+              <div class="shrink-0 text-right">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-charcoal-500">
+                  К выплате
+                </p>
+                <p class="text-base font-semibold text-primary-600">
+                  {{ formatMoney(payoutForDraft(getEmployeeDraft(row.id))) }}
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <label class="space-y-1">
+                <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-charcoal-500">План</span>
+                <UInput
+                  :model-value="formatMoneyInputValue(getEmployeeDraft(row.id).salary)"
+                  inputmode="numeric"
+                  type="text"
+                  size="sm"
+                  class="w-full"
+                  @update:model-value="value => updateMoneyDraft(row.id, 'salary', value)"
+                />
+              </label>
+              <label class="space-y-1">
+                <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-charcoal-500">Надбавка</span>
+                <UInput
+                  :model-value="formatMoneyInputValue(getEmployeeDraft(row.id).bonus_salary)"
+                  inputmode="numeric"
+                  type="text"
+                  size="sm"
+                  class="w-full"
+                  @update:model-value="value => updateMoneyDraft(row.id, 'bonus_salary', value)"
+                />
+              </label>
+              <label class="space-y-1">
+                <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-charcoal-500">Процент</span>
+                <UInput
+                  v-model.number="getEmployeeDraft(row.id).profit_percent"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  size="sm"
+                  class="w-full"
+                  @update:model-value="dirty = true"
+                />
+              </label>
+              <label class="space-y-1">
+                <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-charcoal-500">Бонусный %</span>
+                <UInput
+                  v-model.number="getEmployeeDraft(row.id).bonus_profit_percent"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  size="sm"
+                  class="w-full"
+                  @update:model-value="dirty = true"
+                />
+              </label>
+              <label class="space-y-1">
+                <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-charcoal-500">Авансы</span>
+                <UInput
+                  :model-value="formatMoneyInputValue(getEmployeeDraft(row.id).advances)"
+                  inputmode="numeric"
+                  type="text"
+                  size="sm"
+                  class="w-full"
+                  @update:model-value="value => updateMoneyDraft(row.id, 'advances', value)"
+                />
+              </label>
+              <label class="space-y-1">
+                <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-charcoal-500">Штраф</span>
+                <UInput
+                  :model-value="formatMoneyInputValue(getEmployeeDraft(row.id).penalty)"
+                  inputmode="numeric"
+                  type="text"
+                  size="sm"
+                  class="w-full"
+                  @update:model-value="value => updateMoneyDraft(row.id, 'penalty', value)"
+                />
+              </label>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 border-t border-charcoal-100 pt-3">
+              <div>
+                <p class="text-[11px] uppercase tracking-[0.12em] text-charcoal-500">Val</p>
+                <p class="text-sm font-semibold text-charcoal-950">
+                  {{ formatMoney(getEmployeeDraft(row.id).profit) }}
+                </p>
+              </div>
+              <div>
+                <p class="text-[11px] uppercase tracking-[0.12em] text-charcoal-500">С прибыли</p>
+                <p class="text-sm font-semibold text-charcoal-950">
+                  {{ formatMoney(profitShareForDraft(getEmployeeDraft(row.id))) }}
+                </p>
+              </div>
+              <div>
+                <p class="text-[11px] uppercase tracking-[0.12em] text-charcoal-500">Опоздания</p>
+                <p
+                  class="text-sm font-semibold"
+                  :class="getEmployeeLate(row.id).count ? 'text-red-600' : 'text-charcoal-950'"
+                >
+                  {{ formatCount(getEmployeeLate(row.id).count) }}
+                  <span class="text-[11px] font-normal text-charcoal-500">/ {{ formatCount(getEmployeeLate(row.id).minutes) }} мин</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Планшет/десктоп: таблица -->
+        <div class="hidden md:block max-h-[70vh] overflow-auto rounded-[1.25rem] border border-charcoal-200 bg-white/90">
           <UTable
             :columns="columns"
             :data="employees"
@@ -1003,11 +1265,11 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
             sticky="header"
             :ui="{
               root: 'w-full overflow-auto',
-              base: 'w-full min-w-[72rem]',
+              base: 'w-full min-w-[80rem]',
               thead: 'bg-charcoal-50/90',
               tbody: 'divide-y divide-charcoal-100',
-              th: 'px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-charcoal-500',
-              td: 'px-4 py-4 text-sm text-charcoal-700 align-middle'
+              th: 'px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.06em] text-charcoal-500 whitespace-nowrap',
+              td: 'px-3 py-4 text-sm text-charcoal-700 align-middle whitespace-nowrap'
             }"
           >
             <template #name-cell="{ row }">
@@ -1029,6 +1291,17 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
                 size="sm"
                 class="w-32"
                 @update:model-value="value => updateMoneyDraft(row.original.id, 'salary', value)"
+              />
+            </template>
+
+            <template #bonusSalary-cell="{ row }">
+              <UInput
+                :model-value="formatMoneyInputValue(getEmployeeDraft(row.original.id).bonus_salary)"
+                inputmode="numeric"
+                type="text"
+                size="sm"
+                class="w-32"
+                @update:model-value="value => updateMoneyDraft(row.original.id, 'bonus_salary', value)"
               />
             </template>
 
@@ -1089,9 +1362,29 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
               />
             </template>
 
+            <template #late-cell="{ row }">
+              <div class="space-y-1">
+                <p
+                  class="font-semibold"
+                  :class="getEmployeeLate(row.original.id).count ? 'text-red-600' : 'text-charcoal-950'"
+                >
+                  {{ formatCount(getEmployeeLate(row.original.id).count) }}
+                </p>
+                <p class="text-xs text-charcoal-500">
+                  {{ verifixPending ? 'Загрузка Verifix' : `${formatCount(getEmployeeLate(row.original.id).minutes)} мин` }}
+                </p>
+              </div>
+            </template>
+
             <template #commission-cell="{ row }">
               <span class="font-semibold text-charcoal-950">
-                {{ formatMoney(commissionForDraft(getEmployeeDraft(row.original.id))) }}
+                {{ formatMoney(profitShareForDraft(getEmployeeDraft(row.original.id))) }}
+              </span>
+            </template>
+
+            <template #payout-cell="{ row }">
+              <span class="font-semibold text-primary-600">
+                {{ formatMoney(payoutForDraft(getEmployeeDraft(row.original.id))) }}
               </span>
             </template>
           </UTable>

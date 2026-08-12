@@ -29,6 +29,7 @@ type EmployeeRow = {
   branch: string
   branch_id: string
   id: string
+  is_active: boolean
   login: string
   name: string
   permissions: EmployeePermission[]
@@ -41,6 +42,7 @@ type EmployeeRow = {
 type FinanceEmployeeDraft = {
   advances: number
   bonus_profit_percent: number
+  bonus_salary: number
   penalty: number
   profit: number
   profit_percent: number
@@ -119,13 +121,11 @@ function getEmployeePhotoUrl(value: unknown) {
 }
 
 const formModalOpen = ref(false)
-const detailsModalOpen = ref(false)
 const reportModalOpen = ref(false)
 const isSyncingRolePreset = ref(false)
 const submitting = ref(false)
 const removingId = ref('')
 const editingId = ref('')
-const selectedEmployeeId = ref('')
 const reportEmployeeId = ref('')
 const reportFrom = ref('')
 const reportTo = ref('')
@@ -257,6 +257,7 @@ function normalizeFinanceDraft(value: unknown): FinanceEmployeeDraft {
   return {
     advances: normalizeNumber(source.advances),
     bonus_profit_percent: normalizeNumber(source.bonus_profit_percent),
+    bonus_salary: normalizeNumber(source.bonus_salary),
     penalty: normalizeNumber(source.penalty),
     profit: normalizeNumber(source.profit),
     profit_percent: normalizeNumber(source.profit_percent),
@@ -290,6 +291,7 @@ function hasManualFinanceDraftValues(draft: FinanceEmployeeDraft) {
   return [
     draft.advances,
     draft.bonus_profit_percent,
+    draft.bonus_salary,
     draft.penalty,
     draft.profit_percent,
     draft.salary
@@ -551,11 +553,13 @@ const page = ref(1)
 const pageSize = 10
 const searchLogin = ref('')
 const roleFilter = ref<'all' | EmployeeRole>('all')
+const archiveView = ref<'active' | 'only'>('active')
 
 const { data, pending, refresh } = await useAsyncData('employees-directory', async () => {
   const selectedBranchId = branchStore.activeBranchId ? String(branchStore.activeBranchId) : ''
   const response = await barbersApi.list({
     __skipBranchScope: true,
+    archived: archiveView.value,
     ...(selectedBranchId ? { branch_id: selectedBranchId } : {}),
     mode: 'employees'
   })
@@ -568,13 +572,19 @@ const { data, pending, refresh } = await useAsyncData('employees-directory', asy
   if (selectedBranchId && !items.length && !responseItems.length) {
     const fallbackResponse = await barbersApi.list({
       __skipBranchScope: true,
+      archived: archiveView.value,
       mode: 'employees'
     })
     const fallbackItems = Array.isArray(fallbackResponse?.items) ? fallbackResponse.items : []
     items = fallbackItems.filter(item => String(item.branch_id || '') === selectedBranchId)
   }
 
-  const rows: EmployeeRow[] = items.map((item) => {
+  const canFilterArchiveLocally = items.some(item => Object.prototype.hasOwnProperty.call(item || {}, 'is_active'))
+  const visibleItems = canFilterArchiveLocally
+    ? items.filter(item => archiveView.value === 'only' ? item.is_active === false : item.is_active !== false)
+    : items
+
+  const rows: EmployeeRow[] = visibleItems.map((item) => {
     const branchId = String(item.branch_id || '')
     const login = item.login || 'Без логина'
     const role = String(item.role || 'barber')
@@ -584,6 +594,7 @@ const { data, pending, refresh } = await useAsyncData('employees-directory', asy
       branch: branchMap.value.get(branchId) || 'Не указан',
       branch_id: branchId,
       id: String(item.id),
+      is_active: item.is_active !== false,
       login,
       name: item.name || login || 'Сотрудник без имени',
       permissions,
@@ -596,7 +607,7 @@ const { data, pending, refresh } = await useAsyncData('employees-directory', asy
 
   return { rows }
 }, {
-  watch: [() => branchStore.activeBranchId]
+  watch: [() => branchStore.activeBranchId, archiveView]
 })
 
 const { data: insightsData, pending: insightsPending, refresh: refreshInsights } = await useAsyncData('employees-insights', async () => {
@@ -747,7 +758,7 @@ const employeeInsightMap = computed(() => {
       finance: {
         ...draft,
         commission,
-        payout: Math.round(draft.salary + commission - draft.advances - draft.penalty),
+        payout: Math.round(draft.salary + draft.bonus_salary + commission - draft.advances - draft.penalty),
         reportProfit
       },
       history,
@@ -759,12 +770,6 @@ const employeeInsightMap = computed(() => {
 
   return map
 })
-const selectedEmployee = computed(() =>
-  employeeRows.value.find(row => row.id === selectedEmployeeId.value) || null
-)
-const selectedEmployeeInsight = computed(() =>
-  selectedEmployeeId.value ? employeeInsightMap.value.get(selectedEmployeeId.value) || null : null
-)
 
 const reportEmployee = computed(() =>
   employeeRows.value.find(row => row.id === reportEmployeeId.value) || null
@@ -956,11 +961,6 @@ async function refreshDirectory() {
   ])
 }
 
-function openEmployeeDetails(row: EmployeeRow) {
-  selectedEmployeeId.value = row.id
-  detailsModalOpen.value = true
-}
-
 function openEmployeeReport(row: EmployeeRow) {
   const range = currentPeriodRange()
 
@@ -1125,22 +1125,40 @@ async function submitEmployee() {
   }
 }
 
-async function removeEmployee(row: EmployeeRow) {
+async function fireEmployee(row: EmployeeRow) {
   const label = row.name || row.login
 
-  if (import.meta.client && !window.confirm(`Удалить сотрудника ${label}?`)) {
+  if (import.meta.client && !window.confirm(`Уволить сотрудника ${label}? Логин и доступ будут отключены, сотрудник уйдёт в архив.`)) {
     return
   }
 
   removingId.value = row.id
 
   try {
-    await barbersApi.remove(row.id)
+    await barbersApi.archive(row.id)
     await refreshDirectory()
 
     if (editingId.value === row.id) {
       formModalOpen.value = false
     }
+  }
+  finally {
+    removingId.value = ''
+  }
+}
+
+async function restoreEmployee(row: EmployeeRow) {
+  const label = row.name || row.login
+
+  if (import.meta.client && !window.confirm(`Восстановить сотрудника ${label}? Логин и доступ снова будут включены.`)) {
+    return
+  }
+
+  removingId.value = row.id
+
+  try {
+    await barbersApi.restore(row.id)
+    await refreshDirectory()
   }
   finally {
     removingId.value = ''
@@ -1175,9 +1193,11 @@ onBeforeUnmount(() => {
       <div class="space-y-6">
         <UCard class="warm-card rounded-[1.9rem] border border-charcoal-200">
           <div class="flex flex-wrap items-center justify-between gap-3 pb-2">
-            <UBadge color="neutral" size="lg" variant="soft">
-              {{ filteredRows.length }} сотрудников
-            </UBadge>
+            <div class="flex items-center gap-2">
+              <UBadge :color="archiveView === 'only' ? 'warning' : 'neutral'" size="lg" variant="soft">
+                {{ filteredRows.length }} {{ archiveView === 'only' ? 'в архиве' : 'сотрудников' }}
+              </UBadge>
+            </div>
             <div class="flex items-center gap-2">
               <UButton color="primary" icon="i-lucide-user-plus" @click="openCreateModal">
                 Добавить сотрудника
@@ -1200,6 +1220,26 @@ onBeforeUnmount(() => {
               value-key="value"
               placeholder="Все роли"
             />
+            <div class="flex w-full rounded-xl border border-charcoal-200 bg-charcoal-50/60 p-1">
+              <UButton
+                class="flex-1"
+                :color="archiveView === 'active' ? 'primary' : 'neutral'"
+                :variant="archiveView === 'active' ? 'solid' : 'outline'"
+                icon="i-lucide-users"
+                @click="archiveView = 'active'"
+              >
+                Активные
+              </UButton>
+              <UButton
+                class="flex-1"
+                :color="archiveView === 'only' ? 'warning' : 'neutral'"
+                :variant="archiveView === 'only' ? 'solid' : 'outline'"
+                icon="i-lucide-archive"
+                @click="archiveView = 'only'"
+              >
+                Архив
+              </UButton>
+            </div>
           </div>
 
           <div v-if="filteredRows.length" class="overflow-hidden rounded-[1.25rem] border border-charcoal-200 bg-white/90">
@@ -1226,7 +1266,7 @@ onBeforeUnmount(() => {
                   <button
                     class="flex w-full items-center gap-3 text-left"
                     type="button"
-                    @click="openEmployeeDetails(row.original)"
+                    @click="openEmployeeReport(row.original)"
                   >
                     <div class="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-charcoal-200 bg-charcoal-100">
                       <img
@@ -1286,14 +1326,14 @@ onBeforeUnmount(() => {
                       />
                     </UTooltip>
 
-                    <UTooltip text="Статистика">
+                    <UTooltip text="Статистика по филиалу">
                       <UButton
-                        aria-label="Открыть статистику сотрудника"
+                        aria-label="Открыть статистику филиала"
                         color="neutral"
                         icon="i-lucide-chart-no-axes-combined"
                         square
                         variant="ghost"
-                        @click="openEmployeeDetails(row.original)"
+                        to="/statistics/branch"
                       />
                     </UTooltip>
 
@@ -1308,15 +1348,26 @@ onBeforeUnmount(() => {
                       />
                     </UTooltip>
 
-                    <UTooltip text="Удалить">
+                    <UTooltip v-if="row.original.is_active" text="Уволить">
                       <UButton
-                        aria-label="Удалить сотрудника"
+                        aria-label="Уволить сотрудника"
                         color="error"
-                        icon="i-lucide-trash-2"
+                        icon="i-lucide-user-x"
                         :loading="removingId === row.original.id"
                         square
                         variant="ghost"
-                        @click="removeEmployee(row.original)"
+                        @click="fireEmployee(row.original)"
+                      />
+                    </UTooltip>
+                    <UTooltip v-else text="Восстановить">
+                      <UButton
+                        aria-label="Восстановить сотрудника"
+                        color="success"
+                        icon="i-lucide-user-check"
+                        :loading="removingId === row.original.id"
+                        square
+                        variant="ghost"
+                        @click="restoreEmployee(row.original)"
                       />
                     </UTooltip>
                   </div>
@@ -1346,136 +1397,6 @@ onBeforeUnmount(() => {
       </div>
     </template>
   </UDashboardPanel>
-
-  <UModal
-    v-model:open="detailsModalOpen"
-    class="sm:max-w-[760px]"
-    :title="selectedEmployee?.name || 'Сотрудник'"
-    :description="selectedEmployee ? `${selectedEmployee.branch} · ${getEmployeeRoleLabel(selectedEmployee.role)}` : undefined"
-  >
-    <template #body>
-      <div v-if="selectedEmployee" class="space-y-5">
-        <div class="flex flex-col gap-4 rounded-[1.5rem] border border-charcoal-200 bg-white/90 p-4 sm:flex-row sm:items-center">
-          <div class="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-charcoal-200 bg-charcoal-100">
-            <img
-              v-if="selectedEmployee.photo_url"
-              :alt="selectedEmployee.name"
-              :src="getEmployeePhotoUrl(selectedEmployee.photo_url)"
-              class="size-full object-cover"
-            >
-            <UIcon v-else class="text-2xl text-charcoal-400" name="i-lucide-user-round" />
-          </div>
-          <div class="min-w-0 flex-1">
-            <p class="text-lg font-semibold text-charcoal-950">{{ selectedEmployee.name }}</p>
-            <p class="text-sm text-charcoal-600">{{ selectedEmployee.login }} · {{ selectedEmployee.phone || 'Телефон не указан' }}</p>
-            <p v-if="selectedEmployee.specialization" class="text-sm text-charcoal-500">{{ selectedEmployee.specialization }}</p>
-          </div>
-          <UBadge color="primary" variant="soft">
-            {{ getEmployeeRoleLabel(selectedEmployee.role) }}
-          </UBadge>
-        </div>
-
-        <div class="grid gap-3 sm:grid-cols-4">
-          <div class="rounded-xl border border-charcoal-200 bg-white/90 px-4 py-3">
-            <p class="text-xs uppercase tracking-[0.16em] text-charcoal-500">Визиты</p>
-            <p class="mt-2 text-lg font-semibold text-charcoal-950">{{ formatCount(selectedEmployeeInsight?.visits || 0) }}</p>
-          </div>
-          <div class="rounded-xl border border-charcoal-200 bg-white/90 px-4 py-3">
-            <p class="text-xs uppercase tracking-[0.16em] text-charcoal-500">Завершено</p>
-            <p class="mt-2 text-lg font-semibold text-emerald-600">{{ formatCount(selectedEmployeeInsight?.completed || 0) }}</p>
-          </div>
-          <div class="rounded-xl border border-charcoal-200 bg-white/90 px-4 py-3">
-            <p class="text-xs uppercase tracking-[0.16em] text-charcoal-500">Отмены</p>
-            <p class="mt-2 text-lg font-semibold text-amber-600">{{ formatCount(selectedEmployeeInsight?.cancelled || 0) }}</p>
-          </div>
-          <div class="rounded-xl border border-charcoal-200 bg-white/90 px-4 py-3">
-            <p class="text-xs uppercase tracking-[0.16em] text-charcoal-500">Выручка</p>
-            <p class="mt-2 text-lg font-semibold text-charcoal-950">{{ formatMoney(selectedEmployeeInsight?.revenue || 0) }}</p>
-          </div>
-        </div>
-
-        <div class="rounded-[1.5rem] border border-charcoal-200 bg-white/90 p-4">
-          <div class="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p class="text-xs uppercase tracking-[0.16em] text-charcoal-500">Финансы</p>
-              <p class="mt-1 text-sm text-charcoal-600">Период {{ currentPeriodKey() }}</p>
-            </div>
-            <UBadge color="neutral" variant="outline">
-              {{ formatMoney(selectedEmployeeInsight?.finance.reportProfit || 0) }}
-            </UBadge>
-          </div>
-
-          <div class="mt-4 grid gap-3 sm:grid-cols-3">
-            <div class="rounded-xl bg-charcoal-50/70 px-3 py-2">
-              <p class="text-xs uppercase tracking-[0.14em] text-charcoal-500">Цель</p>
-              <p class="mt-1 font-semibold text-charcoal-950">{{ formatMoney(selectedEmployeeInsight?.finance.salary || 0) }}</p>
-            </div>
-            <div class="rounded-xl bg-charcoal-50/70 px-3 py-2">
-              <p class="text-xs uppercase tracking-[0.14em] text-charcoal-500">Комиссия</p>
-              <p class="mt-1 font-semibold text-charcoal-950">{{ formatMoney(selectedEmployeeInsight?.finance.commission || 0) }}</p>
-            </div>
-            <div class="rounded-xl bg-charcoal-50/70 px-3 py-2">
-              <p class="text-xs uppercase tracking-[0.14em] text-charcoal-500">К выплате</p>
-              <p class="mt-1 font-semibold text-charcoal-950">{{ formatMoney(selectedEmployeeInsight?.finance.payout || 0) }}</p>
-            </div>
-            <div class="rounded-xl bg-charcoal-50/70 px-3 py-2">
-              <p class="text-xs uppercase tracking-[0.14em] text-charcoal-500">Аванс</p>
-              <p class="mt-1 font-semibold text-charcoal-950">{{ formatMoney(selectedEmployeeInsight?.finance.advances || 0) }}</p>
-            </div>
-            <div class="rounded-xl bg-charcoal-50/70 px-3 py-2">
-              <p class="text-xs uppercase tracking-[0.14em] text-charcoal-500">Штраф</p>
-              <p class="mt-1 font-semibold text-charcoal-950">{{ formatMoney(selectedEmployeeInsight?.finance.penalty || 0) }}</p>
-            </div>
-            <div class="rounded-xl bg-charcoal-50/70 px-3 py-2">
-              <p class="text-xs uppercase tracking-[0.14em] text-charcoal-500">Процент</p>
-              <p class="mt-1 font-semibold text-charcoal-950">{{ selectedEmployeeInsight?.finance.profit_percent || 0 }}%</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="rounded-[1.5rem] border border-charcoal-200 bg-white/90 p-4">
-          <div class="flex items-center justify-between gap-3">
-            <p class="text-xs uppercase tracking-[0.16em] text-charcoal-500">История</p>
-            <UBadge color="neutral" variant="outline">
-              {{ formatCount(selectedEmployeeInsight?.history.length || 0) }}
-            </UBadge>
-          </div>
-
-          <div v-if="selectedEmployeeInsight?.history.length" class="mt-4 max-h-[18rem] space-y-2 overflow-auto pr-1">
-            <div
-              v-for="item in selectedEmployeeInsight.history.slice(0, 8)"
-              :key="item.id"
-              class="rounded-xl border border-charcoal-200 bg-charcoal-50/50 px-3 py-2"
-            >
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <p class="text-sm font-semibold text-charcoal-950">
-                    {{ item.client?.name || item.customer_name || 'Клиент' }}
-                  </p>
-                  <p class="text-xs text-charcoal-500">
-                    {{ formatDateTime(getHistoryTimestamp(item) || '') }}
-                  </p>
-                </div>
-                <div class="text-right">
-                  <SharedStatusBadge :label="item.status" />
-                  <p class="mt-1 text-xs font-semibold text-charcoal-700">
-                    {{ formatMoney(getHistoryAmount(item, servicePriceMap)) }}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <SharedEmptyState
-            v-else
-            description="По выбранному филиалу история этого сотрудника не найдена."
-            icon="i-lucide-history"
-            title="История пуста"
-          />
-        </div>
-      </div>
-    </template>
-  </UModal>
 
   <UModal
     v-model:open="reportModalOpen"

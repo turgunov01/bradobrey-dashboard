@@ -15,6 +15,43 @@ import type {
 export function useBarbersApi() {
   const client = useApiClient();
 
+  function getErrorStatus(error: any) {
+    return Number(error?.statusCode || error?.status || error?.response?.status || 500);
+  }
+
+  function shouldFallbackToActivePatch(error: any) {
+    return [404, 405, 501].includes(getErrorStatus(error));
+  }
+
+  async function toggleEmployeeArchive(
+    id: string,
+    endpoint: "archive" | "restore",
+    isActive: boolean,
+    successMessage: string,
+  ) {
+    try {
+      const response = await client.request(`/api/barbers/${id}/${endpoint}`, {
+        method: "PATCH",
+        silent: true,
+      });
+
+      client.notifySuccess(successMessage);
+
+      return response;
+    } catch (error) {
+      if (!shouldFallbackToActivePatch(error)) {
+        client.notifyError(error);
+        throw error;
+      }
+
+      return client.request(`/api/barbers/${id}`, {
+        body: { is_active: isActive },
+        method: "PATCH",
+        successMessage,
+      });
+    }
+  }
+
   return {
     break(minutes: BreakPayload) {
       return client.request("/api/barbers/break", {
@@ -41,6 +78,7 @@ export function useBarbersApi() {
         items: Array<{
           branch_id: string | null;
           id: string;
+          is_active?: boolean | null;
           login: string | null;
           name?: string | null;
           permissions?: EmployeePermission[];
@@ -101,11 +139,11 @@ export function useBarbersApi() {
         successMessage: "Сотрудник создан",
       });
     },
-    remove(id: string) {
-      return client.request(`/api/barbers/${id}`, {
-        method: "DELETE",
-        successMessage: "Сотрудник удален",
-      });
+    archive(id: string) {
+      return toggleEmployeeArchive(id, "archive", false, "Сотрудник уволен");
+    },
+    restore(id: string) {
+      return toggleEmployeeArchive(id, "restore", true, "Сотрудник восстановлен");
     },
     returnFromBreak() {
       return client.request("/api/barbers/return", {
