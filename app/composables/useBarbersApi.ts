@@ -42,6 +42,7 @@ export function useBarbersApi() {
           branch_id: string | null;
           id: string;
           is_active?: boolean | null;
+          is_archived?: boolean | null;
           login: string | null;
           name?: string | null;
           permissions?: EmployeePermission[];
@@ -103,12 +104,6 @@ export function useBarbersApi() {
       });
     },
     archive(id: string) {
-      return client.request(`/api/barbers/${id}/archive`, {
-        method: "PATCH",
-        successMessage: "Сотрудник уволен",
-      });
-    },
-    remove(id: string) {
       return client.request(`/api/barbers/${id}/archive`, {
         method: "PATCH",
         successMessage: "Сотрудник уволен",

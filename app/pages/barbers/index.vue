@@ -30,6 +30,7 @@ type EmployeeRow = {
   branch_id: string
   id: string
   is_active: boolean
+  is_archived: boolean
   login: string
   name: string
   permissions: EmployeePermission[]
@@ -590,6 +591,7 @@ const { data, pending, refresh } = await useAsyncData('employees-directory', asy
       branch_id: branchId,
       id: String(item.id),
       is_active: item.is_active !== false,
+      is_archived: item.is_archived === true,
       login,
       name: item.name || login || 'Сотрудник без имени',
       permissions,
@@ -691,7 +693,7 @@ const filteredRows = computed<EmployeeRow[]>(() => {
   return employeeRows.value.filter((row) => {
     const matchesLogin = !loginNeedle || row.login.toLowerCase().includes(loginNeedle)
     const matchesRole = roleFilter.value === 'all' || row.role === roleFilter.value
-    const matchesArchive = archiveView.value === 'only' ? !row.is_active : row.is_active
+    const matchesArchive = archiveView.value === 'only' ? row.is_archived : !row.is_archived
     return matchesLogin && matchesRole && matchesArchive
   })
 })
@@ -1124,7 +1126,7 @@ async function submitEmployee() {
 async function fireEmployee(row: EmployeeRow) {
   const label = row.name || row.login
 
-  if (import.meta.client && !window.confirm(`Уволить сотрудника ${label}? Логин и доступ будут отключены, сотрудник уйдёт в архив.`)) {
+  if (import.meta.client && !window.confirm(`Уволить сотрудника ${label}? Сотрудник будет перемещён в архив. Его данные и история сохранятся. Восстановление возможно в любой момент.`)) {
     return
   }
 
@@ -1146,7 +1148,7 @@ async function fireEmployee(row: EmployeeRow) {
 async function restoreEmployee(row: EmployeeRow) {
   const label = row.name || row.login
 
-  if (import.meta.client && !window.confirm(`Восстановить сотрудника ${label}? Логин и доступ снова будут включены.`)) {
+  if (import.meta.client && !window.confirm(`Восстановить сотрудника ${label}? Он снова появится в активном списке и сможет войти.`)) {
     return
   }
 
@@ -1346,7 +1348,7 @@ onBeforeUnmount(() => {
 
                     <UTooltip text="Уволить">
                       <UButton
-                        v-if="row.original.is_active"
+                        v-if="!row.original.is_archived"
                         aria-label="Уволить сотрудника"
                         color="error"
                         icon="i-lucide-user-x"
@@ -1356,7 +1358,7 @@ onBeforeUnmount(() => {
                         @click="fireEmployee(row.original)"
                       />
                     </UTooltip>
-                    <UTooltip v-if="!row.original.is_active" text="Восстановить">
+                    <UTooltip v-if="row.original.is_archived" text="Восстановить">
                       <UButton
                         aria-label="Восстановить сотрудника"
                         color="success"

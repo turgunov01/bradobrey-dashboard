@@ -82,6 +82,12 @@ function extractErrorMessage(error: any) {
     return data.message;
   }
 
+  if (data?.error) {
+    return data.error === "Employee access has been revoked"
+      ? "Доступ сотрудника отозван. Обратитесь к администратору для восстановления."
+      : data.error;
+  }
+
   if (error?.statusMessage) {
     return error.statusMessage;
   }
