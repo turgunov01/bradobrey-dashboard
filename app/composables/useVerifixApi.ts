@@ -22,6 +22,27 @@ export type VerifixEventsQuery = {
   start_date?: string
 }
 
+export type VerifixSchedule = {
+  id: string
+  branch_id: string
+  barber_id: string | null
+  day_of_week: number
+  start_time: string
+  end_time: string | null
+  grace_minutes: number | null
+  is_active: boolean
+}
+
+export type VerifixSchedulePayload = {
+  barber_id?: string | null
+  branch_id: string
+  day_of_week: number
+  end_time?: string | null
+  grace_minutes?: number
+  is_active?: boolean
+  start_time: string
+}
+
 export function useVerifixApi() {
   const client = useApiClient()
 
@@ -30,6 +51,31 @@ export function useVerifixApi() {
       return client.request<VerifixEventsResponse>('/api/verifix/events', {
         query: { __skipBranchScope: true, ...query },
         silent: options.silent
+      })
+    },
+    schedules(query: { barber_id?: string, branch_id?: string } = {}) {
+      return client.request<{ items: VerifixSchedule[] }>('/api/verifix/schedules', {
+        query: { __skipBranchScope: true, ...query }
+      })
+    },
+    createSchedule(payload: VerifixSchedulePayload) {
+      return client.request<{ schedule: VerifixSchedule }>('/api/verifix/schedules', {
+        body: payload,
+        method: 'POST',
+        successMessage: 'График Verifix сохранён'
+      })
+    },
+    updateSchedule(id: string, payload: Partial<VerifixSchedulePayload>) {
+      return client.request<{ schedule: VerifixSchedule }>(`/api/verifix/schedules/${id}`, {
+        body: payload,
+        method: 'PATCH',
+        successMessage: 'График Verifix обновлён'
+      })
+    },
+    deactivateSchedule(id: string) {
+      return client.request<{ schedule: VerifixSchedule }>(`/api/verifix/schedules/${id}`, {
+        method: 'DELETE',
+        successMessage: 'График Verifix отключён'
       })
     }
   }

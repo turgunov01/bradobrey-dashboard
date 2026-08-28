@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
+import type { VerifixSchedule } from '~/composables/useVerifixApi'
 
 import type { Branch } from '~~/shared/schemas'
 import { branchFormSchema, branchSchema } from '~~/shared/schemas'
@@ -98,6 +99,8 @@ function extractBranchItems(response: unknown): unknown[] {
 
 const branchesApi = useBranchesApi()
 const branchStore = useBranchStore()
+const barbersApi = useBarbersApi()
+const verifixApi = useVerifixApi()
 
 const search = ref('')
 const modalOpen = ref(false)
@@ -123,6 +126,10 @@ const columns: TableColumn<BranchRow>[] = [
 
 const { data, pending, refresh } = await useAsyncData('branches-dashboard', async () => {
   return await branchesApi.list()
+})
+
+const { data: barbersData } = await useAsyncData('branches-verifix-barbers', async () => {
+  return await barbersApi.list({ include_inactive: true })
 })
 
 const branchRows = computed<BranchRow[]>(() =>
@@ -156,6 +163,129 @@ const filteredRows = computed(() => {
 
 const modalTitle = computed(() => form.id ? 'Редактировать филиал' : 'Создать филиал')
 const modalDescription = computed(() => form.id ? 'Обновите параметры филиала и сохраните изменения.' : 'Заполните данные, чтобы добавить новый филиал.')
+
+const scheduleOpen = ref(false)
+const schedulesPending = ref(false)
+const scheduleSubmitting = ref(false)
+const scheduleBranch = ref<BranchRow | null>(null)
+const scheduleEditingId = ref<string | null>(null)
+const verifixSchedules = ref<VerifixSchedule[]>([])
+
+const scheduleDays = [
+  { label: 'Воскресенье', value: 0 },
+  { label: 'Понедельник', value: 1 },
+  { label: 'Вторник', value: 2 },
+  { label: 'Среда', value: 3 },
+  { label: 'Четверг', value: 4 },
+  { label: 'Пятница', value: 5 },
+  { label: 'Суббота', value: 6 }
+]
+
+const scheduleForm = reactive({
+  barber_id: null as string | null,
+  day_of_week: 1,
+  end_time: '20:00',
+  grace_minutes: 0,
+  start_time: '10:00'
+})
+
+const scheduleBarberOptions = computed(() => {
+  const branchId = scheduleBranch.value?.id
+  const barbers = ((barbersData.value as any)?.items || []) as Array<{ branch_id: string | null, id: string, name: string | null }>
+
+  return [
+    { label: 'Все барберы филиала', value: null },
+    ...barbers
+      .filter(barber => barber.branch_id === branchId)
+      .map(barber => ({ label: barber.name || 'Сотрудник', value: barber.id }))
+  ]
+})
+
+const barberNameById = computed(() => new Map(
+  (((barbersData.value as any)?.items || []) as Array<{ id: string, name: string | null }>)
+    .map(barber => [barber.id, barber.name || 'Сотрудник'])
+))
+
+function resetScheduleForm() {
+  scheduleEditingId.value = null
+  scheduleForm.barber_id = null
+  scheduleForm.day_of_week = 1
+  scheduleForm.start_time = '10:00'
+  scheduleForm.end_time = '20:00'
+  scheduleForm.grace_minutes = 0
+}
+
+async function refreshSchedules() {
+  const branch = scheduleBranch.value
+  if (!branch) return
+
+  schedulesPending.value = true
+  try {
+    const response = await verifixApi.schedules({ branch_id: branch.id })
+    verifixSchedules.value = Array.isArray(response?.items) ? response.items : []
+  }
+  finally {
+    schedulesPending.value = false
+  }
+}
+
+async function openSchedules(row: BranchRow) {
+  scheduleBranch.value = row
+  resetScheduleForm()
+  scheduleOpen.value = true
+  await refreshSchedules()
+}
+
+function editSchedule(schedule: VerifixSchedule) {
+  scheduleEditingId.value = schedule.id
+  scheduleForm.barber_id = schedule.barber_id || null
+  scheduleForm.day_of_week = schedule.day_of_week
+  scheduleForm.start_time = String(schedule.start_time || '').slice(0, 5)
+  scheduleForm.end_time = schedule.end_time ? String(schedule.end_time).slice(0, 5) : ''
+  scheduleForm.grace_minutes = Number(schedule.grace_minutes || 0)
+}
+
+async function saveSchedule() {
+  const branch = scheduleBranch.value
+  if (!branch || !scheduleForm.start_time) return
+
+  scheduleSubmitting.value = true
+  try {
+    const payload = {
+      barber_id: scheduleForm.barber_id,
+      branch_id: branch.id,
+      day_of_week: Number(scheduleForm.day_of_week),
+      end_time: scheduleForm.end_time || null,
+      grace_minutes: Math.max(0, Number(scheduleForm.grace_minutes) || 0),
+      start_time: scheduleForm.start_time
+    }
+
+    if (scheduleEditingId.value) {
+      await verifixApi.updateSchedule(scheduleEditingId.value, payload)
+    }
+    else {
+      await verifixApi.createSchedule(payload)
+    }
+
+    resetScheduleForm()
+    await refreshSchedules()
+  }
+  finally {
+    scheduleSubmitting.value = false
+  }
+}
+
+async function deactivateSchedule(schedule: VerifixSchedule) {
+  scheduleSubmitting.value = true
+  try {
+    await verifixApi.deactivateSchedule(schedule.id)
+    if (scheduleEditingId.value === schedule.id) resetScheduleForm()
+    await refreshSchedules()
+  }
+  finally {
+    scheduleSubmitting.value = false
+  }
+}
 
 function resetForm() {
   form.id = ''
@@ -377,6 +507,13 @@ async function removeBranch(row: BranchRow) {
 
               <template #actions-cell="{ row }">
                 <div class="flex items-center justify-end gap-2">
+                  <UButton
+                    icon="i-lucide-calendar-clock"
+                    title="График сотрудников Verifix"
+                    variant="ghost"
+                    size="xs"
+                    @click="openSchedules(row.original)"
+                  />
                   <UButton icon="i-lucide-pencil" variant="ghost" size="xs" @click="openEditModal(row.original)" />
                   <UButton
                     icon="i-lucide-trash-2"
@@ -445,6 +582,79 @@ async function removeBranch(row: BranchRow) {
             <UButton color="primary" icon="i-lucide-save" :loading="submitting" @click="submit">
               {{ form.id ? 'Сохранить' : 'Создать' }}
             </UButton>
+          </div>
+        </template>
+      </UModal>
+
+      <UModal
+        v-model:open="scheduleOpen"
+        class="sm:max-w-3xl"
+        :title="scheduleBranch ? `График сотрудников: ${scheduleBranch.name}` : 'График сотрудников'"
+        description="График Verifix используется для расчёта опоздания в момент входа барбера."
+      >
+        <template #body>
+          <div class="space-y-5">
+            <div class="rounded-[1.25rem] border border-primary-200 bg-primary-50/60 p-4 text-sm text-charcoal-700">
+              Общий график действует на всех барберов филиала, пока для сотрудника не задан персональный.
+            </div>
+
+            <div class="grid gap-4 md:grid-cols-2">
+              <UFormField label="Сотрудник">
+                <USelectMenu v-model="scheduleForm.barber_id" class="w-full" :items="scheduleBarberOptions" placeholder="Все барберы филиала" value-key="value" />
+              </UFormField>
+              <UFormField label="День недели" required>
+                <USelectMenu v-model="scheduleForm.day_of_week" class="w-full" :items="scheduleDays" value-key="value" />
+              </UFormField>
+              <UFormField label="Начало смены" required>
+                <UInput v-model="scheduleForm.start_time" type="time" />
+              </UFormField>
+              <UFormField label="Конец смены">
+                <UInput v-model="scheduleForm.end_time" type="time" />
+              </UFormField>
+              <UFormField label="Допуск, минут">
+                <UInput v-model.number="scheduleForm.grace_minutes" min="0" type="number" />
+              </UFormField>
+            </div>
+
+            <div class="flex flex-wrap justify-end gap-3">
+              <UButton v-if="scheduleEditingId" color="neutral" variant="ghost" :disabled="scheduleSubmitting" @click="resetScheduleForm">
+                Отменить редактирование
+              </UButton>
+              <UButton color="primary" :disabled="!scheduleForm.start_time" :loading="scheduleSubmitting" @click="saveSchedule">
+                {{ scheduleEditingId ? 'Сохранить изменения' : 'Добавить график' }}
+              </UButton>
+            </div>
+
+            <div class="border-t border-charcoal-200 pt-4">
+              <div class="mb-3 flex items-center justify-between gap-3">
+                <p class="text-sm font-semibold text-charcoal-950">Активные смены</p>
+                <UButton icon="i-lucide-refresh-cw" size="xs" variant="ghost" :loading="schedulesPending" @click="refreshSchedules" />
+              </div>
+              <div v-if="schedulesPending" class="py-6 text-center text-sm text-charcoal-500">Загрузка графика Verifix…</div>
+              <div v-else-if="verifixSchedules.length" class="space-y-2">
+                <div v-for="schedule in verifixSchedules" :key="schedule.id" class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-charcoal-200 bg-charcoal-50/60 px-4 py-3">
+                  <div class="min-w-0">
+                    <p class="font-medium text-charcoal-950">
+                      {{ scheduleDays.find(day => day.value === schedule.day_of_week)?.label }} · {{ String(schedule.start_time).slice(0, 5) }}<span v-if="schedule.end_time">–{{ String(schedule.end_time).slice(0, 5) }}</span>
+                    </p>
+                    <p class="text-xs text-charcoal-500">
+                      {{ schedule.barber_id ? (barberNameById.get(schedule.barber_id) || 'Сотрудник') : 'Все барберы филиала' }} · допуск {{ schedule.grace_minutes || 0 }} мин
+                    </p>
+                  </div>
+                  <div class="flex shrink-0 gap-2">
+                    <UButton icon="i-lucide-pencil" size="xs" variant="ghost" @click="editSchedule(schedule)" />
+                    <UButton icon="i-lucide-power" color="error" size="xs" variant="ghost" :disabled="scheduleSubmitting" @click="deactivateSchedule(schedule)" />
+                  </div>
+                </div>
+              </div>
+              <p v-else class="py-6 text-center text-sm text-charcoal-500">Активных смен ещё нет. Добавьте график, чтобы Verifix начал считать опоздания.</p>
+            </div>
+          </div>
+        </template>
+
+        <template #footer>
+          <div class="flex justify-end">
+            <UButton color="neutral" variant="ghost" @click="scheduleOpen = false">Закрыть</UButton>
           </div>
         </template>
       </UModal>
