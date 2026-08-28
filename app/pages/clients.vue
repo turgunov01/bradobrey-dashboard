@@ -566,10 +566,12 @@ const selectedSummary = computed(() => {
   const total = visits.length
   const completed = visits.filter(v => isCompletedStatus(v.status)).length
   const cancelled = visits.filter(v => isCancelledStatus(v.status)).length
-  const spend = visits.reduce((sum, v) => {
-    const amount = getVisitAmount(v)
-    return sum + (amount ?? 0)
-  }, 0)
+  const spend = visits
+    .filter(v => isCompletedStatus(v.status))
+    .reduce((sum, v) => {
+      const amount = getVisitAmount(v)
+      return sum + (amount ?? 0)
+    }, 0)
 
   return {
     total,

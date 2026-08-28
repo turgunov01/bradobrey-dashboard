@@ -666,6 +666,10 @@ const { data: reportData, pending: reportPending } = await useAsyncData('employe
       return false
     }
 
+    if (!isCompletedStatus(item.status)) {
+      return false
+    }
+
     const timestamp = getHistoryTimestamp(item)
     const dateKey = timestamp ? timestamp.slice(0, 10) : null
 
@@ -809,11 +813,11 @@ const reportRows = computed(() => {
       certificate: split.certificate,
       client: item.client?.name || item.customer_name || item.user_name || 'Клиент',
       durationLabel: formatDurationSeconds(durationSeconds),
-      endLabel: formatClock(endValue),
+      endLabel: formatDateTime(endValue),
       id: String(item.id ?? `${index}`),
       idleLabel: idleSeconds === null ? '—' : formatDurationSeconds(idleSeconds),
       index: index + 1,
-      startLabel: formatClock(startValue),
+      startLabel: formatDateTime(startValue),
       status: item.status,
       total
     }
@@ -1378,10 +1382,9 @@ onBeforeUnmount(() => {
                 Показано {{ pagedRows.length ? (page - 1) * pageSize + 1 : 0 }}–{{ Math.min(page * pageSize, filteredRows.length) }} из {{ filteredRows.length }}
               </span>
               <UPagination
-                v-model="page"
-                :page-count="pageCount"
+                v-model:page="page"
                 :total="filteredRows.length"
-                :per-page="pageSize"
+                :items-per-page="pageSize"
                 size="sm"
               />
             </div>
@@ -1679,37 +1682,37 @@ onBeforeUnmount(() => {
         </div>
 
         <div class="space-y-6">
-          <div class="rounded-[1.5rem] border border-charcoal-200 bg-charcoal-950 p-5 text-white">
+          <div class="rounded-[1.5rem] border border-charcoal-200 bg-white p-5">
             <div class="space-y-1">
-              <h3 class="barbershop-heading text-xl text-white">
+              <h3 class="barbershop-heading text-xl text-charcoal-950">
                 Предпросмотр доступа
               </h3>
-              <p class="text-sm text-white/70">
+              <p class="text-sm text-charcoal-500">
                 Быстрый обзор того, что получит сотрудник после сохранения.
               </p>
             </div>
 
             <div class="mt-4 space-y-3">
-              <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p class="text-xs uppercase tracking-[0.18em] text-white/50">
+              <div class="rounded-2xl border border-primary-200 bg-primary-50/60 p-4">
+                <p class="text-xs uppercase tracking-[0.18em] text-primary-700">
                   Роль
                 </p>
-                <p class="mt-2 text-base font-semibold">
+                <p class="mt-2 text-base font-semibold text-charcoal-950">
                   {{ employeeRoleLabels[form.role] }}
                 </p>
               </div>
 
-              <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p class="text-xs uppercase tracking-[0.18em] text-white/50">
+              <div class="rounded-2xl border border-charcoal-200 bg-charcoal-50/40 p-4">
+                <p class="text-xs uppercase tracking-[0.18em] text-charcoal-500">
                   Филиал
                 </p>
-                <p class="mt-2 text-base font-semibold">
+                <p class="mt-2 text-base font-semibold text-charcoal-950">
                   {{ branchMap.get(form.branch_id) || 'Не выбран' }}
                 </p>
               </div>
 
-              <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p class="text-xs uppercase tracking-[0.18em] text-white/50">
+              <div class="rounded-2xl border border-charcoal-200 bg-charcoal-50/40 p-4">
+                <p class="text-xs uppercase tracking-[0.18em] text-charcoal-500">
                   Набор прав
                 </p>
                 <div class="mt-3 flex flex-wrap gap-2">
@@ -1721,7 +1724,7 @@ onBeforeUnmount(() => {
                   >
                     {{ employeePermissionDefinitions[permission].label }}
                   </UBadge>
-                  <span v-if="!form.permissions.length" class="text-sm text-white/60">
+                  <span v-if="!form.permissions.length" class="text-sm text-charcoal-500">
                     Права не выбраны
                   </span>
                 </div>

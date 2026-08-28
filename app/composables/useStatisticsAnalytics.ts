@@ -819,7 +819,7 @@ export async function useStatisticsAnalytics() {
   const paymentBreakdown = computed<PaymentBreakdownRow[]>(() => {
     const rows = new Map<string, PaymentBreakdownRow>()
 
-    for (const item of filteredHistory.value) {
+    for (const item of completedHistory.value) {
       const key = normalizeText(item.paymentMethod) || 'pending'
       const current = rows.get(key) || {
         count: 0,
@@ -838,7 +838,7 @@ export async function useStatisticsAnalytics() {
     return [...rows.values()]
       .map(row => ({
         ...row,
-        percent: filteredHistory.value.length ? (row.count / filteredHistory.value.length) * 100 : 0
+        percent: completedHistory.value.length ? (row.count / completedHistory.value.length) * 100 : 0
       }))
       .sort((left, right) => right.count - left.count || right.revenue - left.revenue)
   })
@@ -934,15 +934,15 @@ export async function useStatisticsAnalytics() {
 
   const operationsCards = computed(() => [
     {
-      description: 'Статусы cancelled, no_show и not_in_time.',
+      description: 'Статусы «Отменено», «Не явился» и «Не вовремя».',
       icon: 'i-lucide-ban',
       label: 'Отмены',
       value: formatCount(operationsMetrics.value.cancelled)
     },
     {
-      description: 'Отдельно по статусу no_show.',
+      description: 'Клиент не пришёл на запись.',
       icon: 'i-lucide-user-x',
-      label: 'No-show',
+      label: 'Не пришёл',
       value: formatCount(operationsMetrics.value.noShow)
     },
     {

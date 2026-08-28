@@ -537,18 +537,15 @@ function updateMoneyDraft(id: string, field: FinanceMoneyField, value: unknown) 
 
 function commissionForDraft(draft: FinanceEmployeeDraft) {
   const profit = Math.max(0, draft.profit)
-  const goal = Math.max(0, draft.salary)
-  const basePercent = Math.max(0, draft.profit_percent)
-  const bonusPercent = draft.bonus_profit_percent > 0
-    ? Math.max(0, draft.bonus_profit_percent)
-    : basePercent
-
-  const profitToGoal = goal > 0 ? Math.min(profit, goal) : 0
-  const profitAboveGoal = Math.max(0, profit - profitToGoal)
+  const plan = Math.max(0, draft.salary)
+  // Процент — доля выручки барбершопа: сотрудник получает остаток.
+  const barbershopPercent = Math.min(100, Math.max(0, draft.profit_percent))
+  const bonusPercent = Math.max(0, draft.bonus_profit_percent)
+  const profitAbovePlan = plan > 0 ? Math.max(0, profit - plan) : 0
 
   return Math.round(
-    (profitToGoal * basePercent) / 100
-    + (profitAboveGoal * bonusPercent) / 100
+    (profit * (100 - barbershopPercent)) / 100
+    + (profitAbovePlan * bonusPercent) / 100
   )
 }
 
@@ -560,11 +557,21 @@ function profitShareForDraft(draft: FinanceEmployeeDraft) {
   )
 }
 
-// Итоговая выплата по сотруднику: оклад + надбавка + сумма с прибыли после авансов и штрафов.
+// Надбавка выплачивается только после достижения установленного плана.
+function earnedBonusSalaryForDraft(draft: FinanceEmployeeDraft) {
+  const plan = Math.max(0, draft.salary)
+  const profit = Math.max(0, draft.profit)
+
+  return plan > 0 && profit >= plan
+    ? Math.max(0, draft.bonus_salary)
+    : 0
+}
+
+// План — это порог оборота для расчёта процента, а не часть выплаты.
+// Итоговая выплата: заработанная надбавка + сумма с прибыли после авансов и штрафов.
 function payoutForDraft(draft: FinanceEmployeeDraft) {
   return Math.round(
-    Math.max(0, draft.salary)
-    + Math.max(0, draft.bonus_salary)
+    earnedBonusSalaryForDraft(draft)
     + profitShareForDraft(draft)
   )
 }
@@ -880,7 +887,7 @@ watch([
 ], syncBarberProfitsFromHistory, { immediate: true })
 
 const totals = computed(() => {
-  let salary = 0
+  let plan = 0
   let bonusSalary = 0
   let profit = 0
   let advances = 0
@@ -891,8 +898,8 @@ const totals = computed(() => {
   for (const employee of employees.value) {
     const draft = getEmployeeDraft(employee.id)
 
-    salary += draft.salary
-    bonusSalary += draft.bonus_salary
+    plan += draft.salary
+    bonusSalary += earnedBonusSalaryForDraft(draft)
     profit += draft.profit
     advances += draft.advances
     penalties += draft.penalty
@@ -908,7 +915,7 @@ const totals = computed(() => {
     payout,
     penalties,
     profit,
-    salary
+    plan
   }
 })
 
@@ -925,11 +932,11 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
   { id: 'salary', header: 'План' },
   { id: 'bonusSalary', header: 'Надбавка' },
   { id: 'profit', header: 'Val' },
-  { id: 'profitPercent', header: 'Процент' },
+  { id: 'profitPercent', header: 'Процент БШ' },
   { id: 'bonusProfitPercent', header: 'Бонусный процент' },
   { id: 'advances', header: 'Авансы' },
   { id: 'penalty', header: 'Штраф' },
-  { id: 'late', header: 'Опоздания' },
+  { id: 'late', header: 'Опоздания по графику' },
   { id: 'commission', header: 'С прибыли' },
   { id: 'payout', header: 'К выплате' }
 ]
@@ -1055,10 +1062,10 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
           <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div class="rounded-2xl border border-charcoal-200 bg-white/70 px-4 py-3">
               <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">
-                Оклад
+                План оборота
               </p>
               <p class="mt-2 text-lg font-semibold text-charcoal-950">
-                {{ formatMoney(totals.salary) }}
+                {{ formatMoney(totals.plan) }}
               </p>
             </div>
             <div class="rounded-2xl border border-charcoal-200 bg-white/70 px-4 py-3">
@@ -1103,7 +1110,7 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
             </div>
             <div class="rounded-2xl border border-charcoal-200 bg-white/70 px-4 py-3">
               <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">
-                Опозданий за месяц
+                Опозданий по графику за месяц
               </p>
               <p class="mt-2 text-lg font-semibold text-charcoal-950">
                 {{ formatCount(lateTotals.count) }}
@@ -1133,7 +1140,7 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
 
       <div v-else class="space-y-4">
         <!-- Мобильная версия: карточки по сотруднику (таблица не помещается на телефоне) -->
-        <div class="space-y-3 md:hidden">
+        <div class="space-y-3 xl:hidden">
           <div
             v-for="row in employees"
             :key="row.id"
@@ -1182,11 +1189,12 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
                 />
               </label>
               <label class="space-y-1">
-                <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-charcoal-500">Процент</span>
+                <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-charcoal-500">Процент БШ</span>
                 <UInput
                   v-model.number="getEmployeeDraft(row.id).profit_percent"
                   type="number"
                   min="0"
+                  max="100"
                   step="0.1"
                   size="sm"
                   class="w-full"
@@ -1243,7 +1251,7 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
                 </p>
               </div>
               <div>
-                <p class="text-[11px] uppercase tracking-[0.12em] text-charcoal-500">Опоздания</p>
+                <p class="text-[11px] uppercase tracking-[0.12em] text-charcoal-500">Опоздания по графику</p>
                 <p
                   class="text-sm font-semibold"
                   :class="getEmployeeLate(row.id).count ? 'text-red-600' : 'text-charcoal-950'"
@@ -1257,11 +1265,11 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
         </div>
 
         <!-- Планшет/десктоп: таблица -->
-        <div class="hidden md:block max-h-[70vh] overflow-auto rounded-[1.25rem] border border-charcoal-200 bg-white/90">
+        <div class="hidden xl:block max-h-[70vh] overflow-auto rounded-[1.25rem] border border-charcoal-200 bg-white/90">
           <UTable
             :columns="columns"
             :data="employees"
-            :loading="employeesPending || financeHistoryPending"
+            :loading="employeesPending || financeHistoryPending || verifixPending"
             sticky="header"
             :ui="{
               root: 'w-full overflow-auto',
@@ -1321,6 +1329,7 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
                 v-model.number="getEmployeeDraft(row.original.id).profit_percent"
                 type="number"
                 min="0"
+                max="100"
                 step="0.1"
                 size="sm"
                 class="w-28"

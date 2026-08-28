@@ -6,11 +6,11 @@ export function useHistoryApi() {
       return client.request('/api/history/barber', { query })
     },
     branch(branchId: string, query?: Record<string, unknown>) {
-      return client.request('/api/history', {
+      return client.request('/api/history/branch/', {
         query: {
           ...query,
           __skipBranchScope: true,
-          branch_id: branchId
+          id: branchId
         }
       })
     },
