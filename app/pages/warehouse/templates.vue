@@ -12,6 +12,18 @@ type TemplateRow = {
   raw: Record<string, any>
 }
 
+type PositionOption = {
+  label: string
+  value: string
+  unit: string | null
+}
+
+type TemplateItemForm = {
+  position_id: string
+  quantity: number
+  unit: string | null
+}
+
 const warehouseApi = useWarehouseApi()
 const apiClient = useApiClient()
 
@@ -56,21 +68,6 @@ function itemId(value: Record<string, any>, fallback: string) {
   return normalizeText(value.id || value.template_id) || fallback
 }
 
-function parseJsonField(value: string, fallback: unknown) {
-  const text = normalizeText(value)
-
-  if (!text) {
-    return fallback
-  }
-
-  try {
-    return JSON.parse(text)
-  }
-  catch {
-    return text
-  }
-}
-
 const submitting = ref(false)
 const templateModalOpen = ref(false)
 const editingTemplateId = ref<string | null>(null)
@@ -78,7 +75,7 @@ const editingTemplateId = ref<string | null>(null)
 const templateForm = reactive({
   description: '',
   is_active: true,
-  items_json: '[]',
+  items: [] as TemplateItemForm[],
   name: ''
 })
 
@@ -87,6 +84,22 @@ const { data: templatesData, pending: templatesPending, refresh: refreshTemplate
 }, {
   default: () => ({ items: [] })
 })
+
+const { data: positionsData } = await useAsyncData('warehouse-positions', () => warehouseApi.positions(), {
+  default: () => ({ items: [] })
+})
+
+const positionOptions = computed<PositionOption[]>(() =>
+  extractItems(positionsData.value)
+    .filter(position => position.is_active !== false)
+    .map((position, index) => {
+      const id = normalizeText(position.id || position.position_id) || `position-${index}`
+      const name = normalizeText(position.name || position.title) || 'Позиция'
+      const unit = normalizeText(position.unit || position.measure)
+
+      return { label: unit ? `${name} (${unit})` : name, unit, value: id }
+    })
+)
 
 const templateRows = computed<TemplateRow[]>(() =>
   extractItems(templatesData.value).map((item, index) => {
@@ -118,8 +131,24 @@ const templateColumns: TableColumn<TemplateRow>[] = [
 function resetTemplateForm() {
   templateForm.description = ''
   templateForm.is_active = true
-  templateForm.items_json = '[]'
+  templateForm.items = []
   templateForm.name = ''
+}
+
+function addTemplateItem() {
+  templateForm.items.push({
+    position_id: positionOptions.value[0]?.value || '',
+    quantity: 1,
+    unit: positionOptions.value[0]?.unit || null
+  })
+}
+
+function removeTemplateItem(index: number) {
+  templateForm.items.splice(index, 1)
+}
+
+function updateTemplateItemUnit(item: TemplateItemForm) {
+  item.unit = positionOptions.value.find(position => position.value === item.position_id)?.unit || null
 }
 
 function openCreateTemplate() {
@@ -128,13 +157,29 @@ function openCreateTemplate() {
   templateModalOpen.value = true
 }
 
-function openEditTemplate(row: TemplateRow) {
+async function openEditTemplate(row: TemplateRow) {
   editingTemplateId.value = row.id
   templateForm.description = row.description || ''
   templateForm.is_active = row.is_active !== false
-  templateForm.items_json = JSON.stringify(row.raw.items || row.raw.positions || [], null, 2)
   templateForm.name = row.name
   templateModalOpen.value = true
+
+  try {
+    const response = await warehouseApi.template(row.id)
+    const source = response && typeof response === 'object' ? response as Record<string, any> : {}
+    const details = source.item && typeof source.item === 'object' ? source.item as Record<string, any> : source
+    const items = Array.isArray(details.items) ? details.items : []
+
+    templateForm.items = items.map((item: Record<string, any>) => ({
+      position_id: normalizeText(item.position_id || item.positionId) || '',
+      quantity: normalizeNumber(item.quantity) || 1,
+      unit: normalizeText(item.unit || item.measure)
+    })).filter(item => item.position_id)
+  }
+  catch {
+    // Keep the dialog usable if a legacy backend has no detail endpoint.
+    templateForm.items = []
+  }
 }
 
 async function submitTemplate() {
@@ -145,13 +190,26 @@ async function submitTemplate() {
     return
   }
 
+  const items = templateForm.items
+    .filter(item => item.position_id && normalizeNumber(item.quantity) > 0)
+    .map(item => ({
+      position_id: item.position_id,
+      quantity: normalizeNumber(item.quantity),
+      unit: item.unit
+    }))
+
+  if (items.length !== templateForm.items.length) {
+    apiClient.notifyError(new Error('template items are invalid'), 'Выберите позицию и укажите количество больше нуля в каждой строке.')
+    return
+  }
+
   submitting.value = true
 
   try {
     const payload = {
       description: normalizeText(templateForm.description),
       is_active: Boolean(templateForm.is_active),
-      items: parseJsonField(templateForm.items_json, []),
+      items,
       name
     }
 
@@ -252,8 +310,39 @@ async function deleteTemplate(row: TemplateRow) {
             <UFormField label="Описание">
               <UInput v-model="templateForm.description" />
             </UFormField>
-            <UFormField label="Состав JSON">
-              <UTextarea v-model="templateForm.items_json" :rows="7" />
+            <UFormField label="Состав закупки">
+              <div class="space-y-3">
+                <div
+                  v-for="(item, index) in templateForm.items"
+                  :key="`${index}-${item.position_id}`"
+                  class="grid gap-2 rounded-lg border border-charcoal-200 p-3 sm:grid-cols-[minmax(0,1fr)_8rem_auto]"
+                >
+                  <USelectMenu
+                    v-model="item.position_id"
+                    :items="positionOptions"
+                    value-key="value"
+                    placeholder="Выберите позицию"
+                    class="w-full"
+                    @update:model-value="updateTemplateItemUnit(item)"
+                  />
+                  <UInput v-model="item.quantity" type="number" min="0.01" step="0.01" placeholder="Количество" />
+                  <UButton icon="i-lucide-trash-2" color="error" variant="ghost" aria-label="Удалить позицию" @click="removeTemplateItem(index)" />
+                </div>
+
+                <div v-if="!templateForm.items.length" class="rounded-lg border border-dashed border-charcoal-300 px-3 py-4 text-sm text-charcoal-500">
+                  Добавьте позиции, которые должны входить в этот шаблон закупки.
+                </div>
+
+                <UButton
+                  color="neutral"
+                  icon="i-lucide-plus"
+                  variant="outline"
+                  :disabled="!positionOptions.length"
+                  @click="addTemplateItem"
+                >
+                  Добавить позицию
+                </UButton>
+              </div>
             </UFormField>
             <UFormField>
               <UCheckbox v-model="templateForm.is_active" label="Активен" />

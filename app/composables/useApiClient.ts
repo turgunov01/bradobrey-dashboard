@@ -14,6 +14,27 @@ type RequestOptions<TBody = unknown> = {
   successMessage?: string;
 };
 
+const WAREHOUSE_ASYNC_DATA_KEYS = [
+  "warehouse-summary",
+  "warehouse-positions",
+  "warehouse-categories",
+  "warehouse-categories-options",
+  "warehouse-stocks",
+  "warehouse-purchases",
+  "warehouse-templates",
+] as const;
+
+function isWarehouseMutation(url: string, method: RequestOptions["method"] | undefined) {
+  return /^\/api\/warehouse(?:\/|$)/.test(url)
+    && !["GET", "HEAD"].includes((method || "GET").toUpperCase());
+}
+
+function refreshWarehouseData() {
+  if (!import.meta.client) return;
+
+  WAREHOUSE_ASYNC_DATA_KEYS.forEach(key => refreshNuxtData(key));
+}
+
 function buildScopedQuery(
   query: Record<string, unknown> | undefined,
   method: RequestOptions["method"] | undefined,
@@ -193,6 +214,12 @@ export function useApiClient() {
 
       if (options.successMessage) {
         notifySuccess(options.successMessage);
+      }
+
+      // Warehouse pages share useAsyncData keys. Refresh the full data set after
+      // any successful write so navigation between modules never reuses stale data.
+      if (isWarehouseMutation(url, options.method)) {
+        refreshWarehouseData();
       }
 
       return data;

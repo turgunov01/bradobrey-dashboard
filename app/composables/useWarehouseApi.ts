@@ -61,6 +61,11 @@ export function useWarehouseApi() {
     templates(query?: Record<string, unknown>) {
       return list('templates', query)
     },
+    template(id: string) {
+      return client.request<WarehouseRecord>(`/api/warehouse/templates/${id}`, {
+        query: withUnscopedQuery()
+      })
+    },
     createTemplate(body: WarehouseRecord) {
       return create('templates', body, 'Шаблон создан')
     },

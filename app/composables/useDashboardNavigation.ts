@@ -71,6 +71,7 @@ export function useDashboardNavigation() {
             ],
           },
           { icon: "i-lucide-wallet", label: "Финансы", to: "/finance" },
+          { icon: "i-lucide-calendar-clock", label: "Verifix", to: "/verifix" },
         ],
       },
       {

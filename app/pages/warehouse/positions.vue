@@ -25,6 +25,9 @@ type CategoryRow = {
 
 const warehouseApi = useWarehouseApi()
 const apiClient = useApiClient()
+const branchStore = useBranchStore()
+
+await branchStore.ensureLoaded()
 
 function normalizeText(value: unknown) {
   if (value === undefined || value === null) return null
@@ -68,6 +71,7 @@ function itemId(value: Record<string, any>, fallback: string) {
 }
 
 const submitting = ref(false)
+const seeding = ref(false)
 const positionModalOpen = ref(false)
 const editingPositionId = ref<string | null>(null)
 
@@ -78,6 +82,21 @@ const positionForm = reactive({
   name: '',
   unit: 'шт'
 })
+
+const examplePositions = [
+  { category: 'Косметика', min_quantity: 2, name: 'Шампунь профессиональный, 1 л', unit: 'шт' },
+  { category: 'Косметика', min_quantity: 2, name: 'Кондиционер для волос, 1 л', unit: 'шт' },
+  { category: 'Косметика', min_quantity: 3, name: 'Воск для укладки волос', unit: 'шт' },
+  { category: 'Косметика', min_quantity: 2, name: 'Лосьон после бритья', unit: 'шт' },
+  { category: 'Расходники', min_quantity: 5, name: 'Полотенца одноразовые', unit: 'уп' },
+  { category: 'Расходники', min_quantity: 10, name: 'Полотенца хлопковые', unit: 'шт' },
+  { category: 'Расходники', min_quantity: 2, name: 'Жидкое мыло, 5 л', unit: 'канистра' },
+  { category: 'Расходники', min_quantity: 3, name: 'Антисептик для рук', unit: 'шт' },
+  { category: 'Расходники', min_quantity: 3, name: 'Перчатки нитриловые', unit: 'уп' },
+  { category: 'Расходники', min_quantity: 5, name: 'Лезвия для бритья', unit: 'уп' },
+  { category: 'Расходники', min_quantity: 5, name: 'Одноразовые воротнички', unit: 'уп' },
+  { category: 'Расходники', min_quantity: 3, name: 'Ватные диски', unit: 'уп' }
+]
 
 const { data: positionsData, pending: positionsPending, refresh: refreshPositions } = await useAsyncData('warehouse-positions', () => {
   return warehouseApi.positions()
@@ -210,6 +229,139 @@ async function deletePosition(row: PositionRow) {
     submitting.value = false
   }
 }
+
+function todayDate() {
+  const date = new Date()
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
+async function seedWarehouseData() {
+  const branchId = branchStore.activeBranchId
+
+  if (!branchId) {
+    apiClient.notifyError(new Error('branch is required'), 'Выберите филиал для заполнения тестовыми данными.')
+    return
+  }
+
+  const existingNames = new Set(positionRows.value.map(row => row.name.trim().toLocaleLowerCase('ru-RU')))
+  const missing = examplePositions.filter(position => !existingNames.has(position.name.toLocaleLowerCase('ru-RU')))
+
+  if (import.meta.client && !window.confirm('Заполнить позиции, остатки, закупки и шаблоны тестовыми данными для выбранного филиала?')) {
+    return
+  }
+
+  seeding.value = true
+
+  try {
+    for (const position of missing) {
+      await apiClient.request('/api/warehouse/positions', {
+        body: { ...position, is_active: true },
+        method: 'POST',
+        silent: true
+      })
+    }
+
+    const refreshedPositions = await warehouseApi.positions()
+    const seededPositions = extractItems(refreshedPositions)
+    const positionIdByName = new Map(
+      seededPositions.map((position, index) => [
+        (normalizeText(position.name || position.title) || '').toLocaleLowerCase('ru-RU'),
+        itemId(position, `position-${index}`)
+      ])
+    )
+    const seedItems = examplePositions.slice(0, 6).flatMap((position, index) => {
+      const positionId = positionIdByName.get(position.name.toLocaleLowerCase('ru-RU'))
+      return positionId ? [{ ...position, positionId, quantity: (index + 2) * 2, unitPrice: 25000 + index * 15000 }] : []
+    })
+
+    const stocksResponse = await warehouseApi.stocks({ branch_id: branchId })
+    const existingStockPositionIds = new Set(
+      extractItems(stocksResponse)
+        .filter(stock => String(stock.branch_id || stock.branchId || stock.object_id || '') === branchId)
+        .map(stock => normalizeText(stock.position_id || stock.positionId || stock.warehouse_position_id))
+        .filter(Boolean)
+    )
+
+    let stocksCreated = 0
+    for (const item of seedItems) {
+      if (existingStockPositionIds.has(item.positionId)) continue
+      await apiClient.request('/api/warehouse/stocks', {
+        body: { branch_id: branchId, position_id: item.positionId, quantity: item.quantity, unit: item.unit },
+        method: 'POST',
+        silent: true
+      })
+      stocksCreated += 1
+    }
+
+    const date = todayDate()
+    const purchasesResponse = await warehouseApi.purchases({ branch_id: branchId, period: date.slice(0, 7) })
+    const purchaseKeys = new Set(
+      extractItems(purchasesResponse).map(purchase => `${normalizeText(purchase.position_id || purchase.positionId)}:${String(purchase.purchased_at || purchase.purchasedAt || '').slice(0, 10)}`)
+    )
+
+    let purchasesCreated = 0
+    for (const item of seedItems.slice(0, 4)) {
+      if (purchaseKeys.has(`${item.positionId}:${date}`)) continue
+      const totalAmount = item.quantity * item.unitPrice
+      await apiClient.request('/api/warehouse/purchases', {
+        body: {
+          branch_id: branchId,
+          position_id: item.positionId,
+          purchased_at: date,
+          quantity: item.quantity,
+          status: 'received',
+          supplier: 'Тестовый поставщик',
+          total_amount: totalAmount,
+          unit_price: item.unitPrice
+        },
+        method: 'POST',
+        silent: true
+      })
+      purchasesCreated += 1
+    }
+
+    const templatesResponse = await warehouseApi.templates()
+    const existingTemplateNames = new Set(
+      extractItems(templatesResponse).map(template => (normalizeText(template.name || template.title) || '').toLocaleLowerCase('ru-RU'))
+    )
+    const templates = [
+      {
+        description: 'Расходники для регулярной закупки барбершопа.',
+        items: seedItems.slice(0, 4).map(item => ({ position_id: item.positionId, quantity: item.quantity })),
+        name: 'Еженедельная закупка расходников'
+      },
+      {
+        description: 'Косметика для пополнения рабочего места барбера.',
+        items: seedItems.slice(0, 4).map(item => ({ position_id: item.positionId, quantity: 2 })),
+        name: 'Пополнение косметики'
+      }
+    ]
+
+    let templatesCreated = 0
+    for (const template of templates) {
+      if (existingTemplateNames.has(template.name.toLocaleLowerCase('ru-RU'))) continue
+      await apiClient.request('/api/warehouse/templates', {
+        body: { ...template, is_active: true },
+        method: 'POST',
+        silent: true
+      })
+      templatesCreated += 1
+    }
+
+    await Promise.all([refreshPositions(), refreshCategories()])
+    apiClient.notifySuccess(
+      'Тестовые данные добавлены',
+      `Позиции: ${missing.length}; остатки: ${stocksCreated}; закупки: ${purchasesCreated}; шаблоны: ${templatesCreated}. Дата закупок: ${date}.`
+    )
+  }
+  finally {
+    seeding.value = false
+  }
+}
 </script>
 
 <template>
@@ -223,6 +375,9 @@ async function deletePosition(row: PositionRow) {
         <template #right>
           <UButton color="neutral" icon="i-lucide-refresh-cw" :loading="positionsPending" variant="outline" @click="refreshPositions()">
             Обновить
+          </UButton>
+          <UButton color="neutral" icon="i-lucide-package-plus" :loading="seeding" variant="outline" @click="seedWarehouseData">
+            Заполнить тестовыми данными
           </UButton>
           <UButton color="primary" icon="i-lucide-plus" @click="openCreatePosition">
             Создать позицию

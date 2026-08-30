@@ -37,6 +37,13 @@ function extractHistoryItems(response: unknown): HistoryItem[] {
   return []
 }
 
+function extractHistoryCount(response: unknown) {
+  if (!response || typeof response !== 'object') return null
+
+  const count = Number((response as Record<string, unknown>).count)
+  return Number.isFinite(count) && count >= 0 ? count : null
+}
+
 function extractBarberItems(response: unknown): BarberDirectoryItem[] {
   if (Array.isArray(response)) {
     return response as BarberDirectoryItem[]
@@ -476,7 +483,9 @@ const page = ref(1)
 const itemsPerPage = 10
 const exporting = ref(false)
 const allBarbersValue = '__all_barbers__'
+const allStatusesValue = '__all_statuses__'
 const selectedBarberId = ref(allBarbersValue)
+const selectedStatus = ref(allStatusesValue)
 const dateFrom = ref('')
 const dateTo = ref('')
 
@@ -518,6 +527,10 @@ const historyQuery = computed(() => {
     query.branch_id = branchStore.activeBranchId
   }
 
+  if (selectedStatus.value !== allStatusesValue) {
+    query.status = selectedStatus.value
+  }
+
   if (range.start) {
     query.from = range.start
     query.start_date = range.start
@@ -532,16 +545,43 @@ const historyQuery = computed(() => {
 })
 
 const hasActiveFilters = computed(() =>
-  Boolean(selectedBarberId.value !== allBarbersValue || dateFrom.value || dateTo.value)
+  Boolean(selectedBarberId.value !== allBarbersValue || selectedStatus.value !== allStatusesValue || dateFrom.value || dateTo.value)
 )
 
-const { data, pending, refresh } = await useAsyncData('history-current-filter', async () => {
-  const response = await historyApi.list(historyQuery.value)
+async function loadAllHistoryPages(query: Record<string, string>) {
+  const limit = 500
+  const items: HistoryItem[] = []
+  const seenIds = new Set<string>()
+  let offset = 0
+  let total: number | null = null
 
-  return extractHistoryItems(response)
+  while (total === null || items.length < total) {
+    const response = await historyApi.list({ ...query, limit, offset })
+    const pageItems = extractHistoryItems(response)
+    const newItems = pageItems.filter((item) => {
+      const id = normalizeText((item as Record<string, any>).id)
+      if (!id || seenIds.has(id)) return false
+      seenIds.add(id)
+      return true
+    })
+
+    items.push(...newItems)
+    total = extractHistoryCount(response)
+
+    // Also protects the UI if it is temporarily connected to an older API that
+    // does not support offset pagination yet.
+    if (pageItems.length < limit || !newItems.length) break
+    offset += pageItems.length
+  }
+
+  return items
+}
+
+const { data, pending, refresh } = await useAsyncData('history-current-filter', async () => {
+  return loadAllHistoryPages(historyQuery.value)
 }, {
   server: false,
-  watch: [() => branchStore.activeBranchId, dateFrom, dateTo]
+  watch: [() => branchStore.activeBranchId, selectedStatus, dateFrom, dateTo]
 })
 
 const { data: servicesData } = await useAsyncData('history-services', async () => {
@@ -593,6 +633,14 @@ const barberNameMap = computed(() => {
 })
 
 const historyItems = computed<HistoryItem[]>(() => data.value || [])
+
+const statusFilterOptions = [
+  { label: 'Все статусы', value: allStatusesValue },
+  { label: 'Завершён', value: 'completed' },
+  { label: 'Отменён', value: 'cancelled' },
+  { label: 'Неявка', value: 'no_show' },
+  { label: 'Не вовремя', value: 'not_in_time' }
+]
 
 const barberFilterOptions = computed(() => {
   const options = new Map<string, string>()
@@ -652,6 +700,11 @@ function isVisitBySelectedBarber(visit: Record<string, any>) {
   ].includes(selectedBarberId.value)
 }
 
+function isVisitBySelectedStatus(visit: Record<string, any>) {
+  return selectedStatus.value === allStatusesValue
+    || normalizeText(visit.status) === selectedStatus.value
+}
+
 const filteredHistory = computed(() =>
   historyItems.value.filter((item) => {
     const visit = item as Record<string, any>
@@ -661,6 +714,7 @@ const filteredHistory = computed(() =>
 
     return branchMatches
       && isVisitBySelectedBarber(visit)
+      && isVisitBySelectedStatus(visit)
       && isVisitInSelectedDateRange(visit)
   })
 )
@@ -701,7 +755,7 @@ const pageTo = computed(() =>
 )
 
 watch(
-  [() => branchStore.activeBranchId, selectedBarberId, dateFrom, dateTo],
+  [() => branchStore.activeBranchId, selectedBarberId, selectedStatus, dateFrom, dateTo],
   () => {
     page.value = 1
   }
@@ -723,6 +777,7 @@ const selectedEntry = ref<any | null>(null)
 
 function resetHistoryFilters() {
   selectedBarberId.value = allBarbersValue
+  selectedStatus.value = allStatusesValue
   dateFrom.value = ''
   dateTo.value = ''
 }
@@ -816,12 +871,21 @@ async function exportHistoryToExcel() {
         </div>
       </div>
 
-      <div class="mb-4 grid gap-3 rounded-[1.25rem] border border-charcoal-200 bg-white/85 p-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,0.8fr)_minmax(0,0.8fr)_auto] md:items-end">
+      <div class="mb-4 grid gap-3 rounded-[1.25rem] border border-charcoal-200 bg-white/85 p-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,0.8fr)_auto] md:items-end">
         <UFormField label="Барбер">
           <USelect
             v-model="selectedBarberId"
             class="w-full"
             :items="barberFilterOptions"
+            value-key="value"
+          />
+        </UFormField>
+
+        <UFormField label="Статус">
+          <USelect
+            v-model="selectedStatus"
+            class="w-full"
+            :items="statusFilterOptions"
             value-key="value"
           />
         </UFormField>

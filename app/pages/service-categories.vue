@@ -49,6 +49,7 @@ await branchStore.ensureLoaded()
 const createOpen = ref(false)
 const editOpen = ref(false)
 const submitting = ref(false)
+const cloning = ref(false)
 const editingId = ref<string | null>(null)
 
 const form = reactive({
@@ -186,6 +187,101 @@ async function removeRow(row: CategoryRow) {
     submitting.value = false
   }
 }
+
+function categoryKey(name: string) {
+  return name.trim().toLocaleLowerCase('ru-RU')
+}
+
+async function cloneToAllBranches() {
+  const sourceBranchId = branchStore.activeBranchId
+
+  if (!sourceBranchId || !rows.value.length) {
+    apiClient.notifyError(new Error('categories are required'), 'В активном филиале нет категорий для копирования.')
+    return
+  }
+
+  const targets = branchStore.branches.filter(branch => String(branch.id) !== sourceBranchId)
+
+  if (!targets.length) {
+    apiClient.notifyError(new Error('branches are required'), 'Нет других филиалов для копирования.')
+    return
+  }
+
+  const confirmed = !import.meta.client || window.confirm(
+    `Синхронизировать ${rows.value.length} категорий в ${targets.length} филиалов? Категории, которых нет в активном филиале, будут удалены.`
+  )
+
+  if (!confirmed) return
+
+  cloning.value = true
+
+  try {
+    let created = 0
+    let deleted = 0
+    let updated = 0
+
+    for (const branch of targets) {
+      const response = await apiClient.request<{ items?: ServiceCategory[] }>('/api/service-categories', {
+        query: { __skipBranchScope: true, branch_id: branch.id, include_inactive: true },
+        silent: true
+      })
+      const existingByName = new Map<string, CategoryRow[]>()
+
+      for (const category of response.items || []) {
+        const row = toRow(category)
+        if (!row) continue
+
+        const key = categoryKey(row.name)
+        const group = existingByName.get(key) || []
+        group.push(row)
+        existingByName.set(key, group)
+      }
+
+      for (const source of rows.value) {
+        const matches = existingByName.get(categoryKey(source.name)) || []
+        const existing = matches.shift()
+        const payload: ServiceCategoryFormPayload = {
+          branch_id: String(branch.id),
+          is_active: source.is_active !== false,
+          name: source.name,
+          sort_order: toIntegerOrNull(source.sort_order)
+        }
+
+        if (existing) {
+          await apiClient.request(`/api/service-categories/${existing.id}`, {
+            body: { is_active: payload.is_active, name: payload.name, sort_order: payload.sort_order },
+            method: 'PATCH',
+            silent: true
+          })
+          updated += 1
+        }
+        else {
+          await apiClient.request('/api/service-categories', {
+            body: payload,
+            method: 'POST',
+            silent: true
+          })
+          created += 1
+        }
+      }
+
+      for (const remaining of existingByName.values()) {
+        for (const category of remaining) {
+          await apiClient.request(`/api/service-categories/${category.id}`, {
+            method: 'DELETE',
+            silent: true
+          })
+          deleted += 1
+        }
+      }
+    }
+
+    apiClient.notifySuccess('Категории синхронизированы', `Создано: ${created}. Обновлено: ${updated}. Удалено: ${deleted}.`)
+  }
+  finally {
+    cloning.value = false
+  }
+}
 </script>
 
 <template>
@@ -205,6 +301,16 @@ async function removeRow(row: CategoryRow) {
             @click="refresh()"
           >
             Обновить
+          </UButton>
+          <UButton
+            color="neutral"
+            icon="i-lucide-copy"
+            :disabled="!branchStore.activeBranchId || !rows.length || submitting"
+            :loading="cloning"
+            variant="outline"
+            @click="cloneToAllBranches"
+          >
+            Клонировать на все филиалы
           </UButton>
           <UButton color="primary" icon="i-lucide-plus" :disabled="!branchStore.activeBranchId" @click="openCreate">
             Добавить категорию

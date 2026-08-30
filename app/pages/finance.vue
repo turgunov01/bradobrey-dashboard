@@ -31,13 +31,13 @@ type FinanceOverviewBranchRow = {
   id: string
   name: string
   orders: number
-  payroll: number
+  payroll: number | null
   purchases: number
   turnover: number
 }
 
 type FinanceDraftStorage = Record<string, FinanceSnapshotPayload>
-type FinanceMoneyField = 'advances' | 'bonus_salary' | 'penalty' | 'salary'
+type FinanceMoneyField = 'advances' | 'bonus_salary' | 'salary'
 
 const branchStore = useBranchStore()
 const barbersApi = useBarbersApi()
@@ -143,6 +143,73 @@ function getPeriodRange(key: string) {
     end_date: `${year}-${monthKey}-${String(lastDay).padStart(2, '0')}`,
     start_date: `${year}-${monthKey}-01`
   }
+}
+
+function getDaysInPeriod(key: string) {
+  const [yearPart = '', monthPart = ''] = key.split('-')
+  const year = Number(yearPart)
+  const month = Number(monthPart)
+
+  return Number.isInteger(year) && Number.isInteger(month) && month >= 1 && month <= 12
+    ? new Date(year, month, 0).getDate()
+    : new Date().getDate()
+}
+
+function getScheduleDurationHours(startTime: unknown, endTime: unknown) {
+  const parseTime = (value: unknown) => {
+    const match = String(value || '').match(/^(\d{1,2}):(\d{2})/)
+
+    if (!match) {
+      return null
+    }
+
+    const hours = Number(match[1])
+    const minutes = Number(match[2])
+
+    return hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60
+      ? hours * 60 + minutes
+      : null
+  }
+
+  const start = parseTime(startTime)
+  const end = parseTime(endTime)
+
+  if (start === null || end === null) {
+    return 0
+  }
+
+  const durationMinutes = end > start ? end - start : end + 24 * 60 - start
+
+  return durationMinutes / 60
+}
+
+function getTimeMinutes(value: unknown) {
+  const match = String(value || '').match(/^(\d{1,2}):(\d{2})/)
+
+  if (!match) {
+    return null
+  }
+
+  const hours = Number(match[1])
+  const minutes = Number(match[2])
+
+  return hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60
+    ? hours * 60 + minutes
+    : null
+}
+
+function getLocalEventDate(value: unknown) {
+  const date = new Date(String(value || ''))
+
+  return Number.isNaN(date.getTime()) ? null : date
+}
+
+function getDateKey(date: Date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
 }
 
 function normalizeStatus(value: unknown) {
@@ -621,6 +688,7 @@ async function saveToRemote() {
   }
 
   syncBarberProfitsFromHistory()
+  syncBarberPenalties()
 
   saving.value = true
 
@@ -647,6 +715,8 @@ async function refreshAll() {
     refreshFinanceHistory(),
     refreshFinanceServices(),
     refreshVerifix(),
+    refreshVerifixSchedules(),
+    refreshBranchPayrolls(),
     loadRemoteSnapshot()
   ])
 }
@@ -698,16 +768,15 @@ const {
 })
 
 const {
-  data: verifixLateItems,
+  data: verifixLoginItems,
   pending: verifixPending,
   refresh: refreshVerifix
-} = await useAsyncData('finance-verifix-late', async () => {
+} = await useAsyncData('finance-verifix-logins', async () => {
   const branchId = branchStore.activeBranchId || undefined
   const range = periodRange.value
   const response = await verifixApi.events({
     ...(branchId ? { branch_id: branchId } : {}),
     end_date: range.end_date,
-    late_only: true,
     limit: 500,
     start_date: range.start_date
   }, { silent: true })
@@ -717,6 +786,57 @@ const {
   default: () => [] as VerifixEvent[],
   server: false,
   watch: [() => branchStore.activeBranchId, periodKey]
+})
+
+const {
+  data: verifixSchedules,
+  pending: verifixSchedulesPending,
+  refresh: refreshVerifixSchedules
+} = await useAsyncData('finance-verifix-schedules', async () => {
+  const branchId = branchStore.activeBranchId
+
+  if (!branchId) {
+    return []
+  }
+
+  const response = await verifixApi.schedules({ branch_id: branchId })
+
+  return Array.isArray(response?.items) ? response.items : []
+}, {
+  default: () => [],
+  server: false,
+  watch: [() => branchStore.activeBranchId]
+})
+
+const {
+  data: branchPayrolls,
+  pending: branchPayrollsPending,
+  refresh: refreshBranchPayrolls
+} = await useAsyncData('finance-branch-payrolls', async () => {
+  const payrolls: Record<string, number> = {}
+
+  await Promise.all(branchStore.branches.map(async (branch) => {
+    try {
+      const snapshot = await financeApi.snapshot({
+        branch_id: branch.id,
+        period: periodKey.value
+      }, { silent: true })
+      const branchPayload = normalizePayload(snapshot?.payload)
+
+      payrolls[String(branch.id)] = Object.values(branchPayload.employees)
+        .reduce((sum, draft) => sum + payoutForDraft(draft), 0)
+    }
+    catch {
+      // An unavailable snapshot must not be replaced by an approximate value
+      // from overview: the table displays an em dash instead.
+    }
+  }))
+
+  return payrolls
+}, {
+  default: () => ({} as Record<string, number>),
+  server: false,
+  watch: [periodKey, () => branchStore.branches.map(branch => branch.id).join(',')]
 })
 
 const employees = computed<FinanceEmployeeRow[]>(() =>
@@ -771,7 +891,7 @@ const overviewBranchRows = computed<FinanceOverviewBranchRow[]>(() => {
       id,
       name,
       orders: pickNumber(item, ['orders', 'orders_count', 'ordersCount', 'completed', 'completed_count']),
-      payroll: pickMoneyValue(item, ['payroll', 'payroll_total', 'salary_fund', 'salary_total', 'salaries_total']),
+      payroll: branchPayrolls.value[id] ?? null,
       purchases: pickMoneyValue(item, ['purchases', 'purchases_total', 'purchase_total', 'warehouse_purchases']),
       turnover: pickMoneyValue(item, ['turnover', 'turnover_total', 'revenue', 'revenue_total', 'total_revenue', 'amount', 'total'])
     }]
@@ -782,12 +902,12 @@ const overviewTotals = computed(() => {
   const source = overviewSource.value
   const branches = overviewBranchRows.value
   const fallbackTurnover = branches.reduce((sum, row) => sum + row.turnover, 0)
-  const fallbackPayroll = branches.reduce((sum, row) => sum + row.payroll, 0)
+  const fallbackPayroll = branches.reduce((sum, row) => sum + (row.payroll ?? 0), 0)
   const fallbackPurchases = branches.reduce((sum, row) => sum + row.purchases, 0)
 
   return {
     branches: branches.length || pickNumber(source, ['branches_count', 'branchesCount', 'branch_count']),
-    payroll: pickMoneyValue(source, ['payroll', 'payroll_total', 'salary_fund', 'salary_total', 'salaries_total']) || fallbackPayroll,
+    payroll: fallbackPayroll,
     purchases: pickMoneyValue(source, ['purchases', 'purchases_total', 'purchase_total', 'warehouse_purchases']) || fallbackPurchases,
     turnover: pickMoneyValue(source, ['turnover', 'turnover_total', 'revenue', 'revenue_total', 'total_revenue', 'gross_turnover']) || fallbackTurnover
   }
@@ -825,23 +945,101 @@ const barberProfitMap = computed(() => {
   return rows
 })
 
+const selectedBranchTurnover = computed(() => {
+  const range = periodRange.value
+
+  return (financeHistoryItems.value || []).reduce((sum, item) => {
+    if (!isCompletedStatus(item.status) || !isHistoryInPeriod(item, range)) {
+      return sum
+    }
+
+    return sum + getHistoryAmount(item, servicePriceMap.value)
+  }, 0)
+})
+
+const branchSchedulesByDay = computed(() => {
+  const rows = new Map<number, { graceMinutes: number, startMinutes: number }>()
+
+  for (const schedule of verifixSchedules.value || []) {
+    if (!schedule.is_active || schedule.barber_id) {
+      continue
+    }
+
+    const startMinutes = getTimeMinutes(schedule.start_time)
+
+    if (startMinutes === null || rows.has(schedule.day_of_week)) {
+      continue
+    }
+
+    rows.set(schedule.day_of_week, {
+      graceMinutes: Math.max(0, normalizeNumber(schedule.grace_minutes)),
+      startMinutes
+    })
+  }
+
+  return rows
+})
+
+function isLoginEvent(event: VerifixEvent) {
+  const type = String(event.event_type || '').trim().toLowerCase()
+
+  // Older backend records may not have event_type; in that case each record
+  // in this endpoint is treated as an entry event.
+  return !type || [
+    'check_in',
+    'checkin',
+    'clock_in',
+    'clockin',
+    'entry',
+    'login',
+    'sign_in',
+    'signin'
+  ].some(loginType => type === loginType || type.includes(loginType))
+}
+
 const barberLateMap = computed(() => {
   const rows = new Map<string, { count: number, minutes: number }>()
+  const firstLogins = new Map<string, Date>()
 
-  for (const event of verifixLateItems.value || []) {
-    if (!event?.is_late) {
+  for (const event of verifixLoginItems.value || []) {
+    if (!isLoginEvent(event)) {
       continue
     }
 
     const barberId = normalizeText(event.barber_id)
+    const occurredAt = getLocalEventDate(event.occurred_at)
 
-    if (!barberId) {
+    if (!barberId || !occurredAt) {
+      continue
+    }
+
+    const key = `${barberId}:${getDateKey(occurredAt)}`
+    const current = firstLogins.get(key)
+
+    if (!current || occurredAt.getTime() < current.getTime()) {
+      firstLogins.set(key, occurredAt)
+    }
+  }
+
+  for (const [key, loginAt] of firstLogins) {
+    const separatorIndex = key.indexOf(':')
+    const barberId = key.slice(0, separatorIndex)
+    const schedule = branchSchedulesByDay.value.get(loginAt.getDay())
+
+    if (!schedule) {
+      continue
+    }
+
+    const loginMinutes = loginAt.getHours() * 60 + loginAt.getMinutes()
+    const lateMinutes = Math.max(0, loginMinutes - schedule.startMinutes - schedule.graceMinutes)
+
+    if (!lateMinutes) {
       continue
     }
 
     const current = rows.get(barberId) || { count: 0, minutes: 0 }
     current.count += 1
-    current.minutes += Math.max(0, normalizeNumber(event.late_by_minutes))
+    current.minutes += lateMinutes
     rows.set(barberId, current)
   }
 
@@ -860,8 +1058,55 @@ const lateTotals = computed(() => {
   return { count, minutes }
 })
 
+// Используем только общий график филиала: персональные смены сотрудников не
+// меняют стоимость минуты опоздания.
+const branchScheduleHours = computed(() => {
+  const durations = (verifixSchedules.value || [])
+    .filter(schedule => schedule.is_active && !schedule.barber_id)
+    .map(schedule => getScheduleDurationHours(schedule.start_time, schedule.end_time))
+    .filter(hours => hours > 0)
+
+  if (!durations.length) {
+    return 0
+  }
+
+  return durations.reduce((sum, hours) => sum + hours, 0) / durations.length
+})
+
 function getEmployeeLate(id: string) {
   return barberLateMap.value.get(String(id || '').trim()) || { count: 0, minutes: 0 }
+}
+
+function penaltyForEmployee(id: string) {
+  const draft = getEmployeeDraft(id)
+  const plan = Math.max(0, draft.salary)
+  const lateMinutes = getEmployeeLate(id).minutes
+  const daysInMonth = getDaysInPeriod(periodKey.value)
+  const scheduleHours = branchScheduleHours.value
+
+  if (!plan || !lateMinutes || !daysInMonth || !scheduleHours) {
+    return 0
+  }
+
+  return Math.round((plan / daysInMonth / scheduleHours / 60) * 4 * lateMinutes)
+}
+
+function syncBarberPenalties() {
+  for (const employee of employees.value) {
+    const draft = getEmployeeDraft(employee.id)
+    const penalty = penaltyForEmployee(employee.id)
+
+    if (draft.penalty !== penalty) {
+      draft.penalty = penalty
+    }
+  }
+}
+
+function getEmployeeDraftWithCalculatedPenalty(id: string) {
+  return {
+    ...getEmployeeDraft(id),
+    penalty: penaltyForEmployee(id)
+  }
 }
 
 function syncBarberProfitsFromHistory() {
@@ -878,6 +1123,15 @@ function syncBarberProfitsFromHistory() {
     }
   }
 }
+
+watch([
+  employees,
+  barberLateMap,
+  branchSchedulesByDay,
+  branchScheduleHours,
+  periodKey,
+  () => payload.value
+], syncBarberPenalties, { immediate: true })
 
 watch([
   employees,
@@ -902,9 +1156,11 @@ const totals = computed(() => {
     bonusSalary += earnedBonusSalaryForDraft(draft)
     profit += draft.profit
     advances += draft.advances
-    penalties += draft.penalty
-    commission += profitShareForDraft(draft)
-    payout += payoutForDraft(draft)
+    const penalty = penaltyForEmployee(employee.id)
+
+    penalties += penalty
+    commission += profitShareForDraft({ ...draft, penalty })
+    payout += payoutForDraft({ ...draft, penalty })
   }
 
   return {
@@ -919,6 +1175,11 @@ const totals = computed(() => {
   }
 })
 
+// Это единственный источник зарплатного фонда для выбранного филиала:
+// точная сумма всех строк «К выплате» в таблице, включая авансы, штрафы
+// и рассчитанные проценты.
+const selectedBranchPayroll = computed(() => totals.value.payout)
+
 const overviewBranchColumns: TableColumn<FinanceOverviewBranchRow>[] = [
   { accessorKey: 'name', header: 'Филиал' },
   { accessorKey: 'turnover', header: 'Оборот' },
@@ -932,7 +1193,7 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
   { id: 'salary', header: 'План' },
   { id: 'bonusSalary', header: 'Надбавка' },
   { id: 'profit', header: 'Val' },
-  { id: 'profitPercent', header: 'Процент БШ' },
+  { id: 'profitPercent', header: 'Процент барбершопа' },
   { id: 'bonusProfitPercent', header: 'Бонусный процент' },
   { id: 'advances', header: 'Авансы' },
   { id: 'penalty', header: 'Штраф' },
@@ -973,7 +1234,7 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
             color="neutral"
             variant="outline"
             icon="i-lucide-refresh-cw"
-            :loading="employeesPending || financeHistoryPending || financeServicesPending || verifixPending || remoteLoading || overviewPending"
+            :loading="employeesPending || financeHistoryPending || financeServicesPending || verifixPending || verifixSchedulesPending || branchPayrollsPending || remoteLoading || overviewPending"
             @click="refreshAll"
           >
             Обновить
@@ -992,16 +1253,16 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
 
       <div class="grid gap-4 pb-4 md:grid-cols-4">
         <DashboardMetricCard
-          description="Оборот по всем филиалам за выбранный месяц из backend finance overview."
+          description="Сумма только выполненных заказов выбранного филиала за выбранный месяц."
           icon="i-lucide-wallet"
           label="Оборот"
-          :value="formatMoney(overviewTotals.turnover)"
+          :value="formatMoney(selectedBranchTurnover)"
         />
         <DashboardMetricCard
-          description="Сумма зарплатного фонда из finance_snapshots."
+          description="Точная сумма «К выплате» по таблице выбранного филиала."
           icon="i-lucide-users"
           label="Зарплатный фонд"
-          :value="formatMoney(overviewTotals.payroll)"
+          :value="formatMoney(selectedBranchPayroll)"
         />
         <DashboardMetricCard
           description="Закупки склада за выбранный период."
@@ -1028,7 +1289,7 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
                 Разбивка по филиалам
               </h2>
               <p class="text-sm text-charcoal-500">
-                Данные из /api/finance/overview за {{ periodKey }}.
+                Зарплатный фонд — сумма «К выплате» из финансовой таблицы каждого филиала за {{ periodKey }}.
               </p>
             </div>
             <UBadge color="neutral" size="lg" variant="soft">
@@ -1038,14 +1299,20 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
         </template>
 
         <div class="overflow-hidden rounded-[1.25rem] border border-charcoal-200 bg-white/90">
-          <UTable :columns="overviewBranchColumns" :data="overviewBranchRows" :loading="overviewPending">
+          <UTable :columns="overviewBranchColumns" :data="overviewBranchRows" :loading="overviewPending || branchPayrollsPending">
             <template #turnover-cell="{ row }">
               <span class="font-semibold text-charcoal-950">
-                {{ formatMoney(row.original.turnover) }}
+                {{ formatMoney(row.original.id === branchStore.activeBranchId ? selectedBranchTurnover : row.original.turnover) }}
               </span>
             </template>
             <template #payroll-cell="{ row }">
-              {{ formatMoney(row.original.payroll) }}
+              <template v-if="row.original.id === branchStore.activeBranchId">
+                {{ formatMoney(selectedBranchPayroll) }}
+              </template>
+              <template v-else-if="row.original.payroll !== null">
+                {{ formatMoney(row.original.payroll) }}
+              </template>
+              <template v-else>—</template>
             </template>
             <template #purchases-cell="{ row }">
               {{ formatMoney(row.original.purchases) }}
@@ -1160,7 +1427,7 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
                   К выплате
                 </p>
                 <p class="text-base font-semibold text-primary-600">
-                  {{ formatMoney(payoutForDraft(getEmployeeDraft(row.id))) }}
+                  {{ formatMoney(payoutForDraft(getEmployeeDraftWithCalculatedPenalty(row.id))) }}
                 </p>
               </div>
             </div>
@@ -1189,7 +1456,7 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
                 />
               </label>
               <label class="space-y-1">
-                <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-charcoal-500">Процент БШ</span>
+                <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-charcoal-500">Процент барбершопа</span>
                 <UInput
                   v-model.number="getEmployeeDraft(row.id).profit_percent"
                   type="number"
@@ -1224,17 +1491,12 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
                   @update:model-value="value => updateMoneyDraft(row.id, 'advances', value)"
                 />
               </label>
-              <label class="space-y-1">
+              <div class="space-y-1">
                 <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-charcoal-500">Штраф</span>
-                <UInput
-                  :model-value="formatMoneyInputValue(getEmployeeDraft(row.id).penalty)"
-                  inputmode="numeric"
-                  type="text"
-                  size="sm"
-                  class="w-full"
-                  @update:model-value="value => updateMoneyDraft(row.id, 'penalty', value)"
-                />
-              </label>
+                <p class="flex min-h-8 items-center rounded-md border border-charcoal-200 bg-charcoal-50 px-3 text-sm font-semibold text-charcoal-950">
+                  {{ formatMoney(penaltyForEmployee(row.id)) }}
+                </p>
+              </div>
             </div>
 
             <div class="grid grid-cols-3 gap-2 border-t border-charcoal-100 pt-3">
@@ -1247,7 +1509,7 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
               <div>
                 <p class="text-[11px] uppercase tracking-[0.12em] text-charcoal-500">С прибыли</p>
                 <p class="text-sm font-semibold text-charcoal-950">
-                  {{ formatMoney(profitShareForDraft(getEmployeeDraft(row.id))) }}
+                  {{ formatMoney(profitShareForDraft(getEmployeeDraftWithCalculatedPenalty(row.id))) }}
                 </p>
               </div>
               <div>
@@ -1269,7 +1531,7 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
           <UTable
             :columns="columns"
             :data="employees"
-            :loading="employeesPending || financeHistoryPending || verifixPending"
+            :loading="employeesPending || financeHistoryPending || verifixPending || verifixSchedulesPending"
             sticky="header"
             :ui="{
               root: 'w-full overflow-auto',
@@ -1361,14 +1623,14 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
             </template>
 
             <template #penalty-cell="{ row }">
-              <UInput
-                :model-value="formatMoneyInputValue(getEmployeeDraft(row.original.id).penalty)"
-                inputmode="numeric"
-                type="text"
-                size="sm"
-                class="w-32"
-                @update:model-value="value => updateMoneyDraft(row.original.id, 'penalty', value)"
-              />
+              <div class="space-y-1">
+                <p class="font-semibold text-charcoal-950">
+                  {{ formatMoney(penaltyForEmployee(row.original.id)) }}
+                </p>
+                <p class="text-xs text-charcoal-500">
+                  {{ verifixSchedulesPending ? 'Загрузка графика' : `${formatCount(branchScheduleHours)} ч/смена` }}
+                </p>
+              </div>
             </template>
 
             <template #late-cell="{ row }">
@@ -1387,13 +1649,13 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
 
             <template #commission-cell="{ row }">
               <span class="font-semibold text-charcoal-950">
-                {{ formatMoney(profitShareForDraft(getEmployeeDraft(row.original.id))) }}
+                {{ formatMoney(profitShareForDraft(getEmployeeDraftWithCalculatedPenalty(row.original.id))) }}
               </span>
             </template>
 
             <template #payout-cell="{ row }">
               <span class="font-semibold text-primary-600">
-                {{ formatMoney(payoutForDraft(getEmployeeDraft(row.original.id))) }}
+                {{ formatMoney(payoutForDraft(getEmployeeDraftWithCalculatedPenalty(row.original.id))) }}
               </span>
             </template>
           </UTable>

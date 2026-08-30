@@ -106,7 +106,7 @@ const purchaseForm = reactive({
 
 const statusOptions = [
   { label: 'Черновик', value: 'draft' },
-  { label: 'В ожидании', value: 'pending' },
+  { label: 'В ожидании', value: 'ordered' },
   { label: 'Получено', value: 'received' },
   { label: 'Отменено', value: 'cancelled' }
 ]
@@ -186,11 +186,23 @@ function resetPurchaseForm() {
   purchaseForm.position_id = positionOptions.value[0]?.value || ''
   purchaseForm.purchased_at = new Date().toISOString().slice(0, 10)
   purchaseForm.quantity = 1
-  purchaseForm.status = 'draft'
+  purchaseForm.status = 'ordered'
   purchaseForm.supplier = ''
   purchaseForm.total_amount = 0
   purchaseForm.unit_price = 0
 }
+
+watch([
+  () => purchaseForm.quantity,
+  () => purchaseForm.unit_price
+], () => {
+  const quantity = normalizeNumber(purchaseForm.quantity)
+  const unitPrice = normalizeNumber(purchaseForm.unit_price)
+
+  if (quantity > 0 && unitPrice > 0) {
+    purchaseForm.total_amount = quantity * unitPrice
+  }
+})
 
 function openCreatePurchase() {
   editingPurchaseId.value = null
@@ -217,21 +229,35 @@ async function submitPurchase() {
     return
   }
 
+  const quantity = normalizeNumber(purchaseForm.quantity)
+  const unitPrice = normalizeNumber(purchaseForm.unit_price)
+  const purchasedAt = normalizeText(purchaseForm.purchased_at)
+  const supplier = normalizeText(purchaseForm.supplier)
+
+  if (!purchasedAt || !supplier || quantity <= 0 || unitPrice <= 0) {
+    apiClient.notifyError(
+      new Error('purchase fields are required'),
+      'Укажите поставщика, дату, количество и цену за единицу больше нуля.'
+    )
+    return
+  }
+
   submitting.value = true
 
   try {
-    const quantity = normalizeNumber(purchaseForm.quantity)
-    const unitPrice = normalizeNumber(purchaseForm.unit_price)
     const totalAmount = normalizeNumber(purchaseForm.total_amount) || quantity * unitPrice
     const payload = {
       branch_id: purchaseForm.branch_id,
-      position_id: purchaseForm.position_id,
-      purchased_at: normalizeText(purchaseForm.purchased_at),
-      quantity,
+      purchased_at: purchasedAt,
       status: normalizeText(purchaseForm.status),
-      supplier: normalizeText(purchaseForm.supplier),
+      supplier_name: supplier,
       total_amount: totalAmount,
-      unit_price: unitPrice
+      items: [{
+        position_id: purchaseForm.position_id,
+        quantity,
+        total_amount: totalAmount,
+        unit_cost: unitPrice
+      }]
     }
 
     if (editingPurchaseId.value) {
@@ -343,21 +369,21 @@ async function deletePurchase(row: PurchaseRow) {
               </UFormField>
             </div>
             <div class="grid gap-4 sm:grid-cols-3">
-              <UFormField label="Количество">
-                <UInput v-model="purchaseForm.quantity" type="number" min="0" step="0.01" />
+              <UFormField label="Количество" required>
+                <UInput v-model="purchaseForm.quantity" type="number" min="0.01" step="0.01" />
               </UFormField>
-              <UFormField label="Цена за ед.">
-                <UInput v-model="purchaseForm.unit_price" type="number" min="0" />
+              <UFormField label="Цена за ед." required>
+                <UInput v-model="purchaseForm.unit_price" type="number" min="1" />
               </UFormField>
-              <UFormField label="Сумма">
-                <UInput v-model="purchaseForm.total_amount" type="number" min="0" />
+              <UFormField label="Сумма" required>
+                <UInput v-model="purchaseForm.total_amount" type="number" min="1" />
               </UFormField>
             </div>
             <div class="grid gap-4 sm:grid-cols-3">
-              <UFormField label="Поставщик">
+              <UFormField label="Поставщик" required>
                 <UInput v-model="purchaseForm.supplier" />
               </UFormField>
-              <UFormField label="Дата">
+              <UFormField label="Дата" required>
                 <UInput v-model="purchaseForm.purchased_at" type="date" />
               </UFormField>
               <UFormField label="Статус">
