@@ -43,7 +43,6 @@ type EmployeeRow = {
 type FinanceEmployeeDraft = {
   advances: number
   bonus_profit_percent: number
-  bonus_salary: number
   penalty: number
   profit: number
   profit_percent: number
@@ -258,7 +257,6 @@ function normalizeFinanceDraft(value: unknown): FinanceEmployeeDraft {
   return {
     advances: normalizeNumber(source.advances),
     bonus_profit_percent: normalizeNumber(source.bonus_profit_percent),
-    bonus_salary: normalizeNumber(source.bonus_salary),
     penalty: normalizeNumber(source.penalty),
     profit: normalizeNumber(source.profit),
     profit_percent: normalizeNumber(source.profit_percent),
@@ -292,7 +290,6 @@ function hasManualFinanceDraftValues(draft: FinanceEmployeeDraft) {
   return [
     draft.advances,
     draft.bonus_profit_percent,
-    draft.bonus_salary,
     draft.penalty,
     draft.profit_percent,
     draft.salary
@@ -760,7 +757,7 @@ const employeeInsightMap = computed(() => {
       finance: {
         ...draft,
         commission,
-        payout: Math.round(draft.salary + draft.bonus_salary + commission - draft.advances - draft.penalty),
+        payout: Math.round(draft.salary + commission - draft.advances - draft.penalty),
         reportProfit
       },
       history,

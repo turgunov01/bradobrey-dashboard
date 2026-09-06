@@ -16,7 +16,7 @@ function requireBarbershopId(user: Record<string, any>) {
   if (!barbershopId) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Для мерчанта не назначен `marketplace_barbershop_id`.'
+      message: 'Для мерчанта не назначен `marketplace_barbershop_id`.'
     })
   }
 

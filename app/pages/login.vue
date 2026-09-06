@@ -133,10 +133,13 @@ async function submit() {
       statusMessage: error?.statusMessage || error?.response?.statusText || null
     })
 
-    const apiError = error?.data?.error || error?.response?._data?.error
+    const errorBody = error?.data || error?.response?._data
+    const apiError = errorBody?.data?.error || errorBody?.error || errorBody?.message
     fieldErrors.password = apiError === 'Employee access has been revoked'
       ? 'Доступ сотрудника отозван. Обратитесь к администратору для восстановления.'
-      : error?.statusMessage || error?.message || 'Неверный логин или пароль.'
+      : apiError === 'Invalid credentials'
+        ? 'Неверный логин или пароль.'
+        : apiError || error?.message || 'Не удалось войти. Повторите попытку.'
   } finally {
     loading.value = false
   }

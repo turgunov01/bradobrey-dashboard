@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { calculateMinutePenalty } from '~/utils/penalty'
 import { useStorage } from '@vueuse/core'
 import type { TableColumn } from '@nuxt/ui'
 
@@ -9,7 +10,6 @@ import type { VerifixEvent } from '~/composables/useVerifixApi'
 type FinanceEmployeeDraft = {
   advances: number
   bonus_profit_percent: number
-  bonus_salary: number
   penalty: number
   profit: number
   profit_percent: number
@@ -37,7 +37,7 @@ type FinanceOverviewBranchRow = {
 }
 
 type FinanceDraftStorage = Record<string, FinanceSnapshotPayload>
-type FinanceMoneyField = 'advances' | 'bonus_salary' | 'salary'
+type FinanceMoneyField = 'advances' | 'salary'
 
 const branchStore = useBranchStore()
 const barbersApi = useBarbersApi()
@@ -45,6 +45,7 @@ const financeApi = useFinanceApi()
 const historyApi = useHistoryApi()
 const kioskApi = useKioskApi()
 const verifixApi = useVerifixApi()
+const { data: penaltySettings, error: penaltySettingsError, refresh: refreshPenaltySettings } = await useVerifixPenalty()
 const apiClient = useApiClient()
 
 await branchStore.ensureLoaded()
@@ -143,44 +144,6 @@ function getPeriodRange(key: string) {
     end_date: `${year}-${monthKey}-${String(lastDay).padStart(2, '0')}`,
     start_date: `${year}-${monthKey}-01`
   }
-}
-
-function getDaysInPeriod(key: string) {
-  const [yearPart = '', monthPart = ''] = key.split('-')
-  const year = Number(yearPart)
-  const month = Number(monthPart)
-
-  return Number.isInteger(year) && Number.isInteger(month) && month >= 1 && month <= 12
-    ? new Date(year, month, 0).getDate()
-    : new Date().getDate()
-}
-
-function getScheduleDurationHours(startTime: unknown, endTime: unknown) {
-  const parseTime = (value: unknown) => {
-    const match = String(value || '').match(/^(\d{1,2}):(\d{2})/)
-
-    if (!match) {
-      return null
-    }
-
-    const hours = Number(match[1])
-    const minutes = Number(match[2])
-
-    return hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60
-      ? hours * 60 + minutes
-      : null
-  }
-
-  const start = parseTime(startTime)
-  const end = parseTime(endTime)
-
-  if (start === null || end === null) {
-    return 0
-  }
-
-  const durationMinutes = end > start ? end - start : end + 24 * 60 - start
-
-  return durationMinutes / 60
 }
 
 function getTimeMinutes(value: unknown) {
@@ -390,7 +353,6 @@ function createEmptyEmployeeDraft(): FinanceEmployeeDraft {
   return {
     advances: 0,
     bonus_profit_percent: 0,
-    bonus_salary: 0,
     penalty: 0,
     profit: 0,
     profit_percent: 0,
@@ -408,7 +370,6 @@ function normalizeEmployeeDraft(value: unknown): FinanceEmployeeDraft {
   return {
     advances: Math.max(0, normalizeNumber(source.advances)),
     bonus_profit_percent: Math.max(0, normalizeNumber(source.bonus_profit_percent)),
-    bonus_salary: Math.max(0, normalizeNumber(source.bonus_salary)),
     penalty: Math.max(0, normalizeNumber(source.penalty)),
     profit: Math.max(0, normalizeNumber(source.profit)),
     profit_percent: Math.max(0, normalizeNumber(source.profit_percent)),
@@ -624,23 +585,8 @@ function profitShareForDraft(draft: FinanceEmployeeDraft) {
   )
 }
 
-// Надбавка выплачивается только после достижения установленного плана.
-function earnedBonusSalaryForDraft(draft: FinanceEmployeeDraft) {
-  const plan = Math.max(0, draft.salary)
-  const profit = Math.max(0, draft.profit)
-
-  return plan > 0 && profit >= plan
-    ? Math.max(0, draft.bonus_salary)
-    : 0
-}
-
-// План — это порог оборота для расчёта процента, а не часть выплаты.
-// Итоговая выплата: заработанная надбавка + сумма с прибыли после авансов и штрафов.
 function payoutForDraft(draft: FinanceEmployeeDraft) {
-  return Math.round(
-    earnedBonusSalaryForDraft(draft)
-    + profitShareForDraft(draft)
-  )
+  return profitShareForDraft(draft)
 }
 
 async function loadRemoteSnapshot(options: { overwrite?: boolean } = {}) {
@@ -675,6 +621,7 @@ const remoteNeedsMigration = computed(() => {
 })
 
 async function saveToRemote() {
+  if (!penaltySettings.value || penaltySettingsError.value) return
   const branchId = branchStore.activeBranchId
 
   if (!branchId) {
@@ -715,6 +662,7 @@ async function refreshAll() {
     refreshFinanceHistory(),
     refreshFinanceServices(),
     refreshVerifix(),
+    refreshPenaltySettings(),
     refreshVerifixSchedules(),
     refreshBranchPayrolls(),
     loadRemoteSnapshot()
@@ -1058,40 +1006,16 @@ const lateTotals = computed(() => {
   return { count, minutes }
 })
 
-// Используем только общий график филиала: персональные смены сотрудников не
-// меняют стоимость минуты опоздания.
-const branchScheduleHours = computed(() => {
-  const durations = (verifixSchedules.value || [])
-    .filter(schedule => schedule.is_active && !schedule.barber_id)
-    .map(schedule => getScheduleDurationHours(schedule.start_time, schedule.end_time))
-    .filter(hours => hours > 0)
-
-  if (!durations.length) {
-    return 0
-  }
-
-  return durations.reduce((sum, hours) => sum + hours, 0) / durations.length
-})
-
 function getEmployeeLate(id: string) {
   return barberLateMap.value.get(String(id || '').trim()) || { count: 0, minutes: 0 }
 }
 
 function penaltyForEmployee(id: string) {
-  const draft = getEmployeeDraft(id)
-  const plan = Math.max(0, draft.salary)
-  const lateMinutes = getEmployeeLate(id).minutes
-  const daysInMonth = getDaysInPeriod(periodKey.value)
-  const scheduleHours = branchScheduleHours.value
-
-  if (!plan || !lateMinutes || !daysInMonth || !scheduleHours) {
-    return 0
-  }
-
-  return Math.round((plan / daysInMonth / scheduleHours / 60) * 4 * lateMinutes)
+  return calculateMinutePenalty(getEmployeeLate(id).minutes, Number(penaltySettings.value?.penalty_per_minute ?? 0))
 }
 
 function syncBarberPenalties() {
+  if (!penaltySettings.value || penaltySettingsError.value) return
   for (const employee of employees.value) {
     const draft = getEmployeeDraft(employee.id)
     const penalty = penaltyForEmployee(employee.id)
@@ -1128,7 +1052,7 @@ watch([
   employees,
   barberLateMap,
   branchSchedulesByDay,
-  branchScheduleHours,
+  penaltySettings,
   periodKey,
   () => payload.value
 ], syncBarberPenalties, { immediate: true })
@@ -1142,7 +1066,6 @@ watch([
 
 const totals = computed(() => {
   let plan = 0
-  let bonusSalary = 0
   let profit = 0
   let advances = 0
   let penalties = 0
@@ -1153,7 +1076,6 @@ const totals = computed(() => {
     const draft = getEmployeeDraft(employee.id)
 
     plan += draft.salary
-    bonusSalary += earnedBonusSalaryForDraft(draft)
     profit += draft.profit
     advances += draft.advances
     const penalty = penaltyForEmployee(employee.id)
@@ -1165,7 +1087,6 @@ const totals = computed(() => {
 
   return {
     advances,
-    bonusSalary,
     commission,
     netProfit: profit - payout,
     payout,
@@ -1191,7 +1112,6 @@ const overviewBranchColumns: TableColumn<FinanceOverviewBranchRow>[] = [
 const columns: TableColumn<FinanceEmployeeRow>[] = [
   { accessorKey: 'name', header: 'Сотрудник' },
   { id: 'salary', header: 'План' },
-  { id: 'bonusSalary', header: 'Надбавка' },
   { id: 'profit', header: 'Val' },
   { id: 'profitPercent', header: 'Процент барбершопа' },
   { id: 'bonusProfitPercent', header: 'Бонусный процент' },
@@ -1206,6 +1126,7 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
 <template>
   <UDashboardPanel id="finance">
     <template #body>
+      <VerifixPenaltySettings />
       <div class="flex flex-wrap items-center justify-between gap-3 pb-4">
         <div class="flex flex-wrap items-center gap-2">
           <UBadge color="neutral" size="lg" variant="soft">
@@ -1218,7 +1139,7 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
 
         <div class="flex flex-wrap items-center gap-2">
           <UInput v-model="period" type="month" size="sm" class="w-[9.5rem]" />
-          <UButton color="primary" icon="i-lucide-save" :loading="saving" @click="saveToRemote">
+          <UButton color="primary" icon="i-lucide-save" :loading="saving" :disabled="!penaltySettings || !!penaltySettingsError" @click="saveToRemote">
             Сохранить
           </UButton>
           <UButton
@@ -1337,14 +1258,6 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
             </div>
             <div class="rounded-2xl border border-charcoal-200 bg-white/70 px-4 py-3">
               <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">
-                Надбавки
-              </p>
-              <p class="mt-2 text-lg font-semibold text-charcoal-950">
-                {{ formatMoney(totals.bonusSalary) }}
-              </p>
-            </div>
-            <div class="rounded-2xl border border-charcoal-200 bg-white/70 px-4 py-3">
-              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-charcoal-500">
                 Val
               </p>
               <p class="mt-2 text-lg font-semibold text-charcoal-950">
@@ -1442,17 +1355,6 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
                   size="sm"
                   class="w-full"
                   @update:model-value="value => updateMoneyDraft(row.id, 'salary', value)"
-                />
-              </label>
-              <label class="space-y-1">
-                <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-charcoal-500">Надбавка</span>
-                <UInput
-                  :model-value="formatMoneyInputValue(getEmployeeDraft(row.id).bonus_salary)"
-                  inputmode="numeric"
-                  type="text"
-                  size="sm"
-                  class="w-full"
-                  @update:model-value="value => updateMoneyDraft(row.id, 'bonus_salary', value)"
                 />
               </label>
               <label class="space-y-1">
@@ -1564,17 +1466,6 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
               />
             </template>
 
-            <template #bonusSalary-cell="{ row }">
-              <UInput
-                :model-value="formatMoneyInputValue(getEmployeeDraft(row.original.id).bonus_salary)"
-                inputmode="numeric"
-                type="text"
-                size="sm"
-                class="w-32"
-                @update:model-value="value => updateMoneyDraft(row.original.id, 'bonus_salary', value)"
-              />
-            </template>
-
             <template #profit-cell="{ row }">
               <div class="space-y-1">
                 <p class="font-semibold text-charcoal-950">
@@ -1628,7 +1519,7 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
                   {{ formatMoney(penaltyForEmployee(row.original.id)) }}
                 </p>
                 <p class="text-xs text-charcoal-500">
-                  {{ verifixSchedulesPending ? 'Загрузка графика' : `${formatCount(branchScheduleHours)} ч/смена` }}
+                  {{ penaltySettings ? `${formatMoney(penaltySettings.penalty_per_minute)} / мин` : 'Ставка не загружена' }}
                 </p>
               </div>
             </template>

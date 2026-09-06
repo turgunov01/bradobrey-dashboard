@@ -164,21 +164,21 @@ function assertAdminLoginResponse(data: AdminLoginResponse, fallbackLogin: strin
   if (!token) {
     throw createError({
       statusCode: 502,
-      statusMessage: 'Admin login did not return token.'
+      message: 'Admin login did not return token.'
     })
   }
 
   if (!rawUser || !normalizeText(rawUser.id)) {
     throw createError({
       statusCode: 502,
-      statusMessage: 'Admin login did not return user id.'
+      message: 'Admin login did not return user id.'
     })
   }
 
   if (!adminRoles.has(role)) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Admin dashboard login is allowed only for backend dashboard roles.'
+      message: 'Admin dashboard login is allowed only for backend dashboard roles.'
     })
   }
 
@@ -195,14 +195,14 @@ function assertBackendLoginResponse(data: LegacyLoginResponse) {
   if (!token) {
     throw createError({
       statusCode: 502,
-      statusMessage: 'Backend login did not return token.'
+      message: 'Backend login did not return token.'
     })
   }
 
   if (!rawUser || !normalizeText(rawUser.id)) {
     throw createError({
       statusCode: 502,
-      statusMessage: 'Backend login did not return user id.'
+      message: 'Backend login did not return user id.'
     })
   }
 
@@ -319,7 +319,7 @@ async function loginBackend(event: H3Event, payload: LoginPayload): Promise<Logi
   if (!dashboardLoginRoles.has(role)) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Dashboard login is allowed only for backend dashboard roles.'
+      message: 'Dashboard login is allowed only for backend dashboard roles.'
     })
   }
 

@@ -47,6 +47,19 @@ export function useVerifixApi() {
   const client = useApiClient()
 
   return {
+    settings() {
+      return client.request<{ penalty_per_minute: number }>('/api/verifix/settings', { query: { __skipBranchScope: true } })
+    },
+    updateSettings(penalty_per_minute: number) {
+      return client.request<{ penalty_per_minute: number }>('/api/verifix/settings', {
+        method: 'PATCH', body: { penalty_per_minute }, successMessage: 'Ставка штрафа сохранена'
+      })
+    },
+    bulkSchedules(payload: { branch_ids: string[], start_time: string, end_time: string, grace_minutes: number }) {
+      return client.request('/api/verifix/schedules/bulk', {
+        method: 'POST', body: payload, successMessage: 'График на все дни недели сохранён'
+      })
+    },
     events(query: VerifixEventsQuery = {}, options: { silent?: boolean } = {}) {
       return client.request<VerifixEventsResponse>('/api/verifix/events', {
         query: { __skipBranchScope: true, ...query },

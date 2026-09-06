@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   if (!response) {
     throw createError({
       statusCode: 502,
-      statusMessage: 'Пустой ответ от бэкенда.'
+      message: 'Пустой ответ от бэкенда.'
     })
   }
 

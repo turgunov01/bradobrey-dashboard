@@ -71,6 +71,10 @@ function getUpstreamErrorMessage(error: any, method: BackendMethod, path: string
     return data.message
   }
 
+  if (data && typeof data === 'object' && typeof data.error === 'string') {
+    return data.error
+  }
+
   if (isHtmlResponse(data)) {
     return `Upstream API returned ${statusCode}${statusText ? ` ${statusText}` : ''} for ${method} ${path}.`
   }
@@ -120,7 +124,7 @@ export async function backendRequest<T>(event: H3Event, options: BackendRequestO
   if (authMode === 'required' && !token && !hasAuthorizationHeader) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Требуется сессия барбера.'
+      message: 'Требуется сессия барбера.'
     })
   }
 
@@ -144,11 +148,7 @@ export async function backendRequest<T>(event: H3Event, options: BackendRequestO
   }
   catch (error: any) {
     const statusCode = error?.response?.status || 500
-    const statusMessage = error?.response?._data?.message || error?.message || 'Ошибка запроса к бэкенду.'
-
-    const message = isHtmlResponse(error?.response?._data)
-      ? getUpstreamErrorMessage(error, method, options.path)
-      : statusMessage
+    const message = getUpstreamErrorMessage(error, method, options.path)
 
     throw createError({
       data: isHtmlResponse(error?.response?._data) ? undefined : error?.response?._data,

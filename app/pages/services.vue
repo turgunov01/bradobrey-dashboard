@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useStorage } from '@vueuse/core'
 import { serviceFormSchema, type ServiceCategory, type ServiceFormPayload } from '~~/shared/schemas'
 import { formatMoney } from '~/utils/format'
 import { flattenServicesPayload } from '~/utils/services'
@@ -21,6 +20,7 @@ type ServiceRow = {
   image: string | null
   is_active: boolean
   name: string
+  sort_order: number | null
 }
 
 type Bucket = {
@@ -54,11 +54,8 @@ const previewOpen = ref(false)
 const previewSrc = ref('')
 const previewTitle = ref('')
 
-const sortDirection = ref<'asc' | 'desc'>('asc')
-const orderStorage = useStorage<Record<string, string[]>>('services-order', {}, undefined, {
-  deep: true,
-  listenToStorageChanges: false
-})
+const sortDirection = ref<'saved' | 'asc' | 'desc'>('saved')
+const savingOrder = ref(false)
 const buckets = ref<Bucket[]>([])
 const ready = ref(false)
 
@@ -104,7 +101,8 @@ const serviceRows = computed<ServiceRow[]>(() =>
     id: String(service.id ?? `service-${index}`),
     image: service.image ? String(service.image).trim() : null,
     is_active: Boolean(service.is_active ?? true),
-    name: service.name?.trim() || 'Услуга без названия'
+    name: service.name?.trim() || 'Услуга без названия',
+    sort_order: service.sort_order == null ? null : Number(service.sort_order)
   }))
 )
 
@@ -177,31 +175,15 @@ function resolveServiceImageUrl(value: unknown) {
   return resolveApiMediaUrl(value, config.public.apiBase)
 }
 
-function applySortAndOrder(list: ServiceRow[], category: string, preferredOrder?: string[]) {
-  const ordered = [...list].sort((a, b) =>
-    sortDirection.value === 'asc'
+function applySortAndOrder(list: ServiceRow[], _category: string) {
+  return [...list].sort((a, b) => {
+    if (sortDirection.value === 'saved') {
+      return (a.sort_order ?? Number.MAX_SAFE_INTEGER) - (b.sort_order ?? Number.MAX_SAFE_INTEGER)
+    }
+    return sortDirection.value === 'asc'
       ? a.name.localeCompare(b.name, 'ru')
       : b.name.localeCompare(a.name, 'ru')
-  )
-
-  const saved = preferredOrder && preferredOrder.length
-    ? preferredOrder
-    : orderStorage.value?.[category]
-  if (saved?.length) {
-    const indexMap = new Map(saved.map((id, idx) => [id, idx]))
-    ordered.sort((a, b) => {
-      const ai = indexMap.get(a.id)
-      const bi = indexMap.get(b.id)
-      if (ai !== undefined && bi !== undefined) return ai - bi
-      if (ai !== undefined) return -1
-      if (bi !== undefined) return 1
-      return sortDirection.value === 'asc'
-        ? a.name.localeCompare(b.name, 'ru')
-        : b.name.localeCompare(a.name, 'ru')
-    })
-  }
-
-  return ordered
+  })
 }
 
 function syncBuckets(rows: ServiceRow[]) {
@@ -221,11 +203,7 @@ function syncBuckets(rows: ServiceRow[]) {
   const next: Bucket[] = []
 
   for (const name of names) {
-    const existing = buckets.value.find(b => b.name === name)
-    const preferredOrder = ready.value
-      ? (existing?.items.map(i => i.id) || orderStorage.value?.[name] || [])
-      : (existing?.items.map(i => i.id) || [])
-    const items = applySortAndOrder(map.get(name) || [], name, preferredOrder)
+    const items = applySortAndOrder(map.get(name) || [], name)
     if (items.length || orderedCategoryNames.includes(name)) {
       next.push({ name, items })
     }
@@ -234,58 +212,37 @@ function syncBuckets(rows: ServiceRow[]) {
   buckets.value = next
 }
 
-function saveOrder(category: string) {
-  const bucket = buckets.value.find(b => b.name === category)
-  if (!bucket) return
-
-  orderStorage.value = {
-    ...(orderStorage.value || {}),
-    [category]: bucket.items.map(item => item.id)
+async function persistAllOrders() {
+  if (savingOrder.value) return
+  savingOrder.value = true
+  const items = buckets.value.flatMap(bucket => bucket.items.map((item, index) => ({
+    id: item.id,
+    category: bucket.name === 'Без категории' ? null : bucket.name,
+    sort_order: index
+  })))
+  try {
+    await servicesApi.reorder(items)
+    for (const bucket of buckets.value) {
+      bucket.items.forEach((item, index) => { item.sort_order = index })
+    }
+    sortDirection.value = 'saved'
+    await refresh()
+  } catch (error) {
+    console.error('Failed to save service order', error)
+  } finally {
+    savingOrder.value = false
   }
 }
 
-function persistAllOrders() {
-  for (const bucket of buckets.value) {
-    orderStorage.value = {
-      ...(orderStorage.value || {}),
-      [bucket.name]: bucket.items.map(item => item.id)
-    }
-  }
-  apiClient.notifySuccess('Порядок услуг сохранён')
+function moveService(bucket: Bucket, index: number, direction: -1 | 1) {
+  const target = index + direction
+  if (savingOrder.value || pending.value || target < 0 || target >= bucket.items.length) return
+  const [item] = bucket.items.splice(index, 1)
+  if (item) bucket.items.splice(target, 0, item)
 }
 
-async function onDragChange(category: string, evt: any) {
-  if (evt.added?.element) {
-    evt.added.element.category = category
-  }
-  if (evt.moved?.element) {
-    evt.moved.element.category = category
-  }
-
-  saveOrder(category)
-
-  const fromCategory = evt?.from?.dataset?.category
-  if (fromCategory && fromCategory !== category) {
-    saveOrder(fromCategory)
-  }
-
-  const element = evt.added?.element ?? evt.moved?.element
-  const source = fromCategory || category
-  if (element && source !== category) {
-    try {
-      await servicesApi.update(element.id, {
-        category_name: category,
-        name: element.name,
-        price: element.base_price,
-        duration: element.duration_minutes,
-        image: element.image || undefined,
-        is_active: element.is_active
-      })
-    } catch (error) {
-      console.error('Failed to update category', error)
-      apiClient.notifyError(new Error('Не удалось сохранить новую категорию'))
-    }
-  }
+function onDragChange(category: string, evt: any) {
+  if (evt.added?.element) evt.added.element.category = category
 }
 
 watch(serviceModalOpen, (open) => {
@@ -439,13 +396,15 @@ function openPreview(src: string, title: string) {
         <div class="flex items-center gap-2">
           <USelect
             v-model="sortDirection"
+            :disabled="savingOrder"
             :items="[
+              { label: 'Сохранённый порядок', value: 'saved' },
               { label: 'A → Я', value: 'asc' },
               { label: 'Я → A', value: 'desc' }
             ]"
             size="sm"
           />
-          <UButton color="success" icon="i-lucide-save" variant="solid" @click="persistAllOrders">
+          <UButton color="success" icon="i-lucide-save" variant="solid" :loading="savingOrder" :disabled="pending || categoriesPending || !totalServices" @click="persistAllOrders">
             Сохранить порядок услуг
           </UButton>
           <UButton color="neutral" icon="i-lucide-folder" variant="outline" to="/service-categories">
@@ -459,6 +418,10 @@ function openPreview(src: string, title: string) {
           </UButton>
         </div>
       </div>
+
+      <p class="pb-4 text-sm text-charcoal-500">
+        Меняйте порядок стрелками или перетаскивайте услуги. Нажмите «Сохранить порядок услуг» — киоск получит его при следующей загрузке списка.
+      </p>
 
       <div v-if="!categoriesPending && (categoriesError || !canCreateService)" class="pb-4">
         <UAlert
@@ -488,6 +451,7 @@ function openPreview(src: string, title: string) {
             <ClientOnly>
               <Draggable
                 v-model="bucket.items"
+                :disabled="savingOrder || pending"
                 :group="{ name: 'services', pull: true, put: true }"
                 item-key="id"
                 handle=".drag-handle"
@@ -496,11 +460,11 @@ function openPreview(src: string, title: string) {
                 :data-category="bucket.name"
                 @change="onDragChange(bucket.name, $event)"
               >
-                <template #item="{ element }">
+                <template #item="{ element, index }">
                   <div class="rounded-xl border border-charcoal-200 bg-white shadow-sm transition hover:-translate-y-[1px] hover:shadow-md">
                     <div class="flex items-start justify-between gap-3 p-3">
                       <div class="space-y-1">
-                        <p class="font-semibold text-charcoal-950">{{ element.name }}</p>
+                        <p class="font-semibold text-charcoal-950">{{ index + 1 }}. {{ element.name }}</p>
                         <p class="text-xs text-charcoal-500">
                           {{ element.duration_minutes }} мин · {{ formatMoney(element.base_price) }}
                         </p>
@@ -508,6 +472,25 @@ function openPreview(src: string, title: string) {
                       </div>
                       <div class="flex items-center gap-1">
                         <UButton
+                          icon="i-lucide-arrow-up"
+                          aria-label="Переместить услугу выше"
+                          title="Выше"
+                          variant="ghost"
+                          size="xs"
+                          :disabled="index === 0 || savingOrder || pending"
+                          @click.stop="moveService(bucket, index, -1)"
+                        />
+                        <UButton
+                          icon="i-lucide-arrow-down"
+                          aria-label="Переместить услугу ниже"
+                          title="Ниже"
+                          variant="ghost"
+                          size="xs"
+                          :disabled="index === bucket.items.length - 1 || savingOrder || pending"
+                          @click.stop="moveService(bucket, index, 1)"
+                        />
+                        <UButton
+                          aria-label="Перетащить услугу"
                           icon="i-lucide-grip-vertical"
                           variant="ghost"
                           size="xs"

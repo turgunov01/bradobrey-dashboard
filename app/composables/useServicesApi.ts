@@ -13,6 +13,11 @@ export function useServicesApi() {
   })
 
   return {
+    reorder(items: { id: string, category: string | null, sort_order: number }[]) {
+      return client.request('/api/services/reorder', {
+        body: { items }, method: 'PATCH', successMessage: 'Порядок услуг сохранён'
+      })
+    },
     create(payload: ServiceFormPayload | FormData) {
       const body = payload instanceof FormData ? payload : mapPayload(payload)
       return client.request('/api/services', { body, method: 'POST', successMessage: 'Услуга создана' })

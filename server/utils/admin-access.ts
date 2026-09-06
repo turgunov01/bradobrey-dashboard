@@ -31,7 +31,7 @@ function requireAccessUser(accessUser: AccessUser | null) {
   if (!accessUser) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Для доступа к панели требуется пользователь backend API.'
+      message: 'Для доступа к панели требуется пользователь backend API.'
     })
   }
 
@@ -44,7 +44,7 @@ export function assertAdminNetworkRole(accessUser: AccessUser) {
   if (!role || (operationalBarberRoles as readonly string[]).includes(role)) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Доступ в админку запрещён для барберов.'
+      message: 'Доступ в админку запрещён для барберов.'
     })
   }
 

@@ -11,7 +11,7 @@ function assertNotMerchant(accessUser: { marketplaceBarbershopId?: unknown, mark
   if (barbershopId || role === 'merchant' || role === 'partner') {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Доступ в админ-панель запрещён для мерчантов.'
+      message: 'Доступ в админ-панель запрещён для мерчантов.'
     })
   }
 

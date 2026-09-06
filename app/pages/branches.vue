@@ -164,6 +164,38 @@ const filteredRows = computed(() => {
 const modalTitle = computed(() => form.id ? 'Редактировать филиал' : 'Создать филиал')
 const modalDescription = computed(() => form.id ? 'Обновите параметры филиала и сохраните изменения.' : 'Заполните данные, чтобы добавить новый филиал.')
 
+const bulkScheduleOpen = ref(false)
+const bulkScheduleSubmitting = ref(false)
+const bulkScheduleForm = reactive({ start_time: '10:00', end_time: '20:00', grace_minutes: 0 })
+const allScheduleBranches = computed(() => branchRows.value.filter(branch => !branch.marketplace_barbershop_id))
+async function saveBulkSchedule() {
+  if (bulkScheduleSubmitting.value) return
+  bulkScheduleSubmitting.value = true
+  try {
+    await verifixApi.bulkSchedules({
+      branch_ids: allScheduleBranches.value.map(branch => branch.id),
+      ...bulkScheduleForm
+    })
+    bulkScheduleOpen.value = false
+    if (scheduleOpen.value) await refreshSchedules()
+  } catch { /* The API client displays the error. */ }
+  finally { bulkScheduleSubmitting.value = false }
+}
+async function applyScheduleToWeek() {
+  if (!scheduleBranch.value || scheduleSubmitting.value) return
+  scheduleSubmitting.value = true
+  try {
+    await verifixApi.bulkSchedules({
+      branch_ids: [scheduleBranch.value.id],
+      start_time: scheduleForm.start_time, end_time: scheduleForm.end_time,
+      grace_minutes: scheduleForm.grace_minutes
+    })
+    resetScheduleForm()
+    await refreshSchedules()
+  } catch { /* The API client displays the error. */ }
+  finally { scheduleSubmitting.value = false }
+}
+
 const scheduleOpen = ref(false)
 const schedulesPending = ref(false)
 const scheduleSubmitting = ref(false)
@@ -222,7 +254,7 @@ async function refreshSchedules() {
   schedulesPending.value = true
   try {
     const response = await verifixApi.schedules({ branch_id: branch.id })
-    verifixSchedules.value = Array.isArray(response?.items) ? response.items : []
+    verifixSchedules.value = Array.isArray(response?.items) ? response.items.filter(schedule => schedule.is_active) : []
   }
   finally {
     schedulesPending.value = false
@@ -422,6 +454,7 @@ async function removeBranch(row: BranchRow) {
         </template>
 
         <template #right>
+          <UButton icon="i-lucide-calendar-days" :disabled="pending || !allScheduleBranches.length" @click="bulkScheduleOpen = true">Время для всех филиалов</UButton>
           <UButton color="neutral" icon="i-lucide-refresh-cw" :loading="pending" variant="outline" @click="refresh()">
             Обновить
           </UButton>
@@ -586,6 +619,21 @@ async function removeBranch(row: BranchRow) {
         </template>
       </UModal>
 
+      <UModal v-model:open="bulkScheduleOpen" title="Время работы для всех филиалов" description="Одинаковое время с понедельника по воскресенье.">
+        <template #body>
+          <div class="space-y-4">
+            <p class="text-sm text-charcoal-600">Будет заменён общий график {{ allScheduleBranches.length }} филиалов на все 7 дней. Персональные смены сотрудников сохраняются.</p>
+            <div class="flex flex-wrap gap-2"><UBadge v-for="branch in allScheduleBranches" :key="branch.id" color="neutral">{{ branch.name }}</UBadge></div>
+            <UFormField label="Начало работы"><UInput v-model="bulkScheduleForm.start_time" type="time" :disabled="bulkScheduleSubmitting" /></UFormField>
+            <UFormField label="Конец работы"><UInput v-model="bulkScheduleForm.end_time" type="time" :disabled="bulkScheduleSubmitting" /></UFormField>
+            <UFormField label="Допуск опоздания, минут"><UInput v-model.number="bulkScheduleForm.grace_minutes" type="number" min="0" step="1" :disabled="bulkScheduleSubmitting" /></UFormField>
+          </div>
+        </template>
+        <template #footer>
+          <UButton :loading="bulkScheduleSubmitting" :disabled="!allScheduleBranches.length || !bulkScheduleForm.start_time || !bulkScheduleForm.end_time || bulkScheduleForm.start_time === bulkScheduleForm.end_time || !Number.isInteger(bulkScheduleForm.grace_minutes) || bulkScheduleForm.grace_minutes < 0" @click="saveBulkSchedule">Применить ко всем филиалам на всю неделю</UButton>
+        </template>
+      </UModal>
+
       <UModal
         v-model:open="scheduleOpen"
         class="sm:max-w-3xl"
@@ -617,6 +665,7 @@ async function removeBranch(row: BranchRow) {
             </div>
 
             <div class="flex flex-wrap justify-end gap-3">
+              <UButton v-if="!scheduleForm.barber_id" variant="outline" :disabled="!scheduleForm.start_time || !scheduleForm.end_time" :loading="scheduleSubmitting" @click="applyScheduleToWeek">Применить на все дни недели</UButton>
               <UButton v-if="scheduleEditingId" color="neutral" variant="ghost" :disabled="scheduleSubmitting" @click="resetScheduleForm">
                 Отменить редактирование
               </UButton>

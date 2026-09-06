@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { calculateMinutePenalty } from '~/utils/penalty'
+import { formatMoney } from '~/utils/format'
 import type { TableColumn } from '@nuxt/ui'
 
 import type { VerifixEvent, VerifixSchedule } from '~/composables/useVerifixApi'
@@ -18,6 +20,8 @@ type LateRow = {
 const branchStore = useBranchStore()
 const barbersApi = useBarbersApi()
 const verifixApi = useVerifixApi()
+const { data: penaltySettings, refresh: refreshPenaltySettings } = await useVerifixPenalty()
+const penaltyTotal = computed(() => penaltySettings.value ? calculateMinutePenalty(totalLateMinutes.value, penaltySettings.value.penalty_per_minute) : null)
 
 await branchStore.ensureLoaded()
 
@@ -128,6 +132,10 @@ const { data: verifixData, pending, refresh } = await useAsyncData('verifix-late
   watch: [selectedBranchId, fromDate, toDate]
 })
 
+async function refreshAll() {
+  await Promise.all([refresh(), refreshPenaltySettings()])
+}
+
 const employeeNameMap = computed(() => new Map(
   verifixData.value.employees.map(employee => [String(employee.id), String(employee.name || employee.login || `Сотрудник ${employee.id}`)])
 ))
@@ -213,7 +221,8 @@ const columns: TableColumn<LateRow>[] = [
   { id: 'date', header: 'Дата' },
   { id: 'scheduleStart', header: 'Начало смены' },
   { id: 'loginAt', header: 'Первый вход' },
-  { id: 'lateMinutes', header: 'Опоздание' }
+  { id: 'lateMinutes', header: 'Опоздание' },
+  { id: 'penalty', header: 'Штраф' }
 ]
 </script>
 
@@ -226,7 +235,7 @@ const columns: TableColumn<LateRow>[] = [
             <h1 class="barbershop-heading text-2xl text-charcoal-950 sm:text-3xl">Verifix</h1>
             <p class="mt-2 max-w-2xl text-sm leading-6 text-charcoal-500">Опоздания по первому входу сотрудника относительно графика филиала.</p>
           </div>
-          <UButton class="w-full sm:w-auto" icon="i-lucide-refresh-cw" color="neutral" variant="outline" :loading="pending" @click="() => refresh()">Обновить</UButton>
+          <UButton class="w-full sm:w-auto" icon="i-lucide-refresh-cw" color="neutral" variant="outline" :loading="pending" @click="refreshAll">Обновить</UButton>
         </div>
 
         <UCard class="warm-card rounded-[1.25rem] border border-charcoal-200 bg-white/90" :ui="{ body: 'p-4 sm:p-6' }">
@@ -246,7 +255,10 @@ const columns: TableColumn<LateRow>[] = [
           </div>
         </UCard>
 
-        <div class="grid gap-4 sm:grid-cols-3">
+        <VerifixPenaltySettings />
+
+        <div class="grid gap-4 sm:grid-cols-4">
+          <DashboardMetricCard label="Общая сумма штрафов" icon="i-lucide-coins" :value="penaltyTotal === null ? '—' : formatMoney(penaltyTotal)" />
           <DashboardMetricCard label="Опоздания" icon="i-lucide-circle-alert" :value="String(lateRows.length)" />
           <DashboardMetricCard label="Сотрудники" icon="i-lucide-users" :value="String(lateEmployees)" />
           <DashboardMetricCard label="Всего минут" icon="i-lucide-clock-3" :value="`${totalLateMinutes} мин`" />
@@ -259,6 +271,7 @@ const columns: TableColumn<LateRow>[] = [
             <template #date-cell="{ row }">{{ formatDate(row.original.date) }}</template>
             <template #scheduleStart-cell="{ row }">{{ row.original.scheduleStart }}</template>
             <template #loginAt-cell="{ row }">{{ formatTime(row.original.loginAt) }}</template>
+            <template #penalty-cell="{ row }">{{ penaltySettings ? formatMoney(calculateMinutePenalty(row.original.lateMinutes, penaltySettings.penalty_per_minute)) : '—' }}</template>
             <template #lateMinutes-cell="{ row }"><UBadge color="error" variant="soft">{{ row.original.lateMinutes }} мин</UBadge></template>
           </UTable>
           <div v-if="!pending && !lateRows.length" class="px-6 py-12 text-center text-sm text-charcoal-500">За выбранный период опозданий не найдено.</div>
