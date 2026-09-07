@@ -66,13 +66,12 @@ const queryParams = computed(() => {
 
   return {
     from: from || undefined,
-    limit: 100,
     to: to || undefined
   }
 })
 
 const { data, pending, refresh } = await useAsyncData('merchant-history', async () => {
-  return await merchantApi.history(queryParams.value)
+  return await merchantApi.historyAll(queryParams.value)
 }, { watch: [queryParams] })
 
 const rows = computed<HistoryRow[]>(() => {

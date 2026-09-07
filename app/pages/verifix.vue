@@ -21,7 +21,11 @@ const branchStore = useBranchStore()
 const barbersApi = useBarbersApi()
 const verifixApi = useVerifixApi()
 const { data: penaltySettings, refresh: refreshPenaltySettings } = await useVerifixPenalty()
-const penaltyTotal = computed(() => penaltySettings.value ? calculateMinutePenalty(totalLateMinutes.value, penaltySettings.value.penalty_per_minute) : null)
+const penaltyTotal = computed(() => {
+  if (!penaltySettings.value) return null
+
+  return calculateMinutePenalty(totalLateMinutes.value, penaltySettings.value.penalty_per_minute)
+})
 
 await branchStore.ensureLoaded()
 

@@ -34,7 +34,7 @@ const { data, pending, refresh } = await useAsyncData('overview-dashboard', asyn
     $fetch('/api/health').catch(() => null),
     branchStore.ensureLoaded({ force: true }).catch(() => branchStore.branches),
     promoApi.dashboard({ __skipBranchScope: true }).catch(() => ({ items: [] })),
-    historyApi.list({
+    historyApi.listAll({
       __skipBranchScope: true,
       ...rangeQuery
     }).catch(() => ({ items: [] })),

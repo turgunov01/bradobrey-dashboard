@@ -392,8 +392,8 @@ const { data, pending, refresh } = await useAsyncData('clients-directory', async
   }
 
   const response = branchStore.activeBranchId
-    ? await historyApi.branch(branchStore.activeBranchId, query)
-    : await historyApi.list(query)
+    ? await historyApi.branchAll(branchStore.activeBranchId, query)
+    : await historyApi.listAll(query)
 
   return { items: extractHistoryItems(response) }
 }, {

@@ -189,6 +189,36 @@ export function useMerchantApi() {
       })
     },
 
+    async historyAll(params: { from?: string, to?: string } = {}) {
+      const items: MerchantQueueEntry[] = []
+      const seenIds = new Set<string>()
+      const limit = 100
+      let offset = 0
+      let total: number | null = null
+
+      while (total === null || items.length < total) {
+        const response = await client.request<MerchantListResponse<MerchantQueueEntry>>('/api/merchant/history', {
+          query: { __skipBranchScope: true, ...params, limit, offset }
+        })
+        const pageItems = Array.isArray(response?.items) ? response.items : []
+        const newItems = pageItems.filter((item) => {
+          const id = String(item?.id || '')
+          if (!id) return true
+          if (seenIds.has(id)) return false
+          seenIds.add(id)
+          return true
+        })
+
+        items.push(...newItems)
+        total = Number.isFinite(Number(response?.total)) ? Number(response.total) : null
+
+        if (pageItems.length < limit || !newItems.length) break
+        offset += pageItems.length
+      }
+
+      return { items, total: total ?? items.length }
+    },
+
     barbers(includeInactive = true) {
       return client.request<MerchantListResponse<MerchantBarber>>('/api/merchant/barbers', {
         query: { __skipBranchScope: true, include_inactive: includeInactive }

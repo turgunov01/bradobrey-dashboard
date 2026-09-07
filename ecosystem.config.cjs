@@ -10,9 +10,9 @@ module.exports = {
       max_memory_restart: '512M',
       env: {
         NODE_ENV: 'production',
-        HOST: '127.0.0.1',
+        HOST: '0.0.0.0',
         PORT: '3000',
-        NITRO_HOST: '127.0.0.1',
+        NITRO_HOST: '0.0.0.0',
         NITRO_PORT: '3000',
         NITRO_PRESET: 'node-server',
         NUXT_COOKIE_SECURE: 'true',

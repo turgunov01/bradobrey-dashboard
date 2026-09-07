@@ -315,7 +315,7 @@ export async function useStatisticsAnalytics() {
 
     const branchId = branchStore.activeBranchId || undefined
     const [historyResult, servicesResult, barbersResult] = await Promise.allSettled([
-      historyApi.list(branchId ? { branch_id: branchId } : undefined),
+      historyApi.listAll(branchId ? { branch_id: branchId } : undefined),
       kioskApi.services({ active: true, grouped: true, ...(branchId ? { branch_id: branchId } : {}) }),
       barbersApi.list(branchId ? { branch_id: branchId } : undefined)
     ])

@@ -37,13 +37,6 @@ function extractHistoryItems(response: unknown): HistoryItem[] {
   return []
 }
 
-function extractHistoryCount(response: unknown) {
-  if (!response || typeof response !== 'object') return null
-
-  const count = Number((response as Record<string, unknown>).count)
-  return Number.isFinite(count) && count >= 0 ? count : null
-}
-
 function extractBarberItems(response: unknown): BarberDirectoryItem[] {
   if (Array.isArray(response)) {
     return response as BarberDirectoryItem[]
@@ -549,32 +542,7 @@ const hasActiveFilters = computed(() =>
 )
 
 async function loadAllHistoryPages(query: Record<string, string>) {
-  const limit = 500
-  const items: HistoryItem[] = []
-  const seenIds = new Set<string>()
-  let offset = 0
-  let total: number | null = null
-
-  while (total === null || items.length < total) {
-    const response = await historyApi.list({ ...query, limit, offset })
-    const pageItems = extractHistoryItems(response)
-    const newItems = pageItems.filter((item) => {
-      const id = normalizeText((item as Record<string, any>).id)
-      if (!id || seenIds.has(id)) return false
-      seenIds.add(id)
-      return true
-    })
-
-    items.push(...newItems)
-    total = extractHistoryCount(response)
-
-    // Also protects the UI if it is temporarily connected to an older API that
-    // does not support offset pagination yet.
-    if (pageItems.length < limit || !newItems.length) break
-    offset += pageItems.length
-  }
-
-  return items
+  return historyApi.listAll<HistoryItem>(query)
 }
 
 const { data, pending, refresh } = await useAsyncData('history-current-filter', async () => {

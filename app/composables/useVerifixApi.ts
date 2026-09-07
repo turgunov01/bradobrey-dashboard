@@ -43,16 +43,22 @@ export type VerifixSchedulePayload = {
   start_time: string
 }
 
+export type VerifixPenaltySettings = {
+  penalty_per_minute: number
+}
+
 export function useVerifixApi() {
   const client = useApiClient()
 
   return {
     settings() {
-      return client.request<{ penalty_per_minute: number }>('/api/verifix/settings', { query: { __skipBranchScope: true } })
+      return client.request<VerifixPenaltySettings>('/api/verifix/settings', { query: { __skipBranchScope: true } })
     },
     updateSettings(penalty_per_minute: number) {
-      return client.request<{ penalty_per_minute: number }>('/api/verifix/settings', {
-        method: 'PATCH', body: { penalty_per_minute }, successMessage: 'Ставка штрафа сохранена'
+      return client.request<VerifixPenaltySettings>('/api/verifix/settings', {
+        method: 'PATCH',
+        body: { penalty_per_minute },
+        successMessage: 'Настройки штрафов сохранены'
       })
     },
     bulkSchedules(payload: { branch_ids: string[], start_time: string, end_time: string, grace_minutes: number }) {

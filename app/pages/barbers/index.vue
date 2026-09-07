@@ -610,8 +610,8 @@ const { data: insightsData, pending: insightsPending, refresh: refreshInsights }
 
   const [historyResult, servicesResult, financeResult] = await Promise.allSettled([
     branchId
-      ? historyApi.branch(branchId, range)
-      : historyApi.list(range),
+      ? historyApi.branchAll(branchId, range)
+      : historyApi.listAll(range),
     kioskApi.services({ active: true, grouped: true, ...(branchId ? { branch_id: branchId } : {}) }),
     branchId
       ? financeApi.snapshot({ branch_id: branchId, object_id: branchId, period: currentPeriodKey() }, { silent: true })
@@ -655,8 +655,8 @@ const { data: reportData, pending: reportPending } = await useAsyncData('employe
   }
 
   const response = branchId
-    ? await historyApi.branch(branchId, range)
-    : await historyApi.list(range)
+    ? await historyApi.branchAll(branchId, range)
+    : await historyApi.listAll(range)
 
   const items = extractHistoryItems(response).filter((item) => {
     if (getHistoryBarberId(item) !== employeeId) {

@@ -700,7 +700,7 @@ const {
 } = await useAsyncData('finance-history-profit', async () => {
   const branchId = branchStore.activeBranchId || undefined
   const range = periodRange.value
-  const response = await historyApi.list({
+  const response = await historyApi.listAll({
     ...(branchId ? { branch_id: branchId } : {}),
     end_date: range.end_date,
     from: range.start_date,

@@ -14,7 +14,7 @@ NITRO_PRESET=node-server npm run build
 ## Run
 
 ```bash
-HOST=127.0.0.1 PORT=3000 npm start
+HOST=0.0.0.0 PORT=3000 npm start
 ```
 
 Or with PM2:
