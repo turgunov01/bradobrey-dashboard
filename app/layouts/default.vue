@@ -17,7 +17,7 @@ function closeSidebar() {
 }
 
 const mainLinks = computed(() =>
-  (primaryLinks[0] || []).map(item => ({
+  (primaryLinks.value[0] || []).map(item => ({
     ...item,
     onSelect: closeSidebar
   }))

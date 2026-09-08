@@ -22,10 +22,16 @@ const WAREHOUSE_ASYNC_DATA_KEYS = [
   "warehouse-stocks",
   "warehouse-purchases",
   "warehouse-templates",
+  "expenses-list",
 ] as const;
 
 function isWarehouseMutation(url: string, method: RequestOptions["method"] | undefined) {
   return /^\/api\/warehouse(?:\/|$)/.test(url)
+    && !["GET", "HEAD"].includes((method || "GET").toUpperCase());
+}
+
+function isExpensesMutation(url: string, method: RequestOptions["method"] | undefined) {
+  return /^\/api\/expenses(?:\/|$)/.test(url)
     && !["GET", "HEAD"].includes((method || "GET").toUpperCase());
 }
 
@@ -220,6 +226,10 @@ export function useApiClient() {
       // any successful write so navigation between modules never reuses stale data.
       if (isWarehouseMutation(url, options.method)) {
         refreshWarehouseData();
+      }
+
+      if (isExpensesMutation(url, options.method)) {
+        refreshNuxtData("expenses-list");
       }
 
       return data;

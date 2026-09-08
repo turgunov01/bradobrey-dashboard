@@ -149,6 +149,15 @@ function openItem(item: any) {
         </template>
 
         <template #right>
+          <UButton
+            v-if="['manager', 'super-manager', 'admin'].includes(String(sessionStore.user?.role || '').toLowerCase())"
+            color="neutral"
+            icon="i-lucide-receipt"
+            to="/barbers/expenses"
+            variant="outline"
+          >
+            Расходы
+          </UButton>
           <UBadge
             :color="sessionStore.barber?.is_on_break ? 'warning' : (sessionStore.barber?.is_on_shift ? 'primary' : 'neutral')"
             variant="soft"

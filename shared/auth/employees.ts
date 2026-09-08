@@ -51,6 +51,10 @@ export const employeePermissions = [
   'clients.read',
   'services.read',
   'services.manage',
+  'expenses.read',
+  'expenses.create',
+  'expenses.update',
+  'expenses.delete',
   'promo.manage',
   'certificates.manage'
 ] as const
@@ -143,6 +147,22 @@ export const employeePermissionDefinitions: Record<EmployeePermission, Permissio
     description: 'Создание и редактирование услуг.',
     label: 'Управление услугами'
   },
+  'expenses.read': {
+    description: 'Просмотр расходов филиала.',
+    label: 'Просмотр расходов'
+  },
+  'expenses.create': {
+    description: 'Создание расходов филиала.',
+    label: 'Создание расходов'
+  },
+  'expenses.update': {
+    description: 'Редактирование расходов филиала.',
+    label: 'Редактирование расходов'
+  },
+  'expenses.delete': {
+    description: 'Удаление расходов филиала.',
+    label: 'Удаление расходов'
+  },
   'promo.manage': {
     description: 'Управление промокодами.',
     label: 'Промокоды'
@@ -190,6 +210,10 @@ export const employeePermissionSections: PermissionSection[] = [
     items: [
       'services.read',
       'services.manage',
+      'expenses.read',
+      'expenses.create',
+      'expenses.update',
+      'expenses.delete',
       'promo.manage',
       'certificates.manage'
     ],
@@ -215,7 +239,9 @@ export const employeeRolePermissionPresets: Record<EmployeeRole, EmployeePermiss
     'statistics.read.branch',
     'clients.read',
     'services.read',
-    'services.manage'
+    'services.manage',
+    'expenses.read',
+    'expenses.create'
   ],
   'super-barber': [
     'queue.read',
@@ -237,6 +263,10 @@ export const employeeRolePermissionPresets: Record<EmployeeRole, EmployeePermiss
     'clients.read',
     'services.read',
     'services.manage',
+    'expenses.read',
+    'expenses.create',
+    'expenses.update',
+    'expenses.delete',
     'promo.manage',
     'certificates.manage'
   ]

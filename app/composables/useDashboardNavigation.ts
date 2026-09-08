@@ -1,5 +1,6 @@
 import { useCalculatorModal } from "#imports";
 import type { NavigationMenuItem } from "@nuxt/ui";
+import { employeeRolePermissionPresets, type EmployeePermission } from "~~/shared/auth/employees";
 
 function flattenNavigationItems(
   items: NavigationMenuItem[],
@@ -27,9 +28,10 @@ function toSearchItem(item: NavigationMenuItem) {
 
 export function useDashboardNavigation() {
   const route = useRoute();
+  const sessionStore = useSessionStore();
   const { openCalculator } = useCalculatorModal();
 
-  const primaryLinks = [
+  const rawPrimaryLinks = [
     [
       { icon: "i-lucide-layout-dashboard", label: "Обзор", to: "/" },
       {
@@ -67,6 +69,11 @@ export function useDashboardNavigation() {
                 icon: "i-lucide-folder",
                 label: "Категории",
                 to: "/warehouse/categories",
+              },
+              {
+                icon: "i-lucide-receipt",
+                label: "Расходы",
+                to: "/warehouse/expenses",
               },
             ],
           },
@@ -147,12 +154,40 @@ export function useDashboardNavigation() {
     ],
   ] satisfies NavigationMenuItem[][];
 
+  const canViewExpenses = computed(() => {
+    const role = String(sessionStore.user?.role || '').trim().toLowerCase();
+    const explicit = sessionStore.user?.permissions;
+    const permissions = Array.isArray(explicit) && explicit.length
+      ? explicit as EmployeePermission[]
+      : employeeRolePermissionPresets[role as keyof typeof employeeRolePermissionPresets] || [];
+
+    return permissions.includes('expenses.read');
+  });
+
+  function filterExpenseLinks(items: NavigationMenuItem[]): NavigationMenuItem[] {
+    return items.flatMap((item) => {
+      const source = item as NavigationMenuItem & { children?: NavigationMenuItem[] };
+
+      if (source.to === '/warehouse/expenses' && !canViewExpenses.value) {
+        return [];
+      }
+
+      if (Array.isArray(source.children)) {
+        return [{ ...source, children: filterExpenseLinks(source.children) }];
+      }
+
+      return [item];
+    });
+  }
+
+  const primaryLinks = computed(() => rawPrimaryLinks.map(group => filterExpenseLinks(group)));
+
   const supportLinks = [[]] satisfies NavigationMenuItem[][];
 
   const searchGroups = computed(() => [
     {
       id: "dashboard",
-      items: flattenNavigationItems(primaryLinks.flat())
+      items: flattenNavigationItems(primaryLinks.value.flat())
         .filter((item) => Boolean((item as any).to || (item as any).onSelect))
         .map(toSearchItem),
       label: "Панель",

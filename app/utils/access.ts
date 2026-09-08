@@ -10,6 +10,8 @@ export const routePermissions: Record<string, EmployeePermission[]> = {
   '/statistics': ['statistics.read.self', 'statistics.read.branch', 'statistics.read.global'],
   '/promo-codes': ['promo.manage'],
   '/certificates': ['certificates.manage'],
+  '/warehouse/expenses': ['expenses.read'],
+  '/barbers/expenses': ['expenses.read'],
   '/dashboard/marketplace': ['dashboard.access'],
   '/content': ['dashboard.access'], // локальная страница контента
   '/api-debug': ['dashboard.access'] // дополнительно ограничим ролью в middleware
