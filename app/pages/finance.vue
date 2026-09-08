@@ -11,6 +11,7 @@ type FinanceEmployeeDraft = {
   advances: number
   bonus_profit_percent: number
   penalty: number
+  penalty_override?: boolean
   profit: number
   profit_percent: number
   salary: number
@@ -165,6 +166,20 @@ function getLocalEventDate(value: unknown) {
   const date = new Date(String(value || ''))
 
   return Number.isNaN(date.getTime()) ? null : date
+}
+
+function getVerifixEventDate(event: VerifixEvent) {
+  const source = event as VerifixEvent & Record<string, unknown>
+
+  return getLocalEventDate(
+    source.occurred_at
+    ?? source.occurredAt
+    ?? source.login_at
+    ?? source.loginAt
+    ?? source.created_at
+    ?? source.createdAt
+    ?? source.timestamp
+  )
 }
 
 function getDateKey(date: Date) {
@@ -371,6 +386,7 @@ function normalizeEmployeeDraft(value: unknown): FinanceEmployeeDraft {
     advances: Math.max(0, normalizeNumber(source.advances)),
     bonus_profit_percent: Math.max(0, normalizeNumber(source.bonus_profit_percent)),
     penalty: Math.max(0, normalizeNumber(source.penalty)),
+    penalty_override: source.penalty_override === true,
     profit: Math.max(0, normalizeNumber(source.profit)),
     profit_percent: Math.max(0, normalizeNumber(source.profit_percent)),
     salary: Math.max(0, normalizeNumber(source.salary))
@@ -560,6 +576,22 @@ function parseMoneyInputValue(value: unknown) {
 
 function updateMoneyDraft(id: string, field: FinanceMoneyField, value: unknown) {
   getEmployeeDraft(id)[field] = parseMoneyInputValue(value)
+  dirty.value = true
+}
+
+function updatePenaltyDraft(id: string, value: unknown) {
+  const draft = getEmployeeDraft(id)
+  const amount = Number(value)
+
+  draft.penalty = Number.isFinite(amount) ? Math.max(0, Math.round(amount * 100) / 100) : 0
+  draft.penalty_override = true
+  dirty.value = true
+}
+
+function resetPenaltyDraft(id: string) {
+  const draft = getEmployeeDraft(id)
+  draft.penalty_override = false
+  draft.penalty = calculatedPenaltyForEmployee(id)
   dirty.value = true
 }
 
@@ -929,7 +961,8 @@ const branchSchedulesByDay = computed(() => {
 })
 
 function isLoginEvent(event: VerifixEvent) {
-  const type = String(event.event_type || '').trim().toLowerCase()
+  const source = event as VerifixEvent & Record<string, unknown>
+  const type = String(source.event_type ?? source.eventType ?? '').trim().toLowerCase()
 
   // Older backend records may not have event_type; in that case each record
   // in this endpoint is treated as an entry event.
@@ -954,8 +987,9 @@ const barberLateMap = computed(() => {
       continue
     }
 
-    const barberId = normalizeText(event.barber_id)
-    const occurredAt = getLocalEventDate(event.occurred_at)
+    const source = event as VerifixEvent & Record<string, unknown>
+    const barberId = normalizeText(source.barber_id ?? source.barberId)
+    const occurredAt = getVerifixEventDate(event)
 
     if (!barberId || !occurredAt) {
       continue
@@ -1010,15 +1044,23 @@ function getEmployeeLate(id: string) {
   return barberLateMap.value.get(String(id || '').trim()) || { count: 0, minutes: 0 }
 }
 
-function penaltyForEmployee(id: string) {
+function calculatedPenaltyForEmployee(id: string) {
   return calculateMinutePenalty(getEmployeeLate(id).minutes, Number(penaltySettings.value?.penalty_per_minute ?? 0))
+}
+
+function penaltyForEmployee(id: string) {
+  const draft = payload.value.employees[String(id || '').trim()]
+
+  return draft?.penalty_override ? Math.max(0, normalizeNumber(draft.penalty)) : calculatedPenaltyForEmployee(id)
 }
 
 function syncBarberPenalties() {
   if (!penaltySettings.value || penaltySettingsError.value) return
   for (const employee of employees.value) {
     const draft = getEmployeeDraft(employee.id)
-    const penalty = penaltyForEmployee(employee.id)
+    if (draft.penalty_override) continue
+
+    const penalty = calculatedPenaltyForEmployee(employee.id)
 
     if (draft.penalty !== penalty) {
       draft.penalty = penalty
@@ -1219,8 +1261,20 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
           </div>
         </template>
 
-        <div class="overflow-hidden rounded-[1.25rem] border border-charcoal-200 bg-white/90">
-          <UTable :columns="overviewBranchColumns" :data="overviewBranchRows" :loading="overviewPending || branchPayrollsPending">
+        <div class="overflow-x-auto rounded-[1.25rem] border border-charcoal-200 bg-white/90">
+          <UTable
+            :columns="overviewBranchColumns"
+            :data="overviewBranchRows"
+            :loading="overviewPending || branchPayrollsPending"
+            :ui="{
+              root: 'w-full overflow-auto',
+              base: 'w-full min-w-[44rem]',
+              thead: 'bg-charcoal-50/90',
+              tbody: 'divide-y divide-charcoal-100',
+              th: 'px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.06em] text-charcoal-500 whitespace-nowrap',
+              td: 'px-3 py-4 text-sm text-charcoal-700 align-middle whitespace-nowrap'
+            }"
+          >
             <template #turnover-cell="{ row }">
               <span class="font-semibold text-charcoal-950">
                 {{ formatMoney(row.original.id === branchStore.activeBranchId ? selectedBranchTurnover : row.original.turnover) }}
@@ -1429,7 +1483,7 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
         </div>
 
         <!-- Планшет/десктоп: таблица -->
-        <div class="hidden xl:block max-h-[70vh] overflow-auto rounded-[1.25rem] border border-charcoal-200 bg-white/90">
+        <div class="hidden xl:block max-h-[70vh] overflow-x-auto overflow-y-auto rounded-[1.25rem] border border-charcoal-200 bg-white/90">
           <UTable
             :columns="columns"
             :data="employees"
@@ -1515,12 +1569,26 @@ const columns: TableColumn<FinanceEmployeeRow>[] = [
 
             <template #penalty-cell="{ row }">
               <div class="space-y-1">
-                <p class="font-semibold text-charcoal-950">
-                  {{ formatMoney(penaltyForEmployee(row.original.id)) }}
-                </p>
+                <UInput
+                  :model-value="penaltyForEmployee(row.original.id)"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  size="sm"
+                  class="w-32"
+                  @update:model-value="value => updatePenaltyDraft(row.original.id, value)"
+                />
                 <p class="text-xs text-charcoal-500">
-                  {{ penaltySettings ? `${formatMoney(penaltySettings.penalty_per_minute)} / мин` : 'Ставка не загружена' }}
+                  {{ getEmployeeDraft(row.original.id).penalty_override ? 'Вручную' : (penaltySettings ? `${formatMoney(penaltySettings.penalty_per_minute)} / мин` : 'Ставка не загружена') }}
                 </p>
+                <UButton
+                  v-if="getEmployeeDraft(row.original.id).penalty_override"
+                  size="xs"
+                  color="neutral"
+                  variant="link"
+                  class="px-0"
+                  @click="resetPenaltyDraft(row.original.id)"
+                >Авто</UButton>
               </div>
             </template>
 

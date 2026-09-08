@@ -47,19 +47,36 @@ export type VerifixPenaltySettings = {
   penalty_per_minute: number
 }
 
+function normalizePenaltySettings(value: unknown): VerifixPenaltySettings {
+  const source = value && typeof value === 'object'
+    ? value as Record<string, unknown>
+    : {}
+  const nested = [source.settings, source.data]
+    .find(item => item && typeof item === 'object')
+  const settings = nested && typeof nested === 'object'
+    ? nested as Record<string, unknown>
+    : source
+  const rate = Number(settings.penalty_per_minute)
+
+  return {
+    penalty_per_minute: Number.isFinite(rate) && rate >= 0 ? rate : 0
+  }
+}
+
 export function useVerifixApi() {
   const client = useApiClient()
 
   return {
     settings() {
-      return client.request<VerifixPenaltySettings>('/api/verifix/settings', { query: { __skipBranchScope: true } })
+      return client.request<unknown>('/api/verifix/settings', { query: { __skipBranchScope: true } })
+        .then(normalizePenaltySettings)
     },
     updateSettings(penalty_per_minute: number) {
-      return client.request<VerifixPenaltySettings>('/api/verifix/settings', {
+      return client.request<unknown>('/api/verifix/settings', {
         method: 'PATCH',
         body: { penalty_per_minute },
         successMessage: 'Настройки штрафов сохранены'
-      })
+      }).then(normalizePenaltySettings)
     },
     bulkSchedules(payload: { branch_ids: string[], start_time: string, end_time: string, grace_minutes: number }) {
       return client.request('/api/verifix/schedules/bulk', {

@@ -5,7 +5,11 @@ const { data, pending, error, refresh } = await useVerifixPenalty()
 const api = useVerifixApi()
 const session = useSessionStore()
 
-const canEdit = computed(() => ['admin', 'admin_network'].includes(String(session.user?.role)))
+const canEdit = computed(() => {
+  const role = String(session.user?.role || '').trim().toLowerCase()
+
+  return ['admin', 'admin_network', 'admin_branch'].includes(role)
+})
 const minuteRate = ref('0')
 const saving = ref(false)
 

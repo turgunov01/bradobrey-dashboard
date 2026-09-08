@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { calculateMinutePenalty } from '~/utils/penalty'
 import { formatMoney } from '~/utils/format'
+import { useStorage } from '@vueuse/core'
 import type { TableColumn } from '@nuxt/ui'
 
 import type { VerifixEvent, VerifixSchedule } from '~/composables/useVerifixApi'
@@ -21,11 +22,32 @@ const branchStore = useBranchStore()
 const barbersApi = useBarbersApi()
 const verifixApi = useVerifixApi()
 const { data: penaltySettings, refresh: refreshPenaltySettings } = await useVerifixPenalty()
-const penaltyTotal = computed(() => {
-  if (!penaltySettings.value) return null
+const penaltyOverrides = useStorage<Record<string, number>>('verifix-penalty-overrides', {})
 
-  return calculateMinutePenalty(totalLateMinutes.value, penaltySettings.value.penalty_per_minute)
-})
+function calculatedPenalty(row: LateRow) {
+  return penaltySettings.value
+    ? calculateMinutePenalty(row.lateMinutes, penaltySettings.value.penalty_per_minute)
+    : 0
+}
+
+function penaltyForRow(row: LateRow) {
+  const override = penaltyOverrides.value[row.id]
+
+  return typeof override === 'number' && Number.isFinite(override) && override >= 0
+    ? override
+    : calculatedPenalty(row)
+}
+
+function updatePenaltyOverride(row: LateRow, value: unknown) {
+  const amount = Number(value)
+
+  if (!Number.isFinite(amount) || amount < 0) return
+  penaltyOverrides.value[row.id] = Math.round(amount * 100) / 100
+}
+
+function resetPenaltyOverride(row: LateRow) {
+  delete penaltyOverrides.value[row.id]
+}
 
 await branchStore.ensureLoaded()
 
@@ -200,6 +222,9 @@ const lateRows = computed<LateRow[]>(() => {
 })
 
 const totalLateMinutes = computed(() => lateRows.value.reduce((sum, row) => sum + row.lateMinutes, 0))
+const penaltyTotal = computed(() => penaltySettings.value
+  ? lateRows.value.reduce((sum, row) => row ? sum + penaltyForRow(row) : sum, 0)
+  : null)
 const lateEmployees = computed(() => new Set(lateRows.value.map(row => row.barberId)).size)
 const page = ref(1)
 const pageSize = 20
@@ -275,7 +300,27 @@ const columns: TableColumn<LateRow>[] = [
             <template #date-cell="{ row }">{{ formatDate(row.original.date) }}</template>
             <template #scheduleStart-cell="{ row }">{{ row.original.scheduleStart }}</template>
             <template #loginAt-cell="{ row }">{{ formatTime(row.original.loginAt) }}</template>
-            <template #penalty-cell="{ row }">{{ penaltySettings ? formatMoney(calculateMinutePenalty(row.original.lateMinutes, penaltySettings.penalty_per_minute)) : '—' }}</template>
+            <template #penalty-cell="{ row }">
+              <div class="space-y-1">
+                <UInput
+                  :model-value="penaltyForRow(row.original)"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  size="sm"
+                  class="w-32"
+                  @update:model-value="value => updatePenaltyOverride(row.original, value)"
+                />
+                <UButton
+                  v-if="penaltyOverrides[row.original.id] !== undefined"
+                  size="xs"
+                  color="neutral"
+                  variant="link"
+                  class="px-0"
+                  @click="resetPenaltyOverride(row.original)"
+                >Авто</UButton>
+              </div>
+            </template>
             <template #lateMinutes-cell="{ row }"><UBadge color="error" variant="soft">{{ row.original.lateMinutes }} мин</UBadge></template>
           </UTable>
           <div v-if="!pending && !lateRows.length" class="px-6 py-12 text-center text-sm text-charcoal-500">За выбранный период опозданий не найдено.</div>
