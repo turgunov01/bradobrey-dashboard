@@ -133,7 +133,7 @@ const { data: verifixData, pending, refresh } = await useAsyncData('verifix-late
     : [selectedBranchId.value]
   const results = await Promise.all(branchIds.map(async (branchId) => {
     const [eventsResponse, schedulesResponse, employeesResponse] = await Promise.all([
-      verifixApi.events({ branch_id: branchId, start_date: fromDate.value, end_date: toDate.value, limit: 1000 }, { silent: true }),
+      verifixApi.events({ all: true, branch_id: branchId, start_date: fromDate.value, end_date: toDate.value }, { silent: true }),
       verifixApi.schedules({ branch_id: branchId }),
       barbersApi.list({ branch_id: branchId, mode: 'employees' })
     ])

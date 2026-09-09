@@ -2,7 +2,7 @@ import {
   employeeRolePermissionPresets,
   type EmployeePermission,
   type EmployeeRole
-} from './employees.ts'
+} from './employees'
 
 type QueueAccessUser = {
   role?: unknown

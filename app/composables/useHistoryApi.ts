@@ -5,15 +5,11 @@ export function useHistoryApi() {
     request: (query: Record<string, unknown>) => Promise<unknown>,
     query: Record<string, unknown> = {}
   ): Promise<T[]> {
-    const pageSize = 100
-    const items: unknown[] = []
+    const pageSize = 500
     const seenIds = new Set<string>()
-    let offset = 0
-    let total: number | null = null
+    const items: unknown[] = []
 
-    while (total === null || items.length < total) {
-      const response = await request({ ...query, limit: pageSize, offset })
-      const pageItems = extractItems(response)
+    const addItems = (pageItems: unknown[]) => {
       const newItems = pageItems.filter((item) => {
         const id = item && typeof item === 'object' ? String((item as Record<string, unknown>).id || '') : ''
 
@@ -24,7 +20,29 @@ export function useHistoryApi() {
       })
 
       items.push(...newItems)
-      total = extractTotal(response)
+      return newItems
+    }
+
+    const firstResponse = await request({ ...query, all: true })
+    const firstPageItems = extractItems(firstResponse)
+    addItems(firstPageItems)
+    const firstTotal = extractTotal(firstResponse)
+
+    if (
+      firstPageItems.length === 0
+      || firstPageItems.length < pageSize
+      || (firstTotal !== null && items.length >= firstTotal)
+    ) {
+      return items as T[]
+    }
+
+    let offset = firstPageItems.length
+    const expectedTotal = firstTotal ?? Number.MAX_SAFE_INTEGER
+
+    while (items.length < expectedTotal) {
+      const response = await request({ ...query, limit: pageSize, offset })
+      const pageItems = extractItems(response)
+      const newItems = addItems(pageItems)
 
       if (pageItems.length < pageSize || !newItems.length) break
       offset += pageItems.length

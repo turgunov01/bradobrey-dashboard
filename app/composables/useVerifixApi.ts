@@ -13,6 +13,7 @@ export type VerifixEventsResponse = {
 }
 
 export type VerifixEventsQuery = {
+  all?: boolean
   barber_id?: string | null
   branch_id?: string | null
   end_date?: string

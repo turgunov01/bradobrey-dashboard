@@ -7,6 +7,7 @@ type WarehouseListResponse<T = WarehouseRecord> = {
 function withUnscopedQuery(query?: Record<string, unknown>) {
   return {
     __skipBranchScope: true,
+    all: true,
     ...(query || {})
   }
 }

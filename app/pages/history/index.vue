@@ -403,12 +403,96 @@ const serviceNameMap = computed(() =>
   )
 )
 
-function getServiceNames(item: Record<string, any>) {
-  const ids = Array.isArray(item.service_ids)
-    ? item.service_ids
-    : item.service_id
-      ? [item.service_id]
+const serviceDurationMap = computed(() =>
+  new Map(
+    (servicesData.value || []).map((svc: any) => [
+      String(svc.id),
+      Number(svc.duration_minutes ?? svc.duration ?? 0)
+    ])
+  )
+)
+
+const suspiciousDurationRatio = 0.5
+
+function getServiceIds(item: Record<string, any>) {
+  if (Array.isArray(item.service_ids) && item.service_ids.length) {
+    return item.service_ids.filter(Boolean).map((id: unknown) => String(id))
+  }
+
+  if (item.service_id) {
+    return [String(item.service_id)]
+  }
+
+  const services = Array.isArray(item.services)
+    ? item.services
+    : item.service
+      ? [item.service]
       : []
+
+  return services
+    .map((service: any) => service?.id)
+    .filter(Boolean)
+    .map((id: unknown) => String(id))
+}
+
+function getExpectedServiceMinutes(item: Record<string, any>) {
+  return getServiceIds(item).reduce((total, serviceId) => {
+    return total + (serviceDurationMap.value.get(serviceId) || 0)
+  }, 0)
+}
+
+function getActualServiceMinutes(item: Record<string, any>) {
+  const startedAt = item.started_at || item.startedAt || item.called_at || item.calledAt || item.created_at || item.createdAt
+  const finishedAt = item.finished_at || item.finishedAt || item.completed_at || item.completedAt
+  const start = startedAt ? new Date(startedAt).getTime() : NaN
+  const finish = finishedAt ? new Date(finishedAt).getTime() : NaN
+
+  if (!Number.isFinite(start) || !Number.isFinite(finish) || finish < start) {
+    return null
+  }
+
+  return (finish - start) / 60_000
+}
+
+function isSuspiciousOrder(item: Record<string, any>) {
+  if (normalizeText(item.status)?.toLowerCase() !== 'completed') {
+    return false
+  }
+
+  const expectedMinutes = getExpectedServiceMinutes(item)
+  const actualMinutes = getActualServiceMinutes(item)
+
+  return expectedMinutes > 0
+    && actualMinutes !== null
+    && actualMinutes < expectedMinutes * suspiciousDurationRatio
+}
+
+function suspiciousOrderTitle(item: Record<string, any>) {
+  const expected = getExpectedServiceMinutes(item)
+  const actual = getActualServiceMinutes(item)
+
+  if (!expected || actual === null) {
+    return 'Подозрительный заказ'
+  }
+
+  return `Завершён за ${Math.round(actual)} мин. при норме ${expected} мин. (меньше 50% нормы)`
+}
+
+function formatOrderDuration(item: Record<string, any>) {
+  const actual = getActualServiceMinutes(item)
+  const expected = getExpectedServiceMinutes(item)
+
+  if (actual === null) {
+    return '—'
+  }
+
+  const actualLabel = `${Math.round(actual)} мин.`
+
+  return expected > 0 ? `${actualLabel} / норма ${expected} мин.` : actualLabel
+}
+
+function getServiceNames(item: Record<string, any>) {
+  const ids = getServiceIds(item)
 
   return ids
     .map((id: any) => {
@@ -491,6 +575,7 @@ const columns: TableColumn<any>[] = [
   { accessorKey: 'status', header: 'СТАТУС' },
   { accessorKey: 'payment_method', header: 'ОПЛАТА' },
   { accessorKey: 'amount', header: 'СУММА' },
+  { accessorKey: 'service_duration', header: 'ВРЕМЯ ЗАКАЗА' },
   { accessorKey: 'created_at', header: 'СОЗДАНО' },
   { id: 'actions', header: '' }
 ]
@@ -703,7 +788,11 @@ const rows = computed(() =>
     amount_source: (item as any).amount_source || (item as any).amountSource || null,
     original_amount: (item as any).original_amount ?? (item as any).originalAmount ?? null,
     price_override: (item as any).price_override ?? (item as any).priceOverride ?? null,
-    price_override_reason: (item as any).price_override_reason ?? (item as any).priceOverrideReason ?? null
+    price_override_reason: (item as any).price_override_reason ?? (item as any).priceOverrideReason ?? null,
+    suspicious: isSuspiciousOrder(item),
+    actual_service_minutes: getActualServiceMinutes(item),
+    expected_service_minutes: getExpectedServiceMinutes(item),
+    service_duration: formatOrderDuration(item)
   }))
 )
 
@@ -888,28 +977,31 @@ async function exportHistoryToExcel() {
             td: 'px-4 py-4 text-sm text-charcoal-700 align-middle'
           }">
             <template #client-cell="{ row }">
-              <span class="font-semibold text-charcoal-950">{{ row.original.client }}</span>
+              <span :class="row.original.suspicious ? 'font-semibold text-red-700' : 'font-semibold text-charcoal-950'">{{ row.original.client }}</span>
             </template>
 
             <template #phone-cell="{ row }">
-              <span class="text-sm text-charcoal-700">{{ row.original.phone }}</span>
+              <span :class="row.original.suspicious ? 'text-sm text-red-700' : 'text-sm text-charcoal-700'">{{ row.original.phone }}</span>
             </template>
 
             <template #barber-cell="{ row }">
-              <span class="font-medium text-charcoal-950">{{ row.original.barber }}</span>
+              <span :class="row.original.suspicious ? 'font-medium text-red-700' : 'font-medium text-charcoal-950'">{{ row.original.barber }}</span>
             </template>
 
             <template #status-cell="{ row }">
-              <SharedStatusBadge :label="row.original.status" />
+              <UTooltip v-if="row.original.suspicious" :text="suspiciousOrderTitle(row.original)">
+                <UBadge color="error" variant="soft">Подозрительный</UBadge>
+              </UTooltip>
+              <SharedStatusBadge v-else :label="row.original.status" />
             </template>
 
             <template #payment_method-cell="{ row }">
-              {{ formatPaymentMethod(row.original.payment_method) }}
+              <span :class="row.original.suspicious ? 'text-red-700' : 'text-charcoal-700'">{{ formatPaymentMethod(row.original.payment_method) }}</span>
             </template>
 
             <template #amount-cell="{ row }">
               <div class="space-y-1">
-                <p class="font-semibold text-charcoal-950">
+                <p :class="row.original.suspicious ? 'font-semibold text-red-700' : 'font-semibold text-charcoal-950'">
                   {{ formatMoney(row.original.amount) }}
                 </p>
                 <p v-if="isPriceAdjusted(row.original)" class="text-xs text-amber-700">
@@ -919,7 +1011,13 @@ async function exportHistoryToExcel() {
             </template>
 
             <template #created_at-cell="{ row }">
-              {{ formatDateTime(row.original.created_at) }}
+              <span :class="row.original.suspicious ? 'text-red-700' : 'text-charcoal-700'">{{ formatDateTime(row.original.created_at) }}</span>
+            </template>
+
+            <template #service_duration-cell="{ row }">
+              <span :class="row.original.suspicious ? 'font-semibold text-red-700' : 'text-charcoal-700'">
+                {{ row.original.service_duration }}
+              </span>
             </template>
 
             <template #actions-cell="{ row }">
@@ -1002,6 +1100,10 @@ async function exportHistoryToExcel() {
             </div>
 
             <div class="grid gap-3 sm:grid-cols-2">
+              <div v-if="isSuspiciousOrder(selectedEntry)" class="sm:col-span-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-800">
+                <p class="text-xs font-semibold uppercase tracking-[0.16em]">Подозрительный заказ</p>
+                <p class="mt-1 text-sm">{{ suspiciousOrderTitle(selectedEntry) }}. Проверьте фактическое выполнение услуги.</p>
+              </div>
               <div class="rounded-xl border border-charcoal-200 bg-white/90 px-4 py-3">
                 <p class="text-xs uppercase tracking-[0.16em] text-charcoal-500">Филиал</p>
                 <p class="text-sm font-semibold text-charcoal-950">{{ getVisitBranchName(selectedEntry) }}</p>

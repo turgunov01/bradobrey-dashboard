@@ -4,6 +4,7 @@ import { employeeRolePermissionPresets, type EmployeePermission } from '~~/share
 import { formatMoney } from '~/utils/format'
 
 type Option = { label: string; value: string }
+const ALL_OPTION_VALUE = '__all__'
 type ExpenseRow = {
   id: string
   amount: number
@@ -46,7 +47,21 @@ function extractItems(value: unknown): Record<string, any>[] {
 }
 
 function currentDate() {
-  return new Date().toISOString().slice(0, 10)
+  const date = new Date()
+  const offset = date.getTimezoneOffset() * 60_000
+  return new Date(date.getTime() - offset).toISOString().slice(0, 10)
+}
+
+function dateOnly(value: unknown) {
+  const result = text(value)
+  return result ? result.slice(0, 10) : null
+}
+
+function displayDate(value: unknown) {
+  const result = dateOnly(value)
+  if (!result) return '—'
+  const [year, month, day] = result.split('-')
+  return `${day}.${month}.${year}`
 }
 
 const role = computed(() => String(sessionStore.user?.role || '').trim().toLowerCase())
@@ -62,8 +77,8 @@ const canDelete = computed(() => permissions.value.has('expenses.delete'))
 const canChooseBranch = computed(() => !props.barberMode && ['admin', 'super-manager', 'admin_network'].includes(role.value))
 
 const period = ref('')
-const categoryFilter = ref('')
-const branchFilter = ref('')
+const categoryFilter = ref(ALL_OPTION_VALUE)
+const branchFilter = ref(ALL_OPTION_VALUE)
 const modalOpen = ref(false)
 const editingId = ref<string | null>(null)
 const submitting = ref(false)
@@ -83,9 +98,9 @@ const { data: categoryData } = await useAsyncData('warehouse-categories-options'
 const { data, pending, refresh } = await useAsyncData('expenses-list', () => {
   const query: Record<string, unknown> = {}
   if (period.value) query.period = period.value
-  if (categoryFilter.value) query.category = categoryFilter.value
-  if (canChooseBranch.value && branchFilter.value) query.branch_id = branchFilter.value
-  if (canChooseBranch.value && !branchFilter.value) query.__skipBranchScope = true
+  if (categoryFilter.value !== ALL_OPTION_VALUE) query.category = categoryFilter.value
+  if (canChooseBranch.value && branchFilter.value !== ALL_OPTION_VALUE) query.branch_id = branchFilter.value
+  if (canChooseBranch.value && branchFilter.value === ALL_OPTION_VALUE) query.__skipBranchScope = true
   return expensesApi.list(query)
 }, {
   default: () => ({ items: [] }),
@@ -101,7 +116,7 @@ const categoryOptions = computed<Option[]>(() => {
   return options.length ? options : [{ label: 'Прочее', value: 'Прочее' }]
 })
 const branchOptions = computed<Option[]>(() => [
-  { label: 'Все филиалы', value: '' },
+  { label: 'Все филиалы', value: ALL_OPTION_VALUE },
   ...branchStore.branches.map(branch => ({ label: branch.name || String(branch.id), value: String(branch.id) }))
 ])
 
@@ -116,8 +131,15 @@ const rows = computed<ExpenseRow[]>(() => extractItems(data.value).map((item, in
     branch_id: branchId,
     category: text(item.category || item.category_name || item.categoryName) || 'Прочее',
     comment: text(item.comment || item.description || item.note),
-    created_at: text(item.spent_at || item.date || item.created_at || item.createdAt),
-    created_by: text(item.created_by_name || item.createdByName || item.created_by || item.createdBy),
+    created_at: dateOnly(item.spent_at || item.date || item.created_at || item.createdAt),
+    created_by: text(
+      item.creator?.name
+      || item.creator?.login
+      || item.created_by_name
+      || item.createdByName
+      || item.created_by
+      || item.createdBy
+    ),
     id,
     name: text(item.name || item.title) || 'Расход'
   }
@@ -235,8 +257,21 @@ async function remove(row: ExpenseRow) {
         <UCard class="warm-card">
           <div class="grid gap-3 sm:grid-cols-3">
             <UInput v-model="period" type="month" placeholder="Период" />
-            <USelectMenu v-model="categoryFilter" :items="[{ label: 'Все категории', value: '' }, ...categoryOptions]" value-key="value" />
-            <USelectMenu v-if="canChooseBranch" v-model="branchFilter" :items="branchOptions" value-key="value" />
+            <USelect
+              v-model="categoryFilter"
+              :items="[{ label: 'Все категории', value: ALL_OPTION_VALUE }, ...categoryOptions]"
+              value-key="value"
+              class="w-full"
+              placeholder="Все категории"
+            />
+            <USelect
+              v-if="canChooseBranch"
+              v-model="branchFilter"
+              :items="branchOptions"
+              value-key="value"
+              class="w-full"
+              placeholder="Все филиалы"
+            />
           </div>
         </UCard>
 
@@ -248,7 +283,7 @@ async function remove(row: ExpenseRow) {
               :loading="pending"
               :ui="{ root: 'w-full overflow-auto', base: 'w-full min-w-[72rem]', th: 'whitespace-nowrap', td: 'whitespace-nowrap align-middle' }"
             >
-              <template #created_at-cell="{ row }">{{ row.original.created_at || '—' }}</template>
+              <template #created_at-cell="{ row }">{{ displayDate(row.original.created_at) }}</template>
               <template #amount-cell="{ row }"><span class="font-semibold text-charcoal-950">{{ formatMoney(row.original.amount) }}</span></template>
               <template #comment-cell="{ row }">{{ row.original.comment || '—' }}</template>
               <template #actions-cell="{ row }">
@@ -270,9 +305,9 @@ async function remove(row: ExpenseRow) {
               <UFormField label="Дата" required><UInput v-model="form.spent_at" type="date" /></UFormField>
               <UFormField label="Сумма" required><UInput v-model="form.amount" type="number" min="0.01" step="0.01" /></UFormField>
             </div>
-            <UFormField label="Категория" required><USelectMenu v-model="form.category" :items="categoryOptions" value-key="value" class="w-full" /></UFormField>
+            <UFormField label="Категория" required><USelect v-model="form.category" :items="categoryOptions" value-key="value" class="w-full" placeholder="Выберите категорию" /></UFormField>
             <UFormField label="Название" required><UInput v-model="form.name" placeholder="Например, ремонт оборудования" /></UFormField>
-            <UFormField v-if="canChooseBranch" label="Филиал" required><USelectMenu v-model="form.branch_id" :items="branchOptions.slice(1)" value-key="value" class="w-full" /></UFormField>
+            <UFormField v-if="canChooseBranch" label="Филиал" required><USelect v-model="form.branch_id" :items="branchOptions.slice(1)" value-key="value" class="w-full" placeholder="Выберите филиал" /></UFormField>
             <UFormField label="Комментарий"><UTextarea v-model="form.comment" :rows="3" /></UFormField>
           </div>
         </template>
